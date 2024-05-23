@@ -1,9 +1,15 @@
+import 'package:aria2_client/model/aria2_context.dart';
 import 'package:flutter/material.dart';
-import 'home.dart';
+import 'ui/home.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 
 void main() {
+  initAria2();
   runApp(const MyApp());
+}
+
+void initAria2() {
+  Aria2Context.getInstance().loadLocalConfig();
 }
 
 class MyApp extends StatelessWidget {

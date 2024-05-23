@@ -1,6 +1,6 @@
 import 'package:aria2_client/model/task.dart';
 
-enum Protocol { http, https }
+enum Protocol { http, https, websocket, websocketSecure }
 
 class Aria2 {
   Protocol? protocol;
@@ -8,6 +8,7 @@ class Aria2 {
   int port;
   String? secret;
   String? path;
+  bool isDefault;
 
   Aria2({
     this.protocol = Protocol.http,
@@ -15,6 +16,7 @@ class Aria2 {
     required this.port,
     this.secret,
     this.path = "/jsonrpc",
+    this.isDefault = false
   });
 
   List<Task> tell(TaskStatus status) {
@@ -31,8 +33,8 @@ class Aria2 {
       case TaskStatus.complete:
         return tellComplete();
         break;
-        default:
-          return [];
+      default:
+        return [];
     }
   }
 

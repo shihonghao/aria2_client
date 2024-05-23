@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:aria2_client/model/task.dart';
-import 'package:aria2_client/task_card.dart';
 import 'package:flutter/material.dart';
-import 'package:aria2_client/expandable_fab.dart';
+import 'package:aria2_client/ui/expandable_fab.dart';
+import 'package:aria2_client/ui/task_card.dart';
 
 class DownloadPage extends StatefulWidget {
   const DownloadPage({super.key});
@@ -100,7 +100,6 @@ class _DownloadPageState extends State<DownloadPage> {
                   TaskPage(
                     status: const [TaskStatus.error, TaskStatus.removed],
                   ),
-
                 ]))));
   }
 }
