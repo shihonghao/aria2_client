@@ -1,9 +1,10 @@
-import 'dart:async';
-import 'dart:developer' as developer;
 import 'package:aria2_client/model/task.dart';
-import 'package:flutter/material.dart';
+import 'package:aria2_client/providers/aria2_model.dart';
 import 'package:aria2_client/ui/expandable_fab.dart';
-import 'package:aria2_client/ui/task_card.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../component/task_list_view.dart';
 
 class DownloadPage extends StatefulWidget {
   const DownloadPage({super.key});
@@ -62,7 +63,7 @@ class _DownloadPageState extends State<DownloadPage> {
         body: DefaultTabController(
             length: 5,
             child: Scaffold(
-                appBar: const TabBar(
+                appBar: TabBar(
                     // 多个标签时滚动加载
                     tabAlignment: TabAlignment.center,
                     isScrollable: true,
@@ -76,30 +77,61 @@ class _DownloadPageState extends State<DownloadPage> {
                     indicatorSize: TabBarIndicatorSize.label,
                     // 指示器的权重，即线条高度
                     indicatorWeight: 4.0,
-                    tabs: [
+                    onTap: (index) {
+                      changeTaskSubscribe(context, index);
+                    },
+                    tabs: const [
                       Tab(text: "进行中"),
                       Tab(text: "等待中"),
                       Tab(text: "已暂停"),
                       Tab(text: "已完成"),
-                      Tab(text: "错误/移除")
+                      Tab(text: "错误"),
+                      // Tab(text: "已删除"),
                     ]),
                 // 标签页所对应的页面
                 body: TabBarView(children: [
-                  TaskPage(
-                    status: const [TaskStatus.active],
+                  TaskListView(
+                    status: TaskStatus.active,
                   ),
-                  TaskPage(
-                    status: const [TaskStatus.waiting],
+                  TaskListView(
+                    status: TaskStatus.waiting,
                   ),
-                  TaskPage(
-                    status: const [TaskStatus.paused],
+                  TaskListView(
+                    status: TaskStatus.paused,
                   ),
-                  TaskPage(
-                    status: const [TaskStatus.complete],
+                  TaskListView(
+                    status: TaskStatus.complete,
                   ),
-                  TaskPage(
-                    status: const [TaskStatus.error, TaskStatus.removed],
+                  TaskListView(
+                    status: TaskStatus.error,
                   ),
+                  // TaskPage(
+                  //   status: TaskStatus.removed,
+                  // ),
                 ]))));
+  }
+
+  void changeTaskSubscribe(BuildContext context, int index) {
+    TaskStatus taskStatus = TaskStatus.active;
+    switch (index) {
+      case 0:
+        taskStatus = TaskStatus.active;
+        break;
+      case 1:
+        taskStatus = TaskStatus.waiting;
+        break;
+      case 2:
+        taskStatus = TaskStatus.paused;
+        break;
+      case 3:
+        taskStatus = TaskStatus.complete;
+        break;
+      case 4:
+        taskStatus = TaskStatus.error;
+        break;
+      case 5:
+        taskStatus = TaskStatus.removed;
+    }
+    context.read<Aria2Model>().startTaskTimer(taskStatus);
   }
 }

@@ -21,23 +21,25 @@ class SharedPreferencesUtil {
   }
 
   /// 读取数据
-  static Future<T> getData<T>(String key) async {
+  static Future<T?> getData<T>(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    T res = null as T;
+    T? res ;
     switch (T) {
       case const (String):
-        res = prefs.getString(key) as T;
+        res = prefs.getString(key) == null ? null : prefs.getString(key) as T;
         break;
       case const (int):
-        res = prefs.getInt(key) as T;
+        res = prefs.getInt(key) == null ? null : prefs.getInt(key) as T;
         break;
       case const (bool):
-        res = prefs.getBool(key) as T;
+        res = prefs.getBool(key) == null ? null : prefs.getBool(key) as T;
         break;
       case const (double):
-        res = prefs.getDouble(key) as T;
+        res = prefs.getDouble(key) == null ? null : prefs.getDouble(key) as T;
         break;
+        default:
+          res = null;
     }
     return res;
   }

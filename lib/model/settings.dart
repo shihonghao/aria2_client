@@ -1,0 +1,6 @@
+// class Settings {
+//
+//   String themeMode;
+//
+//
+// }
