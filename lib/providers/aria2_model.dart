@@ -69,6 +69,24 @@ class Aria2Model extends ChangeNotifier {
             secret: "Birthday19",
             protocol: "https",
             isDefault: true)));
+    aria2s.add(Aria2(
+        config: Aria2Config(
+            name: 'hhsmtx1',
+            domain: 'hhsmtx.dynv6.net',
+            port: 441,
+            path: "/aria2/s/jsonrpc",
+            secret: "Birthday19",
+            protocol: "https",
+            isDefault: true)));
+    aria2s.add(Aria2(
+        config: Aria2Config(
+            name: 'hhsmtx2',
+            domain: 'hhsmtx.dynv6.net',
+            port: 441,
+            path: "/aria2/s/jsonrpc",
+            secret: "Birthday19",
+            protocol: "https",
+            isDefault: true)));
   }
 
   void parseConfig(config) {
@@ -106,6 +124,9 @@ class Aria2Model extends ChangeNotifier {
       current = aria2s.firstWhere((element) => element.config.name == name);
       rpcClient.updateServer(current!.config);
       var result = await rpcClient.connect();
+      if (result == false) {
+        return false;
+      }
       var enabledFeatures = result["enabledFeatures"] as List<dynamic>?;
       var version = result["version"];
       var options = await rpcClient.getGlobalOption();

@@ -4,18 +4,18 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import '../../aria2/aria2_constants.dart';
 import '../../aria2/model/aria2_config.dart';
 
-class AddAria2Page extends StatefulWidget {
+class AddPage extends StatefulWidget {
   final Aria2Config config = Aria2Config(name: "");
 
-  AddAria2Page({super.key});
+  AddPage({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _AddAria2PageState();
+    return _AddPageState();
   }
 }
 
-class _AddAria2PageState extends State<AddAria2Page> {
+class _AddPageState extends State<AddPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

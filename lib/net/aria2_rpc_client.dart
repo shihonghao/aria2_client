@@ -7,6 +7,9 @@ class Aria2RpcClient {
   Aria2Config? config;
   Aria2Request? request;
 
+  Aria2RpcClient({this.config})
+      : request = Aria2Request.buildRequest(config?.protocol);
+
   updateServer(Aria2Config config) {
     this.config = config;
     request = Aria2Request.buildRequest(config.protocol);
@@ -18,8 +21,12 @@ class Aria2RpcClient {
     });
   }
 
-  connect() async {
-    return request!.connect(config!);
+  Future<dynamic> connect() async {
+    try {
+      return await request!.connect(config!);
+    } catch (e) {
+      return false;
+    }
   }
 
   getGlobalOption() {
@@ -78,7 +85,7 @@ class Aria2RpcClient {
     List<Task> tasks = List.empty(growable: true);
     results.forEach((element) {
       Task task = Task.fromJson(element);
-      if ( task.status == status){
+      if (task.status == status) {
         tasks.add(task);
       }
     });

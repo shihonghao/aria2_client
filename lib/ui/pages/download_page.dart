@@ -1,6 +1,6 @@
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/providers/aria2_model.dart';
-import 'package:aria2_client/ui/expandable_fab.dart';
+import 'package:aria2_client/ui/component/expandable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
