@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:aria2_client/aria2/model/aria2_global_status.dart';
 import 'package:aria2_client/net/Aria2RpcFactory.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
+import 'package:aria2_client/ui/component/animation/my_scale_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,7 @@ import '../../aria2/model/aria2.dart';
 import '../../providers/aria2_model.dart';
 import '../../timer/my_timer.dart';
 import '../../util/Util.dart';
+import 'animation/my_flip_animation.dart';
 
 class ServerCard extends StatefulWidget {
   ServerCard({super.key, required this.aria2})
@@ -36,19 +38,9 @@ class ServerCard extends StatefulWidget {
 }
 
 class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
-  late AnimationController _animationController;
-
-  // 翻转动画
-  late Animation<double> _rotateAnimation;
-
-  late AnimationStatus _lastStatus = AnimationStatus.dismissed;
-
-  // 定义一个翻转从左往右，为false，如果为true，则从右往左开始翻转
-  bool _flipReversal = false;
-
-  bool _isDisposed = false;
-
   late MyTimer globalStatusTimer;
+
+  final GlobalKey _globalKey = GlobalKey();
 
   Aria2GlobalStatus globalStatus = Aria2GlobalStatus(
       downloadSpeed: 0,
@@ -62,33 +54,12 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
   void initState() {
     checkServerAvailable();
     super.initState();
-    _isDisposed = false;
-    _flipReversal = false;
-    _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
-    //使用弹性曲线
-    _rotateAnimation =
-        CurvedAnimation(parent: _animationController, curve: Curves.linear);
-    _rotateAnimation = Tween(begin: 0.0, end: pi).animate(_rotateAnimation);
-
-    _animationController.addListener(() {
-      if (mounted) {
-        setState(() {});
-      }
-    });
-    _animationController.addStatusListener((status) {
-      if (status == _lastStatus) return;
-      _lastStatus = status;
-    });
-
     globalStatusTimer = MyTimer();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
     super.dispose();
-    _isDisposed = true;
   }
 
   @override
@@ -101,41 +72,19 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
               widget.isCurrent = true;
             }
           }
-          return GestureDetector(
-              onTap: () {
-                cardFlip(_flipReversal);
-              },
-              child: Transform(
-                transform: buildTransform(),
-                alignment: Alignment.center,
-                child: IndexedStack(
-                  sizing: StackFit.expand,
-                  textDirection: TextDirection.rtl,
-                  index: _rotateAnimation.value < pi / 2.0 ? 0 : 1,
-                  children: [
-                    buildOverview(),
-                    buildRealTime(),
-                  ],
-                ),
-              ));
+          return MyFlipAnimation(
+            key: _globalKey,
+            front: buildOverview(),
+            back: buildRealTime(),
+            onTap: () {},
+            beforeForward: () {
+              startGlobalStatusTimer();
+            },
+            beforeReverse: () {
+              stopGlobalStatusTimer();
+            },
+          );
         });
-  }
-
-  // 翻转动画
-  void cardFlip(bool reverse) {
-    if (_isDisposed == true) {
-      return;
-    }
-
-    if (_animationController.isAnimating) return;
-    if (reverse) {
-      stopGlobalStatusTimer();
-      _animationController.reverse();
-    } else {
-      startGlobalStatusTimer();
-      _animationController.forward();
-    }
-    _flipReversal = !_flipReversal;
   }
 
   void checkServerAvailable() {
@@ -154,18 +103,39 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
     });
   }
 
-  Card buildFilterCard(Widget child) {
-    return Card(
-      color: widget.isAvailable ? Colors.green : Colors.red,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(30))),
-      elevation: 5,
-      margin: const EdgeInsets.all(10),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(30)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: child,
+  Widget buildFilterCard(Widget child) {
+    return MyScaleAnimation(
+      onLongPress: () {},
+      supplyPosition: () {
+        final RenderBox card = context.findRenderObject() as RenderBox;
+        final RenderBox overlay =
+            Overlay.of(context).context.findRenderObject() as RenderBox;
+        final RelativeRect position = RelativeRect.fromRect(
+          Rect.fromPoints(
+            card.localToGlobal(
+                const Offset(0,0 ),
+                ancestor: overlay),
+            card.localToGlobal(card.size.bottomRight(Offset.zero),
+                ancestor: overlay),
+          ),
+          Offset.zero & overlay.size,
+        );
+        return position;
+      },
+      child: Card(
+        color: const Color.fromARGB(0, 255, 255, 255),
+        surfaceTintColor: Colors.black,
+        shadowColor: Colors.black,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(30))),
+        elevation: 5,
+        margin: const EdgeInsets.all(10),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(30)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+            child: child,
+          ),
         ),
       ),
     );
@@ -201,57 +171,54 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
   }
 
   Widget buildRealTime() {
-    return Transform(
-        alignment: Alignment.center,
-        transform: Matrix4.identity()..rotateY(pi),
-        child: buildFilterCard(Stack(
-          children: [
-            Positioned(
-                top: 10,
-                right: 80,
-                child: Text(widget.aria2.config.name,
-                    style: const TextStyle(fontSize: 20))),
-            Positioned(
-              child: buildRadialGauge(true),
-              top: 50,
-              left: 20,
-            ),
-            const Positioned(
-              top: 150,
-              left: 40,
-              child: Text("下载速度"),
-            ),
-            Positioned(
-              child: buildRadialGauge(false),
-              top: 50,
-              right: 20,
-            ),
-            const Positioned(
-              top: 150,
-              right: 40,
-              child: Text("上传速度"),
-            ),
-            Positioned(
-              bottom: 40,
-              left: 20,
-              child: Row(
-                children: [
-                  const Text("下载中"),
-                  const SizedBox(width: 10),
-                  Text(globalStatus.numActive.toString()),
-                  const SizedBox(width: 10),
-                  const Text("等待中"),
-                  const SizedBox(width: 10),
-                  Text(globalStatus.numWaiting.toString()),
-                  const SizedBox(width: 10),
-                  const Text("已停止"),
-                  const SizedBox(width: 10),
-                  Text(globalStatus.numStopped.toString()),
-                ],
-              ),
-            ),
-          ],
-        )));
+    return buildFilterCard(Stack(
+      children: [
+        Positioned(
+            top: 10,
+            right: 80,
+            child: Text(widget.aria2.config.name,
+                style: const TextStyle(fontSize: 20))),
+        Positioned(
+          child: buildRadialGauge(true),
+          top: 50,
+          left: 20,
+        ),
+        const Positioned(
+          top: 150,
+          left: 40,
+          child: Text("下载速度"),
+        ),
+        Positioned(
+          child: buildRadialGauge(false),
+          top: 50,
+          right: 20,
+        ),
+        const Positioned(
+          top: 150,
+          right: 40,
+          child: Text("上传速度"),
+        ),
+        Positioned(
+          bottom: 40,
+          left: 20,
+          child: Row(
+            children: [
+              const Text("下载中"),
+              const SizedBox(width: 10),
+              Text(globalStatus.numActive.toString()),
+              const SizedBox(width: 10),
+              const Text("等待中"),
+              const SizedBox(width: 10),
+              Text(globalStatus.numWaiting.toString()),
+              const SizedBox(width: 10),
+              const Text("已停止"),
+              const SizedBox(width: 10),
+              Text(globalStatus.numStopped.toString()),
+            ],
+          ),
+        ),
+      ],
+    ));
   }
 
   buildRadialGauge(bool isDownload) {
@@ -340,11 +307,6 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
         ));
   }
 
-  Matrix4 buildTransform() {
-    final matrix = Matrix4.identity()..rotateY(_rotateAnimation.value);
-    return matrix;
-  }
-
   void startGlobalStatusTimer() {
     globalStatusTimer.reStart(1, null, (timer, value) async {
       // widget.client.getGlobalStatus().then((result) {
@@ -363,5 +325,36 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
 
   void stopGlobalStatusTimer() {
     globalStatusTimer.stop();
+  }
+
+  void openPopupMenu(BuildContext context) {
+    final RenderBox card = context.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        card.localToGlobal(Offset(card.size.width - 20, card.size.height - 20),
+            ancestor: overlay),
+        card.localToGlobal(card.size.bottomRight(Offset.zero),
+            ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    showMenu(context: context, position: position, items: [
+      const PopupMenuItem(
+        value: 1,
+        child: Text('添加服务器'),
+      ),
+      const PopupMenuItem(
+        value: 2,
+        child: Text('设置'),
+      ),
+      const PopupMenuItem(
+        value: 3,
+        child: Text('关于'),
+      ),
+    ]);
   }
 }

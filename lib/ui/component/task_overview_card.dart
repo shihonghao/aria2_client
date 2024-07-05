@@ -110,8 +110,8 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
                                     child: TweenAnimationBuilder(
                                       builder: (ctx, value, cd) {
                                         return CircularProgressIndicator(
-                                          backgroundColor: const Color.fromARGB(
-                                              84, 84, 84, 100),
+                                          backgroundColor: const Color.fromRGBO(
+                                              84, 84, 84, 1.0),
                                           strokeWidth: 3,
                                           valueColor: AlwaysStoppedAnimation(
                                               widget.task.status ==

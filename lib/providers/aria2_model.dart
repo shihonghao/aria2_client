@@ -87,6 +87,33 @@ class Aria2Model extends ChangeNotifier {
             secret: "Birthday19",
             protocol: "https",
             isDefault: true)));
+    aria2s.add(Aria2(
+        config: Aria2Config(
+            name: 'hhsmtx2',
+            domain: 'hhsmtx.dynv6.net',
+            port: 441,
+            path: "/aria2/s/jsonrpc",
+            secret: "Birthday19",
+            protocol: "https",
+            isDefault: true)));
+    aria2s.add(Aria2(
+        config: Aria2Config(
+            name: 'hhsmtx2',
+            domain: 'hhsmtx.dynv6.net',
+            port: 441,
+            path: "/aria2/s/jsonrpc",
+            secret: "Birthday19",
+            protocol: "https",
+            isDefault: true)));
+    aria2s.add(Aria2(
+        config: Aria2Config(
+            name: 'hhsmtx2',
+            domain: 'hhsmtx.dynv6.net',
+            port: 441,
+            path: "/aria2/s/jsonrpc",
+            secret: "Birthday19",
+            protocol: "https",
+            isDefault: true)));
   }
 
   void parseConfig(config) {

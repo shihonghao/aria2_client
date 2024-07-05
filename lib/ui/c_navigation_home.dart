@@ -102,7 +102,7 @@ class _CNavigationHomePageState extends State<CNavigationHomePage> {
           label: e.label, icon: e.icon, activeIcon: e.activeIcon);
     }).toList();
     return Scaffold(
-      appBar: widget.appBar,
+      // appBar: widget.appBar,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor,

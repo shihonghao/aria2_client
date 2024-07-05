@@ -1,15 +1,10 @@
-import 'dart:math';
-
 import 'package:aria2_client/providers/aria2_model.dart';
 import 'package:aria2_client/ui/home.dart';
+import 'package:aria2_client/ui/routes/route.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:developer' as developer;
-import 'package:aria2_client/ui/routes/route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'model/task.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

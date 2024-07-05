@@ -17,23 +17,54 @@ class ServersPage extends StatefulWidget {
 class _ServersPageState extends State<ServersPage> {
   late List<Aria2> aria2s;
 
-
-
   @override
   Widget build(BuildContext context) {
     aria2s = Provider.of<Aria2Model>(context).aria2s;
     return Container(
-      color: Colors.teal,
-      child: GridView.builder(
-          itemCount: aria2s.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1,
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 5),
-          itemBuilder: (context, index) {
-            return ServerCard(aria2: aria2s[index]);
-          }),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color.fromRGBO(40, 95, 245, 1.0),
+            Colors.lightGreenAccent,
+          ],
+        ),
+      ),
+      child: Column(
+        children: [
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 110,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
+                  child: Text(
+                    "服务器",
+                    style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.start,
+                  ),
+                ),
+              ),
+              SizedBox(height: 110, child: Icon(Icons.add))
+            ],
+          ),
+          Expanded(
+            child: GridView.builder(
+                itemCount: aria2s.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1,
+                    crossAxisSpacing: 5,
+                    mainAxisSpacing: 5),
+                itemBuilder: (context, index) {
+                  return ServerCard(aria2: aria2s[index]);
+                }),
+          ),
+        ],
+      ),
     );
   }
 }
