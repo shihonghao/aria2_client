@@ -23,12 +23,6 @@ class ServerCard extends StatefulWidget {
 
   final Aria2 aria2;
 
-  bool isCurrent = false;
-
-  bool isAvailable = false;
-
-  bool isTesting = false;
-
   late Aria2RpcClient client;
 
   @override
@@ -40,7 +34,12 @@ class ServerCard extends StatefulWidget {
 class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
   late MyTimer globalStatusTimer;
 
-  final GlobalKey _globalKey = GlobalKey();
+
+  bool isAvailable = false;
+
+  bool isTesting = false;
+
+  bool isCurrent = false;
 
   Aria2GlobalStatus globalStatus = Aria2GlobalStatus(
       downloadSpeed: 0,
@@ -69,27 +68,29 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
         builder: (context, value, child) {
           if (value != null) {
             if (value.config.name == widget.aria2.config.name) {
-              widget.isCurrent = true;
+              isCurrent = true;
             }
           }
-          return MyFlipAnimation(
-            key: _globalKey,
-            front: buildOverview(),
-            back: buildRealTime(),
-            onTap: () {},
-            beforeForward: () {
-              startGlobalStatusTimer();
-            },
-            beforeReverse: () {
-              stopGlobalStatusTimer();
-            },
-          );
+          return MyScaleAnimation(
+              onLongPress: () {},
+              child: MyFlipAnimation(
+                front: buildOverview(),
+                back: buildRealTime(),
+                onTap: () {},
+                beforeForward: () {
+                  startGlobalStatusTimer();
+                },
+                beforeReverse: () {
+                  stopGlobalStatusTimer();
+                  checkServerAvailable();
+                },
+              ));
         });
   }
 
   void checkServerAvailable() {
     setState(() {
-      widget.isTesting = true;
+      isTesting = true;
     });
     widget.client.connect().then((value) {
       var available = false;
@@ -97,47 +98,29 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
         available = true;
       }
       setState(() {
-        widget.isTesting = false;
-        widget.isAvailable = available;
+        isTesting = false;
+        isAvailable = available;
       });
     });
   }
 
   Widget buildFilterCard(Widget child) {
-    return MyScaleAnimation(
-      onLongPress: () {},
-      supplyPosition: () {
-        final RenderBox card = context.findRenderObject() as RenderBox;
-        final RenderBox overlay =
-            Overlay.of(context).context.findRenderObject() as RenderBox;
-        final RelativeRect position = RelativeRect.fromRect(
-          Rect.fromPoints(
-            card.localToGlobal(
-                const Offset(0,0 ),
-                ancestor: overlay),
-            card.localToGlobal(card.size.bottomRight(Offset.zero),
-                ancestor: overlay),
-          ),
-          Offset.zero & overlay.size,
-        );
-        return position;
-      },
-      child: Card(
-        color: const Color.fromARGB(0, 255, 255, 255),
-        surfaceTintColor: Colors.black,
-        shadowColor: Colors.black,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30))),
-        elevation: 5,
-        margin: const EdgeInsets.all(10),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(30)),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-            child: child,
-          ),
+    return Card(
+      color: const Color.fromARGB(0, 255, 255, 255),
+      surfaceTintColor: Colors.black,
+      shadowColor: Colors.black,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(30))),
+      elevation: 5,
+      margin: const EdgeInsets.all(10),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(30)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+          child: child,
         ),
       ),
+      // ),
     );
   }
 
@@ -152,7 +135,7 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
             child: Text(widget.aria2.config.name,
                 style: const TextStyle(fontSize: 30))),
         Visibility(
-          visible: widget.isTesting,
+          visible: isTesting,
           child: Positioned(
               bottom: 30,
               right: 30,
@@ -160,11 +143,11 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
                   color: Colors.red, size: 50)),
         ),
         Visibility(
-            visible: !widget.isTesting,
+            visible: !isTesting,
             child: Positioned(
                 bottom: 30,
                 right: 30,
-                child: Text(widget.isAvailable ? '在线' : '离线',
+                child: Text(isAvailable ? '在线' : '离线',
                     style: const TextStyle(fontSize: 20)))),
       ],
     ));

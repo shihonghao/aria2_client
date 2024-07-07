@@ -6,14 +6,9 @@ import 'package:flutter/material.dart';
 class MyScaleAnimation extends MyAnimation {
   final Widget child;
   final MyAnimationCallback? onLongPress;
-  final MyAnimationCallback<RelativeRect> supplyPosition;
 
   const MyScaleAnimation(
-      {super.key,
-      super.duration,
-      required this.child,
-      required this.supplyPosition,
-      this.onLongPress});
+      {super.key, super.duration, required this.child, this.onLongPress});
 
   @override
   State<StatefulWidget> createState() {
@@ -37,7 +32,7 @@ class _MyScaleAnimationState
         widget.onLongPress?.call();
         handleAction();
       },
-      child: widget.child
+      child: widget.child,
 
       // Transform(
       //     alignment: Alignment.center,
@@ -67,6 +62,7 @@ class _MyScaleAnimationState
       lastStatus = status;
       if (status == AnimationStatus.forward) {
         // if (tmp == AnimationStatus.forward) {
+        MyClipper clipper = buildClipper();
         entry = OverlayEntry(builder: (context) {
           return FadeTransition(
             opacity: CurvedAnimation(
@@ -80,14 +76,16 @@ class _MyScaleAnimationState
                   });
                 },
                 child: SizedBox.expand(
-                  child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Material(
-                        color: const Color.fromRGBO(0, 0, 0, 0),
-                        child: Stack(children: [
-                          buildChildPosition(),
-                        ]),
-                      )),
+                  child: ClipPath(
+                    clipper: clipper,
+                    child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Material(
+                          color: const Color.fromRGBO(0, 0, 0, 0),
+                          child: Container(
+                          ),
+                        )),
+                  ),
                 )),
           );
         });
@@ -106,13 +104,52 @@ class _MyScaleAnimationState
     }
   }
 
-  buildChildPosition() {
-    RelativeRect position = widget.supplyPosition.call();
-    return Positioned(
-        left: position.left,
-        top: position.top,
-        right: position.right,
-        bottom: position.bottom,
-        child: widget.child);
+  buildClipper() {
+    final RenderBox card = context.findRenderObject() as RenderBox;
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        card.localToGlobal(const Offset(0, 0), ancestor: overlay),
+        card.localToGlobal(card.size.bottomRight(Offset.zero),
+            ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+    return MyClipper(
+        left: position.left + 10 ,
+        top: position.top + 10,
+        right: position.right + 10  ,
+        bottom: position.bottom + 10,
+        radius: const Radius.circular(30));
+  }
+}
+
+class MyClipper extends CustomClipper<Path> {
+  double left;
+  double top;
+  double right;
+  double bottom;
+  Radius radius;
+
+  MyClipper(
+      {required this.left,
+      required this.top,
+      required this.right,
+      required this.bottom,
+      required this.radius});
+
+  @override
+  Path getClip(Size size) {
+    debugPrint("$left, $top, $right, $bottom");
+    return Path()
+      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..addRRect(RRect.fromRectAndRadius(Rect.fromPoints( Offset(left, top), Offset( size.width - right, size.height - bottom)), radius))
+      ..fillType = PathFillType.evenOdd;
+
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    return true;
   }
 }

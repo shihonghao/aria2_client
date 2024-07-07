@@ -1,6 +1,6 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=D:\software\dev-tools\flutter
-FLUTTER_APPLICATION_PATH=D:\documents\workspace\idea\aria2_client
+FLUTTER_ROOT=E:\develop\Dev-Tools\flutter\flutter
+FLUTTER_APPLICATION_PATH=E:\develop\workspace\aria2_client
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0

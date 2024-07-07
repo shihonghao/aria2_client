@@ -63,11 +63,11 @@ class Aria2Model extends ChangeNotifier {
     aria2s.add(Aria2(
         config: Aria2Config(
             name: 'hhsmtx',
-            domain: 'hhsmtx.dynv6.net',
-            port: 441,
-            path: "/aria2/s/jsonrpc",
+            domain: '192.168.2.8',
+            port: 6800,
+            path: "/jsonrpc",
             secret: "Birthday19",
-            protocol: "https",
+            protocol: "http",
             isDefault: true)));
     aria2s.add(Aria2(
         config: Aria2Config(
