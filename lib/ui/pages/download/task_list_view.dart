@@ -1,9 +1,9 @@
-import 'package:aria2_client/ui/component/task_overview_card.dart';
+import 'package:aria2_client/ui/pages/download/task_overview_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/task.dart';
-import '../../providers/aria2_model.dart';
+import '../../../model/task.dart';
+import '../../../providers/aria2_model.dart';
 
 class TaskListView extends StatefulWidget {
   // List<TaskStatus> status;

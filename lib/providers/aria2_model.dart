@@ -53,8 +53,8 @@ class Aria2Model extends ChangeNotifier {
 
   Aria2Model()
       : rpcClient = Aria2RpcClient(),
-        taskTimer = MyTimer(),
-        globalStatusTimer = MyTimer();
+        taskTimer = MyTimer.Empty(),
+        globalStatusTimer = MyTimer.Empty();
 
   init() async {
     aria2s.clear();
@@ -173,7 +173,7 @@ class Aria2Model extends ChangeNotifier {
     if (current == null) {
       return false;
     }
-    taskTimer.reStart(1, status, (timer, value) async {
+    taskTimer.reBuild(1, status, (timer, value) async {
       rpcClient.tell(value!).then((tasks) {
         updateTask(tasks, value!);
       });
@@ -185,7 +185,7 @@ class Aria2Model extends ChangeNotifier {
     if (current == null) {
       return false;
     }
-    globalStatusTimer.reStart(1, null, (timer, value) async {
+    globalStatusTimer.reBuild(1, null, (timer, value) async {
       rpcClient.getGlobalStatus().then((result) {
         globalStatus = Aria2GlobalStatus.fromJson(result);
       });

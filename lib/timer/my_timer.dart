@@ -3,27 +3,40 @@ import 'dart:async';
 class MyTimer<T> {
   Timer? timer;
 
-  int? savedSecond;
+  int savedSecond;
 
   T? savedValue;
 
-  Function(Timer timer, T? value)? savedCallback;
+  Function(Timer timer, T? value) savedCallback;
+
+  MyTimer(
+      {required this.savedCallback,
+      required this.savedSecond,
+      this.savedValue});
+
+  static MyTimer Empty() {
+    return MyTimer(savedCallback: (_, __) {}, savedSecond: 0);
+  }
 
   pause() {
-      timer?.cancel();
+    timer?.cancel();
   }
 
   bool resume() {
-    if ( savedCallback != null && savedSecond != null){
-      timer = Timer.periodic(Duration(seconds: savedSecond!), (timer) {
-        savedCallback?.call(timer, savedValue);
-      });
-      return true;
-    }
-    return false;
+    timer = Timer.periodic(Duration(seconds: savedSecond), (timer) {
+      savedCallback.call(timer, savedValue);
+    });
+    return true;
   }
 
-  reStart(int seconds,T? value, Function(Timer timer, T ? value) callback) {
+  restart() {
+    stop();
+    timer = Timer.periodic(Duration(seconds: savedSecond), (timer) {
+      savedCallback(timer, savedValue);
+    });
+  }
+
+  reBuild(int seconds, T? value, Function(Timer timer, T? value) callback) {
     stop();
     savedValue = value;
     timer = Timer.periodic(Duration(seconds: seconds), (timer) {
@@ -31,13 +44,10 @@ class MyTimer<T> {
     });
     savedSecond = seconds;
     savedCallback = callback;
+    resume();
   }
 
   stop() {
     timer?.cancel();
-    savedCallback = null;
-    savedSecond = null;
-    savedValue = null;
   }
 }
-

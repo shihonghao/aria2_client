@@ -1,6 +1,6 @@
 import 'package:aria2_client/ui/c_navigation_home.dart';
-import 'package:aria2_client/ui/pages/download_page.dart';
-import 'package:aria2_client/ui/pages/servers_page.dart';
+import 'package:aria2_client/ui/pages/download/download_page.dart';
+import 'package:aria2_client/ui/pages/servers/servers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 

@@ -4,7 +4,7 @@ import 'package:aria2_client/ui/component/expandable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../component/task_list_view.dart';
+import 'task_list_view.dart';
 
 class DownloadPage extends StatefulWidget {
   const DownloadPage({super.key});

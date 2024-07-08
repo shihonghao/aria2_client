@@ -2,8 +2,8 @@ import 'package:aria2_client/providers/aria2_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../aria2/model/aria2.dart';
-import '../component/server_card.dart';
+import '../../../aria2/model/aria2.dart';
+import 'server_card.dart';
 
 class ServersPage extends StatefulWidget {
   const ServersPage({super.key});
@@ -60,7 +60,7 @@ class _ServersPageState extends State<ServersPage> {
                     crossAxisSpacing: 5,
                     mainAxisSpacing: 5),
                 itemBuilder: (context, index) {
-                  return ServerCard(aria2: aria2s[index]);
+                  return ServerCard(aria2: aria2s[index],index: index,);
                 }),
           ),
         ],

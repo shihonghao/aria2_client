@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../model/task.dart';
+import '../../../model/task.dart';
 
 class TaskDetailCard extends StatefulWidget {
   TaskDetailCard({super.key, required this.task});
