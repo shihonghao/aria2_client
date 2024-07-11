@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import '../aria2/aria2_constants.dart';
 import '../aria2/model/aria2_config.dart';
+import '../util/Util.dart';
 import 'aria2_request.dart';
 
 class Aria2HttpRequest extends Aria2Request {
@@ -22,7 +24,8 @@ class Aria2HttpRequest extends Aria2Request {
       'jsonrpc': '2.0',
       'method': method,
       'params': args,
-      'id': generateId(), // Unique identifier for the request
+      'id': Util.generateId(Aria2Constants.APP_PREFIX),
+      // Unique identifier for the request
     });
     try {
       final response =

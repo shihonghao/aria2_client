@@ -26,18 +26,18 @@ class _ServersPageState extends State<ServersPage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color.fromRGBO(40, 95, 245, 1.0),
-            Colors.lightGreenAccent,
+            Color.fromRGBO(30, 41, 75, 0.5019607843137255),
+            Color.fromRGBO(45, 42, 42, 1.0),
           ],
         ),
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 110,
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
@@ -48,7 +48,25 @@ class _ServersPageState extends State<ServersPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 110, child: Icon(Icons.add))
+              SizedBox(
+                height: 110,
+                width: 110,
+                child: Padding(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.blue.withOpacity(0),
+                          foregroundColor: Colors.greenAccent,
+                          elevation: 0,
+                          shape: const CircleBorder(),
+                          side: BorderSide.none),
+                      child: const Icon(
+                        Icons.add_circle_outline_outlined,
+                        size: 50,
+                      ),
+                    )),
+              )
             ],
           ),
           Expanded(
@@ -60,7 +78,9 @@ class _ServersPageState extends State<ServersPage> {
                     crossAxisSpacing: 5,
                     mainAxisSpacing: 5),
                 itemBuilder: (context, index) {
-                  return ServerCard(aria2: aria2s[index],index: index,);
+                  return ServerCard(
+                    aria2: aria2s[index],
+                  );
                 }),
           ),
         ],

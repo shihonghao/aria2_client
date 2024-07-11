@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -97,17 +98,21 @@ class _CNavigationHomePageState extends State<CNavigationHomePage> {
   }
 
   Widget createBottomNavigationHomePage(BuildContext context) {
-    final List<BottomNavigationBarItem> items = widget.navigationItems.map((e) {
-      return BottomNavigationBarItem(
-          label: e.label, icon: e.icon, activeIcon: e.activeIcon);
+    // final List<BottomNavigationBarItem> items = widget.navigationItems.map((e) {
+    //   return BottomNavigationBarItem(
+    //       label: e.label, icon: e.icon, activeIcon: e.activeIcon);
+    // }).toList();
+    final List<Widget> items = widget.navigationItems.map((e) {
+      return e.icon;
     }).toList();
     return Scaffold(
       // appBar: widget.appBar,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
-        type: BottomNavigationBarType.fixed,
-        currentIndex: widget.selectedIndex,
+      bottomNavigationBar: CurvedNavigationBar(
+        backgroundColor: const Color.fromRGBO(30, 41, 75, 0.5019607843137255),
+        color: Colors.brown,
+        // type: BottomNavigationBarType.fixed,
+        index: widget.selectedIndex,
         items: items,
         onTap: onSelected,
       ),

@@ -1,23 +1,16 @@
-import 'dart:math';
-
 import 'package:aria2_client/ui/pages/servers/server_card.dart';
 import 'package:flutter/material.dart';
+import 'package:gauge_indicator/gauge_indicator.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../../aria2/model/aria2.dart';
 import '../../../aria2/model/aria2_global_status.dart';
 import '../../../net/aria2_rpc_client.dart';
-import '../../../timer/my_timer.dart';
 import '../../../util/Util.dart';
 import '../../../util/card_util.dart';
 
 class ServerGlobalStatus extends StatefulWidget {
-  Aria2 aria2;
-
-  Aria2RpcClient client;
-
-  ServerGlobalStatus({super.key, required this.aria2, required this.client});
+  const ServerGlobalStatus({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -39,143 +32,183 @@ class ServerGlobalStatusState extends State<ServerGlobalStatus> {
   @override
   Widget build(BuildContext context) {
     ServerCardModel model = Provider.of<ServerCardModel>(context);
-
-    return CardUtil.buildFilterCard(SizedBox.expand(
-        child: Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              margin: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(widget.aria2.config.name,
-                    style: const TextStyle(fontSize: 20)),
-              ),
-            )
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            buildRadialGauge(true, model),
-            const SizedBox(width: 5),
-            buildRadialGauge(false, model)
-          ],
-        ),
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [Text("下载速度"), SizedBox(width: 55), Text("上传速度")],
-        ),
-        Container(
-          margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("下载中"),
-              const SizedBox(width: 10),
-              Text(model.globalStatus.numActive.toString()),
-              const SizedBox(width: 10),
-              const Text("等待中"),
-              const SizedBox(width: 10),
-              Text(model.globalStatus.numWaiting.toString()),
-              const SizedBox(width: 10),
-              const Text("已停止"),
-              const SizedBox(width: 10),
-              Text(model.globalStatus.numStopped.toString()),
-            ],
-          ),
-        ),
-      ],
-    )));
-  }
-
-  buildRadialGauge(bool isDownload, ServerCardModel model) {
-    Pair<double, String> pair = Util.formatBytesWithUnit(
-        isDownload
-            ? model.globalStatus.downloadSpeed
-            : model.globalStatus.uploadSpeed,
-        DataUnit.MB);
-    double value = pair.first!;
-    String unit = pair.second!;
-    String valueString = value.toString();
-    if (value < 1) {
-      Pair<double, String> pair2 = Util.formatBytes(isDownload
-          ? model.globalStatus.downloadSpeed
-          : model.globalStatus.uploadSpeed);
-      valueString = pair2.first!.toString();
-      unit = pair2.second!;
-    }
-
-    return CardUtil.buildFilterCard(SizedBox(
-        width: 100,
-        height: 100,
-        child: SfRadialGauge(
-          enableLoadingAnimation: true,
-          axes: <RadialAxis>[
-            RadialAxis(
-                showLabels: false,
-                showTicks: false,
-                radiusFactor: 0.8,
-                maximum: 40,
-                axisLineStyle: const AxisLineStyle(
-                    cornerStyle: CornerStyle.startCurve, thickness: 5),
-                annotations: <GaugeAnnotation>[
-                  GaugeAnnotation(
-                      angle: 90,
-                      widget: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(valueString,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.italic,
-                                  fontSize: 20)),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 0),
-                            child: Text(
-                              "$unit/s",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.italic,
-                                  fontSize: 12),
-                            ),
-                          )
-                        ],
-                      )),
-                  const GaugeAnnotation(
-                    angle: 124,
-                    positionFactor: 1.2,
-                    widget: Text('0', style: TextStyle(fontSize: 12)),
+    Aria2GlobalStatus globalStatus = model.globalStatus;
+    Aria2 aria2 = model.aria2;
+    // return Selector<ServerCardModel, Aria2GlobalStatus>(
+    //   builder: (context, model, child) {
+    //     return
+    //
+    //   },
+    //   selector: (context, model) => model.globalStatus,
+    //   // shouldRebuild: (prev, next) => true,
+    // );
+    return CardUtil.buildFilterCard(LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return SizedBox(
+              width: constraints.maxHeight,
+              height: constraints.maxWidth,
+              child: Column(
+                children: [
+                  Container(
+                    height: constraints.maxHeight * 0.1,
+                    margin: const EdgeInsets.all(10),
+                    child: Center(
+                      child: Text(aria2.config.name,
+                          style: const TextStyle(fontSize: 20)),
+                    ),
                   ),
-                  const GaugeAnnotation(
-                    angle: 54,
-                    positionFactor: 1.2,
-                    widget: Text('40', style: TextStyle(fontSize: 12)),
+                  SizedBox(
+                    height: constraints.maxHeight * 0.5,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          buildSpeedGauge(constraints, globalStatus, true),
+                          buildSpeedGauge(constraints, globalStatus, false)
+                        ]),
+                  ),
+                  SizedBox(
+                    height: constraints.maxHeight * 0.1,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                            width: constraints.maxWidth * 0.4,
+                            child: const Center(child: Text("下载速度"))),
+                        SizedBox(
+                          width: constraints.maxWidth * 0.1,
+                        ),
+                        SizedBox(
+                            width: constraints.maxWidth * 0.4,
+                            child: const Center(child: Text("上传速度"))),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: constraints.maxHeight * 0.1,
+                    margin: EdgeInsets.fromLTRB(
+                        constraints.maxWidth * 0.05, 10, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                            width: constraints.maxWidth * 0.2,
+                            child: const Text("下载中")),
+                        // const SizedBox(width: 10),
+                        SizedBox(
+                            width: constraints.maxWidth * 0.1,
+                            child: Text(globalStatus.numActive.toString())),
+                        // const SizedBox(width: 10),
+                        SizedBox(
+                            width: constraints.maxWidth * 0.2,
+                            child: const Text("等待中")),
+                        // const SizedBox(width: 10),
+                        SizedBox(
+                            width: constraints.maxWidth * 0.1,
+                            child: Text(globalStatus.numWaiting.toString())),
+                        // const SizedBox(width: 10),
+                        SizedBox(
+                            width: constraints.maxWidth * 0.2,
+                            child: const Text("已停止")),
+                        // const SizedBox(width: 10),
+                        SizedBox(
+                            width: constraints.maxWidth * 0.1,
+                            child: Text(globalStatus.numStopped.toString())),
+                      ],
+                    ),
                   ),
                 ],
-                pointers: <GaugePointer>[
-                  RangePointer(
-                    value: value,
-                    width: 5,
-                    pointerOffset: 0,
-                    cornerStyle: CornerStyle.bothCurve,
-                    color: const Color(0xFFF67280),
-                    enableAnimation: true,
-                    gradient: const SweepGradient(
+              ));
+        }));
+  }
+
+  buildSpeedGauge(
+      BoxConstraints constraints, Aria2GlobalStatus model, bool isDownload) {
+    Pair<double, DataUnit> pair = Util.formatBytesWithUnit(
+        isDownload ? model.downloadSpeed : model.uploadSpeed, DataUnit.MB);
+    double value = pair.first!;
+    String unit = pair.second!.name;
+    String valueString = value.toString();
+    if (value < 1) {
+      Pair<double, DataUnit> pair2 = Util.formatBytes(
+          isDownload ? model.downloadSpeed : model.uploadSpeed);
+      valueString = pair2.first!.toString();
+      unit = pair2.second!.name;
+    }
+    return CardUtil.buildFilterCard(SizedBox(
+        width: constraints.maxWidth * 0.4,
+        height: constraints.maxHeight * 0.4,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: AnimatedRadialGauge(
+            duration: const Duration(milliseconds: 500),
+            value: value,
+            axis: const GaugeAxis(
+
+                /// Provide the [min] and [max] value for the [value] argument.
+                min: 0,
+                max: 40,
+
+                /// Render the gauge as a 180-degree arc.
+                degrees: 270,
+
+                /// Set the background color and axis thickness.
+                style: GaugeAxisStyle(
+                  thickness: 7,
+                  background: Color(0xFFDFE2EC),
+                  segmentSpacing: 4,
+                ),
+
+                /// Define the pointer that will indicate the progress (optional).
+                pointer: GaugePointer.circle(
+                  border: GaugePointerBorder(color: Colors.black45,width: 1),
+                    radius: 5.0, color: Colors.lightGreenAccent),
+
+                /// Define the progress bar (optional).
+                progressBar: GaugeProgressBar.rounded(
+                    color: Color(0xFFF67280),
+                    gradient: GaugeAxisGradient(
                         colors: <Color>[Color(0xFFFF7676), Color(0xFFF54EA2)],
-                        stops: <double>[0.25, 0.75]),
+                        colorStops: <double>[0.25, 0.75])),
+
+                /// Define axis segments (optional).
+                segments: [
+                  GaugeSegment(
+                    from: 0,
+                    to: 40,
+                    color: Color(0xFFD9DEEB),
+                    cornerRadius: Radius.circular(10),
                   ),
-                  MarkerPointer(
-                    value: value,
-                    color: Colors.lightGreenAccent,
-                    markerType: MarkerType.circle,
-                    markerHeight: 7,
-                    markerWidth: 7,
-                    enableAnimation: true,
-                  ),
+                  // GaugeSegment(
+                  //   from: 13.33,
+                  //   to: 26.66,
+                  //   color: Color(0xFFD9DEEB),
+                  //   cornerRadius: Radius.circular(10),
+                  // ),
+                  // GaugeSegment(
+                  //   from: 26.66,
+                  //   to: 40,
+                  //   color: Color(0xFFD9DEEB),
+                  //   cornerRadius: Radius.circular(10),
+                  // ),
                 ]),
-          ],
+            builder: (context, child, value) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      valueString,
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      "$unit/s",
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         )));
   }
 }

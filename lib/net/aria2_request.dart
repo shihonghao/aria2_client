@@ -16,7 +16,7 @@ abstract class Aria2Request {
 
   call(Aria2Config config,String method, List<dynamic>? params);
 
-  generateId() {
+  generateId(String prefix) {
     var round = (DateTime.now().millisecond / 1000).round();
     String sourceId = '${Aria2Constants.APP_PREFIX}_'
         '$round'

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class MyTransparentPageRoute extends PageRoute {
@@ -21,13 +23,16 @@ class MyTransparentPageRoute extends PageRoute {
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
     Widget content = builder(context);
-    return GestureDetector(
-      onTap: () {
-        Navigator.pop(context);
-      },
+    return Material(
+      color: const Color.fromRGBO(255, 255, 255, 0),
       child: FadeTransition(
           opacity: Tween<double>(begin: 0, end: 1).animate(animation),
-          child: content),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(30)),
+            child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: content),
+          )),
     );
   }
 
