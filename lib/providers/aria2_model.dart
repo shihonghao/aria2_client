@@ -5,6 +5,7 @@ import 'package:aria2_client/aria2/model/aria2_config.dart';
 import 'package:aria2_client/aria2/model/aria2_global_status.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/timer/my_timer.dart';
+import 'package:aria2_client/util/Util.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../aria2/model/aria2.dart';
@@ -62,11 +63,11 @@ class Aria2Model extends ChangeNotifier {
     parseConfig(config);
     aria2s.add(Aria2(
         config: Aria2Config(
-            name: 'hhsmtx',
-            domain: '192.168.2.8',
+            name: 'localhost',
+            domain: '10.2.5.216',
             port: 6800,
             path: "/jsonrpc",
-            secret: "Birthday19",
+            secret: "",
             protocol: "http",
             isDefault: true)));
     aria2s.add(Aria2(
@@ -146,27 +147,27 @@ class Aria2Model extends ChangeNotifier {
   }
 
   Future<bool> changeServer(String name) async {
-    try {
-      clear();
-      current = aria2s.firstWhere((element) => element.config.name == name);
-      rpcClient.updateServer(current!.config);
-      var result = await rpcClient.connect();
-      if (result == false) {
-        return false;
-      }
-      var enabledFeatures = result["enabledFeatures"] as List<dynamic>?;
-      var version = result["version"];
-      var options = await rpcClient.getGlobalOption();
+    clear();
+    current = aria2s.firstWhere((element) => element.config.name == name);
+    rpcClient.updateServer(current!.config);
+    List<dynamic>? enabledFeatures;
+    String? version;
+    return await rpcClient.connect().then((result) {
+      enabledFeatures = result["enabledFeatures"] as List<dynamic>?;
+      version = result["version"];
+      return rpcClient.getGlobalOption();
+    }).then((options) {
+      debugPrint("$name getGlobalOption");
       options.addAll({"version": version, "enabledFeatures": enabledFeatures});
       Aria2ServerConfig serverConfig = Aria2ServerConfig.fromJson(options);
       current?.serverConfig = serverConfig;
       startGlobalStatusTimer();
       notifyListeners();
-    } catch (e) {
-      debugPrint(e.toString());
+      return true;
+    }).catchError((error) {
+      Util.showErrorToast("Can not connect to server $name");
       return false;
-    }
-    return true;
+    });
   }
 
   Future<bool> startTaskTimer(TaskStatus? status) async {

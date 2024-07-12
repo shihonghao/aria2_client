@@ -24,3 +24,4 @@ class EventBusManager {
     eventBus.destroy();
   }
 }
+

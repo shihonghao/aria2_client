@@ -13,7 +13,7 @@ class Aria2HttpRequest extends Aria2Request {
   }
 
   @override
-  call(Aria2Config config, String method, List<dynamic>? params) async {
+  Future<dynamic> call(Aria2Config config, String method, List<dynamic>? params) async {
     List<dynamic> args = [];
     if (config.secret != null) {
       args.add("token:${config.secret}");
@@ -41,7 +41,7 @@ class Aria2HttpRequest extends Aria2Request {
   }
 
   @override
-  connect(Aria2Config config) async {
+  Future<dynamic> connect(Aria2Config config) async {
     return call(config, "aria2.getVersion", []);
   }
 }

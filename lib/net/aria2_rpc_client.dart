@@ -22,14 +22,10 @@ class Aria2RpcClient {
   }
 
   Future<dynamic> connect() async {
-    try {
-      return await request!.connect(config!);
-    } catch (e) {
-      return false;
-    }
+    return await request!.connect(config!);
   }
 
-  getGlobalOption() {
+  Future<dynamic> getGlobalOption() {
     return request!.call(config!, "aria2.getGlobalOption", []);
   }
 
@@ -92,7 +88,7 @@ class Aria2RpcClient {
     return tasks;
   }
 
-  getGlobalStatus() async {
+  Future<dynamic> getGlobalStatus() async {
     return request!.call(config!, "aria2.getGlobalStat", []);
   }
 }

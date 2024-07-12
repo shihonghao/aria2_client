@@ -6,8 +6,6 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
-import '../../../aria2/model/aria2.dart';
-import '../../../net/aria2_rpc_client.dart';
 import '../../../util/Util.dart';
 import '../../../util/card_util.dart';
 import '../../component/pageRoute/my_transparent_page_route.dart';
@@ -24,8 +22,6 @@ class ServerOverviewCard extends StatefulWidget {
 }
 
 class _ServerOverviewCardState extends State<ServerOverviewCard> {
-  late ServerCardModel model;
-
   @override
   void initState() {
     super.initState();
@@ -37,27 +33,40 @@ class _ServerOverviewCardState extends State<ServerOverviewCard> {
   }
 
   Widget buildOverview() {
-    ServerCardModel serverCardModel = Provider.of<ServerCardModel>(context);
     String tag = Util.generateId("overview");
+    ServerCardModel model = context.read<ServerCardModel>();
     return GestureDetector(
       onLongPress: () {
         Navigator.push(context, MyTransparentPageRoute(builder: (context) {
           return ChangeNotifierProvider.value(
-              value: serverCardModel,
-              child: ServerDetailCard(
-                hero: Hero(
-                  tag: tag,
-                  child: CardUtil.buildFilterCard(buildBaseInfo(true)),
-                ),
-              ));
+            value: model,
+            child: ServerDetailCard(tag: tag),
+          );
         }));
       },
       child:
-          Hero(tag: tag, child: CardUtil.buildFilterCard(buildBaseInfo(false))),
+      Hero(tag: tag, child: CardUtil.buildFilterCard(ServerBaseInfo(visibleUri: false))),
     );
   }
 
-  Widget buildBaseInfo(bool more) {
+}
+
+class ServerBaseInfo extends StatefulWidget {
+
+  bool visibleUri;
+
+  ServerBaseInfo({super.key, required this.visibleUri});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _ServerBaseInfoState();
+  }
+
+}
+
+class _ServerBaseInfoState extends State<ServerBaseInfo> {
+  @override
+  Widget build(BuildContext context) {
     ServerCardModel model = Provider.of<ServerCardModel>(context);
     return Stack(
       children: [
@@ -84,7 +93,7 @@ class _ServerOverviewCardState extends State<ServerOverviewCard> {
                 child: Text(model.isAvailable ? '在线' : '离线',
                     style: const TextStyle(fontSize: 20)))),
         Visibility(
-            visible: more,
+            visible: widget.visibleUri,
             child: Positioned(
                 bottom: 10,
                 left: 30,
@@ -102,12 +111,7 @@ class _ServerOverviewCardState extends State<ServerOverviewCard> {
                           Colors.red,
                         ])
                   ],
-                )
-
-                //
-                // model.aria2.config.uri.toString(),
-                // style: const TextStyle(fontSize: 10)))
-                )),
+                ))),
       ],
     );
   }

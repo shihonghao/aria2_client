@@ -1,13 +1,12 @@
-import 'dart:math';
-
 import 'package:aria2_client/aria2/model/aria2_global_status.dart';
+import 'package:aria2_client/event/base_event.dart';
 import 'package:aria2_client/event/event_bus_manager.dart';
-import 'package:aria2_client/net/Aria2RpcFactory.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
+import 'package:aria2_client/net/aria2_rpc_client_factory.dart';
 import 'package:aria2_client/ui/pages/servers/server_global_status.dart';
 import 'package:aria2_client/ui/pages/servers/server_overview_card.dart';
+import 'package:aria2_client/ui/pages/servers/servers_page.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../../../aria2/model/aria2.dart';
@@ -18,7 +17,7 @@ import '../../component/animation/my_flip_animation.dart';
 
 class ServerCard extends StatefulWidget {
   ServerCard({super.key, required this.aria2})
-      : client = Aria2RpcFactory.create(aria2.config);
+      : client = Aria2RpcClientFactory.create(aria2.config);
 
   final Aria2 aria2;
 
@@ -40,14 +39,14 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
     initTimer();
     serverCardModel =
         ServerCardModel(aria2: widget.aria2, client: widget.client);
-    EventBusManager.eventBus.on<ServerCardEvent>().listen((event) {
-      if (serverCardModel.id == event.id) {
+    EventBusManager.eventBus.on<ServerPageEvent>().listen((event) {
+      if (serverCardModel.key == event.key || event.scope == EventScope.All) {
         switch (event.eventType) {
-          case ServerCardEventType.START_MONITOR:
+          case ServerPageEventType.START_MONITOR:
             globalStatusTimer.resume();
             serverCardModel.setMonitoring(true);
             break;
-          case ServerCardEventType.CHECK_AVAILABLE_AND_START_MONITOR:
+          case ServerPageEventType.CHECK_AVAILABLE_AND_START_MONITOR:
             checkServerAvailable().then((available) {
               if (available) {
                 globalStatusTimer.resume();
@@ -55,40 +54,43 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
               }
             });
             break;
-          case ServerCardEventType.STOP_MONITOR:
+          case ServerPageEventType.STOP_MONITOR:
             globalStatusTimer.pause();
             serverCardModel.setMonitoring(false);
+            serverCardModel.resetGlobalStatus();
             break;
-          case ServerCardEventType.CHECK_AVAILABLE:
-            checkServerAvailable();
+          case ServerPageEventType.CHECK_AVAILABLE:
+            checkServerAvailable().then((value) {
+              event.executeCallback();
+            });
+            break;
+          default:
             break;
         }
       }
     });
+    checkServerAvailable();
     super.initState();
   }
 
   void initTimer() {
     globalStatusTimer = MyTimer(
         savedSecond: 1,
-        savedCallback: (timer, value) async {
-          // widget.client.getGlobalStatus().then((result) {
-          //   globalStatus = Aria2GlobalStatus.fromJson(result);
-          // });
-          debugPrint("running");
-          serverCardModel.updateGlobalStatus(
-              Aria2GlobalStatus(
-              downloadSpeed: Random.secure().nextInt(40 * 1024 * 1024),
-              uploadSpeed: Random.secure().nextInt(40 * 1024 * 1024),
-              numActive: Random.secure().nextInt(10),
-              numWaiting: Random.secure().nextInt(10),
-              numStopped: Random.secure().nextInt(10),
-              numStoppedTotal: Random.secure().nextInt(10)));
+        savedCallback: (timer, value) {
+          widget.client.getGlobalStatus().then((result) {
+            serverCardModel
+                .updateGlobalStatus(Aria2GlobalStatus.fromJson(result));
+          }).catchError((error) {
+            Util.showErrorToast(
+                "Can not connect to Aria2 ${widget.aria2.config.uri.toString()}");
+            timer.cancel();
+          });
         });
   }
 
   @override
   void dispose() {
+    globalStatusTimer.stop();
     super.dispose();
   }
 
@@ -96,14 +98,16 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
         value: serverCardModel,
-        child: Selector<Aria2Model, Aria2?>(
-            selector: (context, model) => model.current,
-            builder: (context, value, child) {
-              if (value != null) {
-                if (value.config.name == widget.aria2.config.name) {
-                  serverCardModel.setCurrent(true);
-                }
+        child: Selector<Aria2Model, bool>(
+            selector: (context, model) =>
+                model.current?.config.name == widget.aria2.config.name,
+            builder: (context, isCurrent, child) {
+              if (!isCurrent) {
+                EventBusManager.eventBus.fire(ServerPageEvent(
+                    key: serverCardModel.key,
+                    eventType: ServerPageEventType.STOP_MONITOR));
               }
+              serverCardModel.isCurrent = isCurrent;
               return MyFlipAnimation(
                 front: const ServerOverviewCard(),
                 back: const ServerGlobalStatus(),
@@ -121,24 +125,21 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
 
   Future<bool> checkServerAvailable() async {
     serverCardModel.setTesting(true);
-    dynamic result = await widget.client.connect();
+    await Future.delayed(const Duration(seconds: 1));
     var available = false;
-    if (result != false) {
-      available = true;
-    }
-    serverCardModel.setTesting(false);
-    serverCardModel.setAvailable(available);
-    if (!available) {
-      Fluttertoast.showToast(
-          msg: "Can not connect to Aria2 ${widget.aria2.config.uri.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.redAccent,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    }
-    return available;
+    return await widget.client.connect().then((result) {
+      return true;
+    }).catchError((error) {
+      Util.showErrorToast(
+          "Can not connect to Aria2 ${widget.aria2.config.uri.toString()}");
+      return false;
+    }).then((isAvailable) {
+      available = isAvailable;
+      return available;
+    }).whenComplete(() {
+      serverCardModel.setTesting(false);
+      serverCardModel.setAvailable(available);
+    });
   }
 
   void openPopupMenu(BuildContext context) {
@@ -174,7 +175,7 @@ class _ServerCardState extends State<ServerCard> with TickerProviderStateMixin {
 }
 
 class ServerCardModel extends ChangeNotifier {
-  final String id;
+  final String key;
   bool isMonitoring = false;
   bool isAvailable = false;
   bool isTesting = false;
@@ -184,7 +185,7 @@ class ServerCardModel extends ChangeNotifier {
   Aria2RpcClient client;
 
   ServerCardModel({required this.aria2, required this.client})
-      : id = Util.generateId("serverCard");
+      : key = Util.generateId("serverCard");
 
   Aria2GlobalStatus globalStatus = Aria2GlobalStatus(
       downloadSpeed: 0,
@@ -226,18 +227,14 @@ class ServerCardModel extends ChangeNotifier {
     globalStatus = info;
     notifyListeners();
   }
-}
 
-enum ServerCardEventType {
-  START_MONITOR,
-  CHECK_AVAILABLE,
-  CHECK_AVAILABLE_AND_START_MONITOR,
-  STOP_MONITOR;
-}
-
-class ServerCardEvent {
-  String id;
-  ServerCardEventType eventType;
-
-  ServerCardEvent({required this.id, required this.eventType});
+  void resetGlobalStatus() {
+    globalStatus = Aria2GlobalStatus(
+        downloadSpeed: 0,
+        uploadSpeed: 0,
+        numActive: 0,
+        numWaiting: 0,
+        numStopped: 0,
+        numStoppedTotal: 0);
+  }
 }

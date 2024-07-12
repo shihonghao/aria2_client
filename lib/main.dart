@@ -80,14 +80,6 @@ class MyApp extends StatelessWidget {
     //todo 主题切换
     return MaterialApp(
       title: 'Aria2',
-      theme: FlexThemeData.light(
-          scheme: FlexScheme.aquaBlue,
-          surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-          blendLevel: 7),
-      darkTheme: FlexThemeData.dark(
-          scheme: FlexScheme.aquaBlue,
-          surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-          blendLevel: 7),
       themeMode: ThemeMode.light,
       routes: routes,
       home: MyHomePage(title: 'Aria2'),

@@ -34,14 +34,6 @@ class ServerGlobalStatusState extends State<ServerGlobalStatus> {
     ServerCardModel model = Provider.of<ServerCardModel>(context);
     Aria2GlobalStatus globalStatus = model.globalStatus;
     Aria2 aria2 = model.aria2;
-    // return Selector<ServerCardModel, Aria2GlobalStatus>(
-    //   builder: (context, model, child) {
-    //     return
-    //
-    //   },
-    //   selector: (context, model) => model.globalStatus,
-    //   // shouldRebuild: (prev, next) => true,
-    // );
     return CardUtil.buildFilterCard(LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           return SizedBox(

@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:aria2_client/aria2/model/json/converter.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 typedef DataConverter = double Function(double value, DataUnit toUnit);
+
 enum DataUnit {
   B("b"),
   KB("kb"),
@@ -13,7 +16,6 @@ enum DataUnit {
   final String name;
 
   const DataUnit(this.name);
-
 
   double convertData(double value, DataUnit toUnit) {
     DataUnit fromUnit = DataUnit.fromName(name);
@@ -26,11 +28,12 @@ enum DataUnit {
           case DataUnit.B:
             return value;
           case DataUnit.KB:
-          return double.parse((value / 1024).toStringAsFixed(2));
+            return double.parse((value / 1024).toStringAsFixed(2));
           case DataUnit.MB:
-          return double.parse((value / 1024 / 1024).toStringAsFixed(2));
+            return double.parse((value / 1024 / 1024).toStringAsFixed(2));
           case DataUnit.GB:
-          return double.parse((value / 1024 / 1024 / 1024).toStringAsFixed(2));
+            return double.parse(
+                (value / 1024 / 1024 / 1024).toStringAsFixed(2));
         }
       case DataUnit.KB:
         switch (toUnit) {
@@ -61,7 +64,7 @@ enum DataUnit {
         switch (toUnit) {
           case DataUnit.B:
             // return double.parse(
-                // (value / 1024 / 1024 / 1024).toStringAsFixed(2));
+            // (value / 1024 / 1024 / 1024).toStringAsFixed(2));
             return 0.0;
           case DataUnit.KB:
             // return double.parse((value / 1024 / 1024).toStringAsFixed(2));
@@ -83,15 +86,11 @@ enum DataUnit {
     }
     return DataUnit.B;
   }
-
-
 }
 
 class Util {
   static generateId(String prefix) {
-    var round = (DateTime
-        .now()
-        .millisecond / 1000).round();
+    var round = (DateTime.now().millisecond / 1000).round();
     String sourceId = '${prefix}_'
         '$round'
         '_${Random().nextInt(1000000000)}';
@@ -141,6 +140,16 @@ class Util {
     return Pair(first: value, second: unit);
   }
 
+  static void showErrorToast(String msg) {
+    Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
 }
 
 class Pair<T1, T2> {
