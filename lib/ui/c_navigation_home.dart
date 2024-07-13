@@ -50,7 +50,7 @@ class _CNavigationHomePageState extends State<CNavigationHomePage> {
     } else if (Platform.isAndroid) {
       return createBottomNavigationHomePage(context);
     } else if (Platform.isIOS) {
-      throw Exception("unsupported");
+      return createBottomNavigationHomePage(context);
     } else if (Platform.isFuchsia) {
       throw Exception("unsupported");
     } else {
