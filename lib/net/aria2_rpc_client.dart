@@ -1,5 +1,6 @@
 import 'package:aria2_client/aria2/model/aria2_config.dart';
 import 'package:aria2_client/model/task.dart';
+import 'package:aria2_client/net/rpc_result.dart';
 import 'aria2_request.dart';
 
 class Aria2RpcClient {
@@ -21,15 +22,15 @@ class Aria2RpcClient {
     });
   }
 
-  Future<dynamic> connect() async {
+  Future<RpcResult> connect() async {
     return await request!.connect(config!);
   }
 
-  Future<dynamic> getGlobalOption() {
+  Future<RpcResult> getGlobalOption() {
     return request!.call(config!, "aria2.getGlobalOption", []);
   }
 
-  Future<List<Task>> tell(TaskStatus status) async {
+  Future<RpcResult> tell(TaskStatus status) async {
     String method = "aria2.tellActive";
     List<dynamic> params = List.empty(growable: true);
     switch (status) {
@@ -77,18 +78,23 @@ class Aria2RpcClient {
       "verifyIntegrityPending",
       "files"
     ]);
-    var results = await request!.call(config!, method, params);
-    List<Task> tasks = List.empty(growable: true);
-    results.forEach((element) {
-      Task task = Task.fromJson(element);
-      if (task.status == status) {
-        tasks.add(task);
-      }
-    });
-    return tasks;
+    RpcResult rpcResult = await request!.call(config!, method, params);
+
+    if (rpcResult.success) {
+      List<Task> tasks = List.empty(growable: true);
+      rpcResult.data.forEach((element) {
+        Task task = Task.fromJson(element);
+        if (task.status == status) {
+          tasks.add(task);
+        }
+      });
+      return RpcResult.ok(tasks);
+    }
+
+    return rpcResult;
   }
 
-  Future<dynamic> getGlobalStatus() async {
+  Future<RpcResult> getGlobalStatus() async {
     return request!.call(config!, "aria2.getGlobalStat", []);
   }
 }

@@ -1,21 +1,36 @@
 import 'dart:async';
+import 'dart:ui';
+
+import 'package:aria2_client/static/vars.dart';
 
 class MyTimer<T> {
   Timer? timer;
 
-  int savedSecond;
+  Duration duration;
 
-  T? savedValue;
+  T? data;
 
-  Function(Timer timer, T? value) savedCallback;
+  Future<bool> Function(Timer timer, T? value) onTime;
+
+  VoidCallback? onError;
+
+  int failedCount = 0;
+
+  int maxFailedCount;
 
   MyTimer(
-      {required this.savedCallback,
-      required this.savedSecond,
-      this.savedValue});
+      {required this.onTime,
+      this.onError,
+      required this.duration,
+      this.data,
+      this.maxFailedCount = 3});
 
-  static MyTimer Empty() {
-    return MyTimer(savedCallback: (_, __) {}, savedSecond: 0);
+  factory MyTimer.empty() {
+    return MyTimer(
+        onTime: (_, __) async {
+          return true;
+        },
+        duration: duration100ms);
   }
 
   pause() {
@@ -23,28 +38,43 @@ class MyTimer<T> {
   }
 
   bool resume() {
-    timer = Timer.periodic(Duration(seconds: savedSecond), (timer) {
-      savedCallback.call(timer, savedValue);
-    });
+    timer = _buildTimer();
     return true;
   }
 
   restart() {
     stop();
-    timer = Timer.periodic(Duration(seconds: savedSecond), (timer) {
-      savedCallback(timer, savedValue);
+    resume();
+  }
+
+  Timer _buildTimer() {
+    return Timer.periodic(duration, (timer) {
+      onTime.call(timer, data).then((success) {
+        if (success) {
+          failedCount = 0;
+        } else {
+          failedCount++;
+        }
+        if (failedCount > maxFailedCount) {
+          stop();
+          onError?.call();
+        }
+      });
     });
   }
 
-  reBuild(int seconds, T? value, Function(Timer timer, T? value) callback) {
+  reBuild(
+      Duration duration, Future<bool> Function(Timer timer, T? value) onTime,
+      [VoidCallback? onError, T? data, int? maxFailedCount]) {
     stop();
-    savedValue = value;
-    timer = Timer.periodic(Duration(seconds: seconds), (timer) {
-      callback(timer, savedValue);
-    });
-    savedSecond = seconds;
-    savedCallback = callback;
-    resume();
+    this.data = data;
+    this.duration = duration;
+    this.onTime = onTime;
+    this.onError = onError;
+    if (maxFailedCount != null) {
+      this.maxFailedCount = maxFailedCount;
+    }
+    timer = _buildTimer();
   }
 
   stop() {

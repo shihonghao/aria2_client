@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:aria2_client/aria2/model/aria2_config.dart';
 import 'package:aria2_client/aria2/model/aria2_global_status.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
+import 'package:aria2_client/net/rpc_result.dart';
+import 'package:aria2_client/static/vars.dart';
 import 'package:aria2_client/timer/my_timer.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +14,8 @@ import '../aria2/model/aria2.dart';
 import '../aria2/model/aria2_server_config.dart';
 import '../model/task.dart';
 import '../util/SharedPreferencesUtil.dart';
+
+typedef RpcRequestCallBack = void Function(dynamic data);
 
 class Aria2Model extends ChangeNotifier {
   final List<Aria2> aria2s = List.empty(growable: true);
@@ -25,6 +29,8 @@ class Aria2Model extends ChangeNotifier {
   MyTimer globalStatusTimer;
 
   TaskStatus? subscribeStatus;
+
+  int disconnectCount = 0;
 
   Aria2GlobalStatus globalStatus = Aria2GlobalStatus(
       downloadSpeed: 0,
@@ -54,8 +60,8 @@ class Aria2Model extends ChangeNotifier {
 
   Aria2Model()
       : rpcClient = Aria2RpcClient(),
-        taskTimer = MyTimer.Empty(),
-        globalStatusTimer = MyTimer.Empty();
+        taskTimer = MyTimer.empty(),
+        globalStatusTimer = MyTimer.empty();
 
   init() async {
     aria2s.clear();
@@ -153,17 +159,24 @@ class Aria2Model extends ChangeNotifier {
     List<dynamic>? enabledFeatures;
     String? version;
     return await rpcClient.connect().then((result) {
-      enabledFeatures = result["enabledFeatures"] as List<dynamic>?;
-      version = result["version"];
-      return rpcClient.getGlobalOption();
-    }).then((options) {
-      debugPrint("$name getGlobalOption");
-      options.addAll({"version": version, "enabledFeatures": enabledFeatures});
-      Aria2ServerConfig serverConfig = Aria2ServerConfig.fromJson(options);
-      current?.serverConfig = serverConfig;
-      startGlobalStatusTimer();
-      notifyListeners();
-      return true;
+      if (result.success) {
+        enabledFeatures = result.data["enabledFeatures"] as List<dynamic>?;
+        version = result.data["version"];
+        return rpcClient.getGlobalOption();
+      }
+      throw Exception();
+    }).then((result) {
+      if (result.success) {
+        result.data
+            .addAll({"version": version, "enabledFeatures": enabledFeatures});
+        Aria2ServerConfig serverConfig =
+            Aria2ServerConfig.fromJson(result.data);
+        current?.serverConfig = serverConfig;
+        startGlobalStatusTimer();
+        notifyListeners();
+        return true;
+      }
+      throw Exception();
     }).catchError((error) {
       Util.showErrorToast("Can not connect to server $name");
       return false;
@@ -174,11 +187,16 @@ class Aria2Model extends ChangeNotifier {
     if (current == null) {
       return false;
     }
-    taskTimer.reBuild(1, status, (timer, value) async {
-      rpcClient.tell(value!).then((tasks) {
-        updateTask(tasks, value!);
+    taskTimer.reBuild(duration1s, (timer, status) async {
+      return rpcClient.tell(status!).then((result) {
+        if (result.success) {
+          updateTask(result.data, status!);
+        }
+        return result.success;
       });
-    });
+    }, () {
+      Util.showErrorToast("Can not connect to server ${current?.config.uri}");
+    }, status);
     return true;
   }
 
@@ -186,11 +204,18 @@ class Aria2Model extends ChangeNotifier {
     if (current == null) {
       return false;
     }
-    globalStatusTimer.reBuild(1, null, (timer, value) async {
-      rpcClient.getGlobalStatus().then((result) {
-        globalStatus = Aria2GlobalStatus.fromJson(result);
+
+    globalStatusTimer.reBuild(duration1s, (timer, status) async {
+      return rpcClient.tell(status!).then((result) {
+        if (result.success) {
+          globalStatus = Aria2GlobalStatus.fromJson(result.data);
+        }
+        return result.success;
       });
+    }, () {
+      Util.showErrorToast("Can not connect to server ${current?.config.uri}");
     });
+
     return true;
   }
 
@@ -242,5 +267,18 @@ class Aria2Model extends ChangeNotifier {
       taskList.add(task);
     }
     notifyListeners();
+  }
+
+  bool processRpcRequest(RpcResult result, RpcRequestCallBack callback) {
+    if (result.success) {
+      disconnectCount = 0;
+      callback(result.data);
+      return true;
+    }
+    disconnectCount++;
+    if (disconnectCount > 3) {
+      Util.showErrorToast("Can not connect to server ${current?.config.uri}");
+    }
+    return false;
   }
 }

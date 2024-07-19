@@ -34,25 +34,27 @@ class _ServerOverviewCardState extends State<ServerOverviewCard> {
 
   Widget buildOverview() {
     String tag = Util.generateId("overview");
-    ServerCardModel model = context.read<ServerCardModel>();
+    ServerModel model = context.read<ServerModel>();
     return GestureDetector(
       onLongPress: () {
         Navigator.push(context, MyTransparentPageRoute(builder: (context) {
-          return ChangeNotifierProvider.value(
-            value: model,
-            child: ServerDetailCard(tag: tag),
+          return ChangeNotifierProvider(
+            create: (context) => model,
+            builder: (context, child) {
+              model.shouldDispose = false;
+              return ServerDetailCard(tag: tag);
+            },
           );
         }));
       },
-      child:
-      Hero(tag: tag, child: CardUtil.buildFilterCard(ServerBaseInfo(visibleUri: false))),
+      child: Hero(
+          tag: tag,
+          child: CardUtil.buildFilterCard(ServerBaseInfo(visibleUri: false))),
     );
   }
-
 }
 
 class ServerBaseInfo extends StatefulWidget {
-
   bool visibleUri;
 
   ServerBaseInfo({super.key, required this.visibleUri});
@@ -61,13 +63,12 @@ class ServerBaseInfo extends StatefulWidget {
   State<StatefulWidget> createState() {
     return _ServerBaseInfoState();
   }
-
 }
 
 class _ServerBaseInfoState extends State<ServerBaseInfo> {
   @override
   Widget build(BuildContext context) {
-    ServerCardModel model = Provider.of<ServerCardModel>(context);
+    ServerModel model = Provider.of<ServerModel>(context);
     return Stack(
       children: [
         const Positioned(

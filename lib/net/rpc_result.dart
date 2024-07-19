@@ -1,11 +1,17 @@
-
-
 class RpcResult {
-  int status;
+  bool success;
 
-  dynamic body;
+  dynamic data;
 
-  Error? error;
+  String? message;
 
-  RpcResult({required this.status, this.body, this.error});
+  factory RpcResult.ok([Object? data]) {
+    return RpcResult(success: true, data: data);
+  }
+
+  factory RpcResult.error([String? message]) {
+    return RpcResult(success: false, message: message);
+  }
+
+  RpcResult({required this.success, this.data, this.message});
 }

@@ -132,12 +132,12 @@ class _ServerDetailCardState extends State<ServerDetailCard>
   }
 
   Widget buildInfoPanel() {
-    return Selector<ServerCardModel, bool>(
+    return Selector<ServerModel, bool>(
       builder: (context, isAvailable, child) {
         List<Widget> children = List.empty(growable: true);
         if (isAvailable) {
           Aria2ServerConfig? serverConfig =
-              context.read<ServerCardModel>().aria2.serverConfig;
+              context.read<ServerModel>().aria2.serverConfig;
           for (var value in enabledFeatures) {
             children.add(MyTag(
                 text: value,

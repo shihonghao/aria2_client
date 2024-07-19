@@ -16,15 +16,6 @@ abstract class Aria2Request {
 
   call(Aria2Config config,String method, List<dynamic>? params);
 
-  generateId(String prefix) {
-    var round = (DateTime.now().millisecond / 1000).round();
-    String sourceId = '${Aria2Constants.APP_PREFIX}_'
-        '$round'
-        '_${Random().nextInt(1000000000)}';
-    var hashedId = base64Encode(utf8.encode(sourceId));
-    return hashedId;
-  }
-
   static buildRequest(protocol){
      switch (protocol) {
       case Aria2Constants.PROTOCOL_HTTP:

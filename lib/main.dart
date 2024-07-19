@@ -9,47 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Aria2Model aria2model = await initAria2();
-  // Task task1 = Task(
-  //     gid: '1',
-  //     status: TaskStatus.active,
-  //     totalLength: 1000,
-  //     completedLength: 100,
-  //     uploadLength: 1000,
-  //     downloadSpeed: 30,
-  //     uploadSpeed: 40);
-  // Timer(const Duration(milliseconds: 2000), () {
-  //
-  //   aria2model.updateTask([task1],TaskStatus.active);
-  //   developer.log("add Task 1");
-  // });
-  // Timer(const Duration(milliseconds: 5000), () {
-  //   Task task2 = Task(
-  //       gid: '2',
-  //       status: TaskStatus.active,
-  //       totalLength: 2000,
-  //       completedLength: 1000,
-  //       uploadLength: 2000,
-  //       downloadSpeed: 50,
-  //       uploadSpeed: 100);
-  //   aria2model.updateTask([task2,task1],TaskStatus.active);
-  //   developer.log("add Task 2");
-  //   Task task3 = Task(
-  //       gid: '3',
-  //       status: TaskStatus.active,
-  //       totalLength: 2000,
-  //       completedLength: 1000,
-  //       uploadLength: 2000,
-  //       downloadSpeed: 50,
-  //       uploadSpeed: 100);
-  //   Timer(const Duration(milliseconds: 1000), () {
-  //     developer.log("开始下");
-  //     Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-  //       task2.completedLength += 100;
-  //       task2.downloadSpeed = Random().nextInt(1000);
-  //       aria2model.updateTask([task2,task3],TaskStatus.active);
-  //     });
-  //   });
-  // });
   runApp(MyApp(aria2model: aria2model));
 }
 

@@ -41,12 +41,12 @@ class _ServerDetailSpeedChartState extends State<ServerDetailSpeedChart> {
 
   @override
   Widget build(BuildContext context) {
-    key = context.read<ServerCardModel>().key;
+    key = context.read<ServerModel>().key;
     return buildLineChart();
   }
 
   Widget buildLineChart() {
-    ServerCardModel model = Provider.of<ServerCardModel>(context);
+    ServerModel model = Provider.of<ServerModel>(context);
     Pair<double, DataUnit> downloadPair = Util.formatBytesWithUnit(
         model.globalStatus.downloadSpeed, selectedSpeedUnit);
     Pair<double, DataUnit> uploadPair = Util.formatBytesWithUnit(
@@ -195,7 +195,7 @@ class _ServerDetailSpeedChartState extends State<ServerDetailSpeedChart> {
     ]);
   }
 
-  LineChartData speedLineData(ServerCardModel model) {
+  LineChartData speedLineData(ServerModel model) {
     Pair<AxisTitles, AxisTitles>? titleWidgets;
     if (model.isAvailable) {
       while (uploadSpeedPoints.length > limitCount) {

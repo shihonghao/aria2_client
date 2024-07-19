@@ -31,7 +31,7 @@ class ServerGlobalStatusState extends State<ServerGlobalStatus> {
 
   @override
   Widget build(BuildContext context) {
-    ServerCardModel model = Provider.of<ServerCardModel>(context);
+    ServerModel model = Provider.of<ServerModel>(context);
     Aria2GlobalStatus globalStatus = model.globalStatus;
     Aria2 aria2 = model.aria2;
     return CardUtil.buildFilterCard(LayoutBuilder(

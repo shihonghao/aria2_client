@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:aria2_client/net/rpc_result.dart';
 import 'package:http/http.dart' as http;
+
 import '../aria2/aria2_constants.dart';
 import '../aria2/model/aria2_config.dart';
 import '../util/Util.dart';
@@ -13,7 +15,8 @@ class Aria2HttpRequest extends Aria2Request {
   }
 
   @override
-  Future<dynamic> call(Aria2Config config, String method, List<dynamic>? params) async {
+  Future<RpcResult> call(
+      Aria2Config config, String method, List<dynamic>? params) async {
     List<dynamic> args = [];
     if (config.secret != null) {
       args.add("token:${config.secret}");
@@ -31,17 +34,17 @@ class Aria2HttpRequest extends Aria2Request {
       final response =
           await http.post(config.uri, headers: headers, body: body);
       if (response.statusCode == 200) {
-        return jsonDecode(response.body)['result'];
+        return RpcResult.ok(jsonDecode(response.body)['result']);
       } else {
-        throw Exception('Failed to connect to server: ${response.statusCode}');
+        throw Exception();
       }
     } catch (e) {
-      throw Exception('Failed to connect to server: $e');
+      return RpcResult.error('Failed to connect to server ${config.uri}');
     }
   }
 
   @override
-  Future<dynamic> connect(Aria2Config config) async {
+  Future<RpcResult> connect(Aria2Config config) async {
     return call(config, "aria2.getVersion", []);
   }
 }
