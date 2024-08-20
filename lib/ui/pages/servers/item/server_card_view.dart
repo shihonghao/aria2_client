@@ -4,6 +4,7 @@ import 'package:aria2_client/aria2/model/aria2_config.dart';
 import 'package:aria2_client/aria2/model/aria2_global_status.dart';
 import 'package:aria2_client/aria2/model/aria2_server_config.dart';
 import 'package:aria2_client/const/Const.dart';
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/providers/aria2_model.dart';
 import 'package:aria2_client/providers/server_model.dart';
 import 'package:aria2_client/ui/component/animation/my_animated_icon.dart';
@@ -130,18 +131,18 @@ class _ServerCardViewState extends State<ServerCardView> {
                                       child: Container(
                                           padding: const EdgeInsets.all(8),
                                           child: Text(
-                                            style: textStyle,
-                                            "下载中 :  ${globalStatus.numActive}",
-                                          )),
+                                              style: textStyle,
+                                              S.of(context).downloading_count(
+                                                  globalStatus.numActive))),
                                     ),
                                     Expanded(
                                       child: Container(
                                           padding: const EdgeInsets.all(8),
                                           child: Center(
                                             child: Text(
-                                              style: textStyle,
-                                              "等待中 :  ${globalStatus.numWaiting}",
-                                            ),
+                                                style: textStyle,
+                                                S.of(context).waiting_count(
+                                                    globalStatus.numWaiting)),
                                           )),
                                     ),
                                     Expanded(
@@ -150,9 +151,9 @@ class _ServerCardViewState extends State<ServerCardView> {
                                           child: Align(
                                             alignment: Alignment.centerRight,
                                             child: Text(
-                                              style: textStyle,
-                                              "已停止 :  ${globalStatus.numStopped}",
-                                            ),
+                                                style: textStyle,
+                                                S.of(context).stopped_count(
+                                                    globalStatus.numStopped)),
                                           )),
                                     ),
                                   ]),
@@ -263,7 +264,7 @@ class _ServerCardViewState extends State<ServerCardView> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      "全局限速",
+                                      S.of(context).global_limit,
                                       style: TextStyle(
                                           color:
                                               Theme.of(context).indicatorColor),
@@ -276,7 +277,7 @@ class _ServerCardViewState extends State<ServerCardView> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Text("下载 ："),
+                                        Text("${S.of(context).download} ："),
                                         SizedBox(
                                             width: 80,
                                             height: 45,
@@ -310,7 +311,7 @@ class _ServerCardViewState extends State<ServerCardView> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Text("上传 ： "),
+                                        Text("${S.of(context).upload} ： "),
                                         SizedBox(
                                             width: 80,
                                             height: 45,
@@ -389,7 +390,8 @@ class _ServerCardViewState extends State<ServerCardView> {
                       if (context.read<ServerModel>().isCurrent) {
                         action();
                       } else {
-                        Util.showTextAlert(context, "请先切换到当前服务器");
+                        Util.showTextAlert(
+                            context, S.of(context).check_firstly);
                       }
                     });
                   },

@@ -1,3 +1,4 @@
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/store/IHive.dart';
 import 'package:aria2_client/ui/component/animation/my_animated_icon.dart';
@@ -43,7 +44,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("设置"),
+          title:  Text(S.of(context).settings),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {

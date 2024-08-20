@@ -4,6 +4,7 @@ import 'package:aria2_client/aria2/model/aria2_global_status.dart';
 import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/event/base_event.dart';
 import 'package:aria2_client/event/event_bus_manager.dart';
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/providers/aria2_model.dart';
 import 'package:aria2_client/providers/server_model.dart';
@@ -173,7 +174,7 @@ class _ServerItemState extends MyTimerState<ServerItem>
                         .read<Aria2Model>()
                         .removeAria2(widget.model.aria2.config);
                   },
-                  child: const Text("删除"),
+                  child: Text(S.of(context).delete),
                 ),
               ));
         },

@@ -1,4 +1,5 @@
 import 'package:aria2_client/aria2/model/aria2_global_status.dart';
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/providers/server_model.dart';
 import 'package:aria2_client/ui/pages/servers/item/server_item.dart';
 import 'package:flutter/material.dart';
@@ -98,7 +99,9 @@ class _ServerListViewState extends State<ServerListView> {
                           padding: const EdgeInsets.all(8),
                           child: Text(
                             style: textStyle,
-                            "下载中 :  ${globalStatus.numActive}",
+                            S
+                                .of(context)
+                                .downloading_count(globalStatus.numActive),
                           )),
                       Expanded(
                         child: Container(
@@ -127,7 +130,9 @@ class _ServerListViewState extends State<ServerListView> {
                           padding: const EdgeInsets.all(8),
                           child: Text(
                             style: textStyle,
-                            "等待中 :  ${globalStatus.numWaiting}",
+                            S
+                                .of(context)
+                                .waiting_count(globalStatus.numWaiting),
                           )),
                       Expanded(
                         child: Container(
@@ -158,7 +163,9 @@ class _ServerListViewState extends State<ServerListView> {
                           padding: const EdgeInsets.all(8),
                           child: Text(
                             style: textStyle,
-                            "已停止 :  ${globalStatus.numStopped}",
+                            S
+                                .of(context)
+                                .stopped_count(globalStatus.numStopped),
                           )),
                       child!
                     ])),
@@ -175,7 +182,9 @@ class _ServerListViewState extends State<ServerListView> {
                   switchOutCurve: Curves.linear,
                   child: !isTesting
                       ? Text(
-                          context.read<ServerModel>().isAvailable ? '在线' : '离线',
+                          context.read<ServerModel>().isAvailable
+                              ? S.of(context).online
+                              : S.of(context).offline,
                           style: const TextStyle(fontSize: 20))
                       : LoadingAnimationWidget.staggeredDotsWave(
                           color: Colors.red, size: 35),

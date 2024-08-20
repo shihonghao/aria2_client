@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../aria2/aria2_constants.dart';
 import '../../../aria2/model/aria2_config.dart';
+import '../../../generated/l10n.dart';
 import '../../../util/Util.dart';
 
 class ServerAddPage extends StatefulWidget {
@@ -36,8 +37,7 @@ class _ServerAddPageState extends State<ServerAddPage> {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      child: Container(
-          child: FormBuilder(
+      child: FormBuilder(
         key: _formKey,
         child: Center(
           child: Column(
@@ -50,10 +50,10 @@ class _ServerAddPageState extends State<ServerAddPage> {
                     name: 'name',
                     validator: FormBuilderValidators.compose(
                         [FormBuilderValidators.required()]),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       fillColor: Colors.transparent,
-                      icon: Icon(Icons.text_fields),
-                      labelText: 'Aria2 别名',
+                      icon: const Icon(Icons.text_fields),
+                      labelText: S.of(context).aria2_alias,
                       hintText: '',
                       // border: OutlineInputBorder(),
                     ),
@@ -66,10 +66,10 @@ class _ServerAddPageState extends State<ServerAddPage> {
                 child: FormBuilderTextField(
                     name: 'domain',
                     initialValue: "127.0.0.1",
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       fillColor: Colors.transparent,
-                      icon: Icon(Icons.add_task),
-                      labelText: 'Aria2 地址',
+                      icon: const Icon(Icons.add_task),
+                      labelText: S.of(context).aria2_rpc_url,
                       hintText: '127.0.0.1',
                       // border: OutlineInputBorder(),
                     ),
@@ -88,10 +88,10 @@ class _ServerAddPageState extends State<ServerAddPage> {
                           errorText: "invalid port"),
                       FormBuilderValidators.min(1, errorText: "invalid port")
                     ]),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       fillColor: Colors.transparent,
-                      icon: Icon(Icons.crop_portrait),
-                      labelText: 'Aria2 端口',
+                      icon: const Icon(Icons.crop_portrait),
+                      labelText: S.of(context).aria2_rpc_port,
                       hintText: '6800',
                     ),
                     keyboardType: TextInputType.number,
@@ -104,10 +104,10 @@ class _ServerAddPageState extends State<ServerAddPage> {
                 child: FormBuilderTextField(
                     name: 'path',
                     initialValue: "/jsonrpc",
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       fillColor: Colors.transparent,
-                      icon: Icon(Icons.add_road),
-                      labelText: 'Aria2 路径',
+                      icon: const Icon(Icons.add_road),
+                      labelText: S.of(context).aria2_rpc_path,
                       hintText: '/jsonrpc',
                       // border: OutlineInputBorder(),
                     ),
@@ -118,9 +118,9 @@ class _ServerAddPageState extends State<ServerAddPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(100, 10, 100, 10),
                 child: FormBuilderChoiceChip(
-                  decoration: const InputDecoration(
-                      labelText: 'Protocol',
-                      icon: Icon(Icons.health_and_safety),
+                  decoration: InputDecoration(
+                      labelText: S.of(context).aria2_rpc_protocol,
+                      icon: const Icon(Icons.health_and_safety),
                       fillColor: Colors.transparent,
                       border: InputBorder.none),
                   name: 'protocol',
@@ -153,10 +153,10 @@ class _ServerAddPageState extends State<ServerAddPage> {
                 padding: const EdgeInsets.fromLTRB(100, 10, 100, 10),
                 child: FormBuilderTextField(
                     name: 'secret',
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       fillColor: Colors.transparent,
-                      icon: Icon(Icons.key),
-                      labelText: 'Aria2 秘钥',
+                      icon: const Icon(Icons.key),
+                      labelText: S.of(context).aria2_rpc_secret,
                       hintText: '',
                       // border: OutlineInputBorder(),
                     ),
@@ -186,7 +186,7 @@ class _ServerAddPageState extends State<ServerAddPage> {
                             });
                           }
                         },
-                        child: const Text("测试"),
+                        child: Text(S.of(context).test),
                       ),
                     ),
                     const SizedBox(
@@ -199,7 +199,7 @@ class _ServerAddPageState extends State<ServerAddPage> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text("取消"),
+                        child: Text(S.of(context).cancel),
                       ),
                     ),
                   ],
@@ -232,7 +232,7 @@ class _ServerAddPageState extends State<ServerAddPage> {
             ],
           ),
         ),
-      )),
+      ),
     );
   }
 

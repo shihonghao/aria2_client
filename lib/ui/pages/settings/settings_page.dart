@@ -33,7 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
                       child: Text(
-                        S.of(context).settingPageTitle,
+                        S.of(context).settings,
                         style: const TextStyle(
                             fontSize: 70, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.start,
@@ -53,7 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           key: SettingsHiveKey.language,
                           value: IHive.settings.get(SettingsHiveKey.language,
                               defaultValue: "zh"),
-                          label: S.of(context).languageSettingLabel,
+                          label: S.of(context).language,
                           type: FormItemType.select,
                           onChange: (value) {
                             if (value.contains("_")) {
@@ -80,14 +80,14 @@ class _SettingsPageState extends State<SettingsPage> {
                           key: SettingsHiveKey.themeMode,
                           value: IHive.settings.get(SettingsHiveKey.themeMode,
                               defaultValue: "dark"),
-                          label: S.of(context).themeSettingLabel,
+                          label: S.of(context).theme,
                           type: FormItemType.select,
                           options: [
                             FormItemOption(
-                                label: S.of(context).themeSettingOption1,
+                                label: S.of(context).lightTheme,
                                 value: 'light'),
                             FormItemOption(
-                                label: S.of(context).themeSettingOption2,
+                                label: S.of(context).darkTheme,
                                 value: 'dark')
                           ],
                         ),
