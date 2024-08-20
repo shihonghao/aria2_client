@@ -1,6 +1,9 @@
-import 'package:aria2_client/ui/c_navigation_home.dart';
+import 'package:aria2_client/generated/l10n.dart';
+import 'package:aria2_client/ui/pages/settings/settings_item.dart';
+import 'package:aria2_client/ui/pages/settings/settings_page.dart';
+import 'package:aria2_client/ui/platformed_home.dart';
 import 'package:aria2_client/ui/pages/download/download_page.dart';
-import 'package:aria2_client/ui/pages/servers/servers_page.dart';
+import 'package:aria2_client/ui/pages/servers/server_page.dart';
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
@@ -8,27 +11,6 @@ import 'aria2_dropdown_menu.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({super.key, required this.title});
-
-  List<CNavigationItem> navigationItems = [
-    CNavigationItem(
-      icon: const Icon(TDIcons.server),
-      label: "服务器",
-    ),
-    CNavigationItem(
-      icon: const Icon(Icons.download),
-      label: "下载",
-    ),
-    CNavigationItem(
-      icon: const Icon(Icons.settings),
-      label: "设置",
-    ),
-  ];
-
-  List<Widget> pages = [
-    const ServersPage(),
-    const DownloadPage(),
-    const DownloadPage(),
-  ];
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -54,10 +36,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CNavigationHomePage(
+    return PlatformedHomePage(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         title: const Center(child: Aria2DropdownMenu()),
         leading: Center(
             child: Text(
@@ -69,8 +55,25 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () => addAria2(context), icon: const Icon(Icons.add)),
         ],
       ),
-      navigationItems: widget.navigationItems,
-      pages: widget.pages,
+      navigationItems: [
+        CNavigationItem(
+          icon: const Icon(TDIcons.server),
+          label: S.of(context).appNavigation1,
+        ),
+        CNavigationItem(
+          icon: const Icon(Icons.download),
+          label: S.of(context).appNavigation2,
+        ),
+        CNavigationItem(
+          icon: const Icon(Icons.settings),
+          label: S.of(context).appNavigation3,
+        ),
+      ],
+      pages: const [
+        ServerPage(),
+        DownloadPage(),
+        SettingsPage(),
+      ],
     );
   }
 

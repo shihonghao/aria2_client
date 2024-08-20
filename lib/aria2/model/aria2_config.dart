@@ -1,41 +1,46 @@
-import 'package:json_annotation/json_annotation.dart';
-
+import 'package:hive/hive.dart';
 import '../aria2_constants.dart';
+
 part 'aria2_config.g.dart';
-@JsonSerializable()
+
+@HiveType(typeId: 1)
 class Aria2Config {
+  @HiveField(0)
+  final String key;
+  @HiveField(1)
   String name;
+  @HiveField(2)
   String protocol;
+  @HiveField(3)
   String domain;
+  @HiveField(4)
   int port;
+  @HiveField(5)
   String? secret;
-  String? path;
-  Uri uri;
+  @HiveField(6)
+  String path;
+  Uri? _uri;
   bool isDefault = false;
 
   Aria2Config(
-      {required this.name,
-      this.protocol = Aria2Constants.PROTOCOL_HTTP, this.domain = "127.0.0.1",
-      this.port = 6800,
+      {required this.key,
+      required this.name,
+      this.protocol = Aria2Constants.PROTOCOL_HTTP,
+      String? domain,
+      int? port,
       this.secret,
-      this.path = "/jsonrpc",
+      String? path,
       isDefault = false})
-      : uri = Uri.parse("$protocol"
-            "://"
-            "$domain"
-            ":"
-            "$port$path");
+      : path = path ?? "/jsonrpc",
+        port = port ?? 6800,
+        domain = domain ?? "127.0.0.1";
 
-  buildUri() {
-    uri = Uri.parse("$protocol"
+  Uri uri() {
+    _uri = Uri.parse("$protocol"
         "://"
         "$domain"
         ":"
         "$port$path");
+    return _uri!;
   }
-
-  factory Aria2Config.fromJson(Map<String, dynamic> json) =>
-      _$Aria2ConfigFromJson(json);
-
-  Map<String, dynamic> toJson() => _$Aria2ConfigToJson(this);
 }

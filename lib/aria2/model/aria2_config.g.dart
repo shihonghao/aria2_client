@@ -3,27 +3,57 @@
 part of 'aria2_config.dart';
 
 // **************************************************************************
-// JsonSerializableGenerator
+// TypeAdapterGenerator
 // **************************************************************************
 
-Aria2Config _$Aria2ConfigFromJson(Map<String, dynamic> json) => Aria2Config(
-      name: json['name'] as String,
-      protocol: json['protocol'] as String? ?? Aria2Constants.PROTOCOL_HTTP,
-      domain: json['domain'] as String? ?? "127.0.0.1",
-      port: (json['port'] as num?)?.toInt() ?? 6800,
-      secret: json['secret'] as String?,
-      path: json['path'] as String? ?? "/jsonrpc",
-      isDefault: json['isDefault'] ?? false,
-    )..uri = Uri.parse(json['uri'] as String);
+class Aria2ConfigAdapter extends TypeAdapter<Aria2Config> {
+  @override
+  final int typeId = 1;
 
-Map<String, dynamic> _$Aria2ConfigToJson(Aria2Config instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'protocol': instance.protocol,
-      'domain': instance.domain,
-      'port': instance.port,
-      'secret': instance.secret,
-      'path': instance.path,
-      'uri': instance.uri.toString(),
-      'isDefault': instance.isDefault,
+  @override
+  Aria2Config read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
+    return Aria2Config(
+      key: fields[0] as String,
+      name: fields[1] as String,
+      protocol: fields[2] as String,
+      domain: fields[3] as String?,
+      port: fields[4] as int?,
+      secret: fields[5] as String?,
+      path: fields[6] as String?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Aria2Config obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.key)
+      ..writeByte(1)
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.protocol)
+      ..writeByte(3)
+      ..write(obj.domain)
+      ..writeByte(4)
+      ..write(obj.port)
+      ..writeByte(5)
+      ..write(obj.secret)
+      ..writeByte(6)
+      ..write(obj.path);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Aria2ConfigAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

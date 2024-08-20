@@ -43,20 +43,20 @@ Task _$TaskFromJson(Map<String, dynamic> json) => Task(
       files: (json['files'] as List<dynamic>?)
           ?.map((e) => TaskFile.fromJson(e as Map<String, dynamic>))
           .toList(),
+      bittorrent: json['bittorrent'] == null
+          ? null
+          : Bittorrent.fromJson(json['bittorrent'] as Map<String, dynamic>),
       verifiedLength: json['verifiedLength'] as String?,
       verifyIntegrityPending: json['verifyIntegrityPending'] as String?,
     )
-      ..taskName = json['taskName'] as String?
       ..lastCompletedLength = _$JsonConverterFromJson<String, int>(
           json['lastCompletedLength'],
           const StringToIntegerConverter().fromJson)
-      ..bittorrent = json['bittorrent'] == null
-          ? null
-          : Bittorrent.fromJson(json['bittorrent'] as Map<String, dynamic>);
+      ..lastDownloadSpeed = (json['lastDownloadSpeed'] as num?)?.toInt()
+      ..lastUploadSpeed = (json['lastUploadSpeed'] as num?)?.toInt();
 
 Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
       'gid': instance.gid,
-      'taskName': instance.taskName,
       'status': _$TaskStatusEnumMap[instance.status]!,
       'totalLength': _$JsonConverterToJson<String, int>(
           instance.totalLength, const StringToIntegerConverter().toJson),
@@ -94,6 +94,8 @@ Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
       'bittorrent': instance.bittorrent?.toJson(),
       'verifiedLength': instance.verifiedLength,
       'verifyIntegrityPending': instance.verifyIntegrityPending,
+      'lastDownloadSpeed': instance.lastDownloadSpeed,
+      'lastUploadSpeed': instance.lastUploadSpeed,
     };
 
 const _$TaskStatusEnumMap = {
@@ -157,10 +159,10 @@ Map<String, dynamic> _$TaskUriToJson(TaskUri instance) => <String, dynamic>{
 
 Bittorrent _$BittorrentFromJson(Map<String, dynamic> json) => Bittorrent(
       announceList: (json['announceList'] as List<dynamic>?)
-          ?.map((e) => e as String)
+          ?.map((e) => (e as List<dynamic>).map((e) => e as String).toList())
           .toList(),
       comment: json['comment'] as String?,
-      creationDate: json['creationDate'] as String?,
+      creationDate: (json['creationDate'] as num?)?.toInt(),
       mode: json['mode'] as String?,
       info: json['info'] == null
           ? null
@@ -184,4 +186,38 @@ BittorrentInfo _$BittorrentInfoFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$BittorrentInfoToJson(BittorrentInfo instance) =>
     <String, dynamic>{
       'name': instance.name,
+    };
+
+Peer _$PeerFromJson(Map<String, dynamic> json) => Peer(
+      peerId: json['peerId'] as String?,
+      ip: json['ip'] as String?,
+      port: json['port'] as String?,
+      bitfield: json['bitfield'] as String?,
+      amChoking: _$JsonConverterFromJson<String, bool>(
+          json['amChoking'], const StringToBoolConverter().fromJson),
+      peerChoking: _$JsonConverterFromJson<String, bool>(
+          json['peerChoking'], const StringToBoolConverter().fromJson),
+      downloadSpeed: _$JsonConverterFromJson<String, int>(
+          json['downloadSpeed'], const StringToIntegerConverter().fromJson),
+      uploadSpeed: _$JsonConverterFromJson<String, int>(
+          json['uploadSpeed'], const StringToIntegerConverter().fromJson),
+      seeder: _$JsonConverterFromJson<String, bool>(
+          json['seeder'], const StringToBoolConverter().fromJson),
+    );
+
+Map<String, dynamic> _$PeerToJson(Peer instance) => <String, dynamic>{
+      'peerId': instance.peerId,
+      'ip': instance.ip,
+      'port': instance.port,
+      'bitfield': instance.bitfield,
+      'amChoking': _$JsonConverterToJson<String, bool>(
+          instance.amChoking, const StringToBoolConverter().toJson),
+      'peerChoking': _$JsonConverterToJson<String, bool>(
+          instance.peerChoking, const StringToBoolConverter().toJson),
+      'downloadSpeed': _$JsonConverterToJson<String, int>(
+          instance.downloadSpeed, const StringToIntegerConverter().toJson),
+      'uploadSpeed': _$JsonConverterToJson<String, int>(
+          instance.uploadSpeed, const StringToIntegerConverter().toJson),
+      'seeder': _$JsonConverterToJson<String, bool>(
+          instance.seeder, const StringToBoolConverter().toJson),
     };

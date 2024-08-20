@@ -1,0 +1,24 @@
+{
+  "@@locale": "en",
+  "appNavigation1": "Servers",
+  "appNavigation2": "Downloads",
+  "appNavigation3": "Settings",
+  "serverPageTitle": "Servers",
+  "settingPageTitle": "Settings",
+  "languageSettingLabel": "Language",
+  "languageSettingOption1": "中文",
+  "languageSettingOption2": "English",
+  "themeSettingLabel": "Theme",
+  "themeSettingOption1": "light",
+  "themeSettingOption2": "dark",
+  "globalRefreshIntervalLabel": "Updating Global Stat Interval",
+  "taskRefreshIntervalLabel": "Updating Task Information Interval",
+  "enableSettingChangeTipLabel": "Enable setting confirm",
+  "second": "s",
+  "minute": "min",
+  "yes": "yes",
+  "no": "no",
+  "cancel": "cancel",
+  "confirm": "confirm"
+
+}

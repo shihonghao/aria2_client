@@ -11,7 +11,7 @@ class MyScaleAnimation extends MyAnimation {
       {super.key, super.duration, required this.child, this.onLongPress});
 
   @override
-  State<StatefulWidget> createState() {
+  MyAnimationState createState() {
     return _MyScaleAnimationState();
   }
 }
@@ -44,7 +44,7 @@ class _MyScaleAnimationState
   @override
   initAnimation() {
     controller = AnimationController(
-        vsync: this, duration: Duration(milliseconds: widget.duration));
+        vsync: this, duration: widget.duration);
     //使用弹性曲线
     animation = CurvedAnimation(parent: super.controller, curve: Curves.linear);
     animation = Tween(begin: 0.0, end: 1.0).animate(super.controller);

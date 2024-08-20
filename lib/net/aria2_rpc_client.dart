@@ -1,36 +1,46 @@
 import 'package:aria2_client/aria2/model/aria2_config.dart';
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/net/rpc_result.dart';
+import 'package:aria2_client/util/Util.dart';
+
 import 'aria2_request.dart';
 
 class Aria2RpcClient {
-  bool connected = false;
-  Aria2Config? config;
-  Aria2Request? request;
+  Aria2RpcClient._();
 
-  Aria2RpcClient({this.config})
-      : request = Aria2Request.buildRequest(config?.protocol);
+  static Aria2RpcClient? _instance;
+
+  static Aria2RpcClient get instance {
+    _instance ??= Aria2RpcClient._();
+    return _instance!;
+  }
+
+  bool connected = false;
+  late Aria2Config config;
 
   updateServer(Aria2Config config) {
     this.config = config;
-    request = Aria2Request.buildRequest(config.protocol);
   }
 
   disconnect() {
-    request!.disconnect(config!).then((value) {
-      connected = !value;
+    Aria2Request.getRequest(config).disconnect(config).then((value) {
+      connected = value;
     });
   }
 
-  Future<RpcResult> connect() async {
-    return await request!.connect(config!);
+  Future<RpcResult> connect([Aria2Config? config]) async {
+    config ??= this.config;
+    return await Aria2Request.getRequest(config).connect(config);
   }
 
-  Future<RpcResult> getGlobalOption() {
-    return request!.call(config!, "aria2.getGlobalOption", []);
+  Future<RpcResult> getGlobalOption([Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.getGlobalOption", []);
   }
 
-  Future<RpcResult> tell(TaskStatus status) async {
+  Future<RpcResult> tell(TaskStatus status, [Aria2Config? config]) async {
+    config ??= this.config;
     String method = "aria2.tellActive";
     List<dynamic> params = List.empty(growable: true);
     switch (status) {
@@ -76,9 +86,16 @@ class Aria2RpcClient {
       "errorCode",
       "verifiedLength",
       "verifyIntegrityPending",
-      "files"
+      "files",
+      // "dir",
+      // "bitfield",
+      // "numPieces",
+      // "pieceLength",
+      "bittorrent",
+      // "infoHash"
     ]);
-    RpcResult rpcResult = await request!.call(config!, method, params);
+    RpcResult rpcResult =
+        await Aria2Request.getRequest(config).call(config, method, params);
 
     if (rpcResult.success) {
       List<Task> tasks = List.empty(growable: true);
@@ -94,7 +111,82 @@ class Aria2RpcClient {
     return rpcResult;
   }
 
-  Future<RpcResult> getGlobalStatus() async {
-    return request!.call(config!, "aria2.getGlobalStat", []);
+  Future<RpcResult> getGlobalStatus([Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.getGlobalStat", []);
+  }
+
+  Future<RpcResult> pauseTask(String gid, [Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.forcePause", [gid]);
+  }
+
+  Future<RpcResult> unpauseTask(String gid, [Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.unpause", [gid]);
+  }
+
+  Future<RpcResult> removeTask(String gid, [Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.forceRemove", [gid]);
+  }
+
+  Future<RpcResult> unpauseAll([Aria2Config? config]) async {
+    config ??= this.config;
+
+    return Aria2Request.getRequest(config).call(config, "aria2.unpauseAll", []);
+  }
+
+  Future<RpcResult> pauseAll([Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.forcePauseAll", []);
+  }
+
+  Future<RpcResult> changeGlobalOption(String option, String value,
+      [Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.changeGlobalOption", [
+      {option: value}
+    ]);
+  }
+
+  Future<RpcResult> changeTaskOption(String gid, Map<String,String> options,
+      [Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.changeOption", [gid, options]);
+  }
+
+
+
+  Future<RpcResult> createTask(List<String> urls, Map<String, String> options,
+      [Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.addUri", [urls, options]);
+  }
+
+  Future<RpcResult> getPeers(String gid, [Aria2Config? config]) async {
+    config ??= this.config;
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.getPeers", [gid]);
+  }
+
+  Future<RpcResult> tellStatusAndPeers(String gid) async {
+    return Aria2Request.getRequest(config).multiCall(config, [
+      Pair(first: "aria2.tellStatus", second: [gid]),
+      Pair(first: "aria2.getPeers", second: [gid]),
+    ]);
+  }
+
+  Future<RpcResult> tellStatus(String gid) async {
+    return Aria2Request.getRequest(config)
+        .call(config, "aria2.tellStatus", [gid]);
   }
 }

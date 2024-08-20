@@ -16,9 +16,10 @@ class Aria2HttpRequest extends Aria2Request {
 
   @override
   Future<RpcResult> call(
-      Aria2Config config, String method, List<dynamic>? params) async {
+      Aria2Config config, String method, List<dynamic>? params,
+      {bool needSecret = true}) async {
     List<dynamic> args = [];
-    if (config.secret != null) {
+    if (config.secret != null && needSecret) {
       args.add("token:${config.secret}");
     }
     args.addAll(params as Iterable<dynamic>);
@@ -30,11 +31,12 @@ class Aria2HttpRequest extends Aria2Request {
       'id': Util.generateId(Aria2Constants.APP_PREFIX),
       // Unique identifier for the request
     });
+    final uri = config.uri();
     try {
-      final response =
-          await http.post(config.uri, headers: headers, body: body);
+      final response = await http.post(uri, headers: headers, body: body);
       if (response.statusCode == 200) {
-        return RpcResult.ok(jsonDecode(response.body)['result']);
+        return RpcResult.ok(jsonDecode(
+            const Utf8Decoder().convert(response.bodyBytes))['result']);
       } else {
         throw Exception();
       }
@@ -46,5 +48,20 @@ class Aria2HttpRequest extends Aria2Request {
   @override
   Future<RpcResult> connect(Aria2Config config) async {
     return call(config, "aria2.getVersion", []);
+  }
+
+  @override
+  Future<RpcResult> multiCall(
+      Aria2Config config, List<Pair<String, List<dynamic>>> methods) {
+    List<dynamic> params = [];
+    for (var value in methods) {
+      List<dynamic> args = [];
+      if (config.secret != null) {
+        args.add("token:${config.secret}");
+      }
+      args.addAll(value.second as Iterable<dynamic>);
+      params.add({"methodName": value.first, "params": args});
+    }
+    return call(config, "system.multicall", [params], needSecret: false);
   }
 }

@@ -30,9 +30,10 @@ class MyTransparentPageRoute extends PageRoute {
           child: ClipRRect(
             borderRadius: const BorderRadius.all(Radius.circular(30)),
             child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
                 child: content),
-          )),
+          )
+      ),
     );
   }
 

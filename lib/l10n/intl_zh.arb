@@ -1,0 +1,23 @@
+{
+  "@@locale": "zh",
+  "appNavigation1": "服务器",
+  "appNavigation2": "下载",
+  "appNavigation3": "设置",
+  "serverPageTitle": "服务器",
+  "settingPageTitle": "设置",
+  "languageSettingLabel": "语言",
+  "languageSettingOption1": "中文",
+  "languageSettingOption2": "English",
+  "themeSettingLabel": "主题",
+  "themeSettingOption1": "浅色",
+  "themeSettingOption2": "深色",
+  "globalRefreshIntervalLabel": "全局刷新间隔",
+  "taskRefreshIntervalLabel": "任务刷新间隔",
+  "enableSettingChangeTipLabel": "开启配置修改提示",
+  "second": "秒",
+  "minute": "分钟",
+  "yes": "是",
+  "no": "否",
+  "cancel": "取消",
+  "confirm": "确认"
+}

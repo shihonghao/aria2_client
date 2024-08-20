@@ -7,7 +7,7 @@ import '../../aria2/aria2_constants.dart';
 import '../../providers/aria2_model.dart';
 
 class Aria2ServerAddDialog extends Dialog {
-  final Aria2Config config = Aria2Config(name: "");
+  final Aria2Config config = Aria2Config(key: "", name: "");
 
   Aria2ServerAddDialog({super.key});
 
@@ -228,7 +228,7 @@ class Aria2ServerAddDialog extends Dialog {
   }
 
   confirm(BuildContext context) {
-    config.buildUri();
+    config.uri();
     context.read<Aria2Model>().addAria2(config);
     Navigator.pop(context);
   }

@@ -45,29 +45,29 @@ class _AriaDropdownState extends State<Aria2DropdownMenu>
               builder: (BuildContext context, int value, Widget? child) {
                 List<DropdownMenuEntry<String>> menuList = [];
                 Aria2Model model = context.read<Aria2Model>();
-                for (Aria2 aria2 in model.aria2s) {
-                  menuList.add(DropdownMenuEntry(
-                    value: aria2.config.name,
-                    label: aria2.config.name,
-                  ));
-                }
+                // for (Aria2 aria2 in model.aria2s) {
+                //   menuList.add(DropdownMenuEntry(
+                //     value: aria2.config.name,
+                //     label: aria2.config.name,
+                //   ));
+                // }
                 return DropdownMenu(
                   width: 200,
                   leadingIcon: const Icon(TDIcons.server),
                   dropdownMenuEntries: menuList,
                   label: const Text("Aria2服务"),
-                  initialSelection: model.current?.config.name,
+                  initialSelection: model.currentServer?.aria2.config.name,
                   inputDecorationTheme:
                       const InputDecorationTheme(border: InputBorder.none),
                   controller: TextEditingController(),
                   onSelected: (selected) {
-                    if (model.current?.config.name == selected) {
+                    if (model.currentServer?.aria2.config.name == selected) {
                       return;
                     }
                     setConnecting(true);
-                    model.changeServer(selected!).then((value) {
-                      setConnecting(false);
-                    });
+                    // model.changeServer(selected!).then((value) {
+                    //   setConnecting(false);
+                    // });
                   },
                 );
               },

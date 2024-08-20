@@ -10,12 +10,21 @@ enum MyAnimationDirection {
 enum MyAnimationAction { tap, longPress, hover }
 
 abstract class MyAnimation extends StatefulWidget {
-  final int duration;
+  final Duration duration;
+  final Curve curve;
+  final bool auto;
+  final bool repeat;
 
   const MyAnimation({
     super.key,
-    this.duration = 500,
+    this.duration = const Duration(seconds: 1),
+    this.curve = Curves.linear,
+    this.auto = false,
+    this.repeat = false
   });
+
+  @override
+  MyAnimationState createState();
 }
 
 abstract class MyAnimationState<T extends StatefulWidget, R> extends State<T>
@@ -28,6 +37,12 @@ abstract class MyAnimationState<T extends StatefulWidget, R> extends State<T>
   initState() {
     super.initState();
     initAnimation();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   initAnimation();

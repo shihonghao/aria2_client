@@ -340,8 +340,9 @@ class Aria2ServerConfig {
   @JsonKey(name: "dscp",defaultValue: 0)
   @StringToIntegerConverter()
   int? dscp;
-  @JsonKey(name: "rlimit-nofile",defaultValue: "")
-  String? rlimitNofile;
+  @JsonKey(name: "rlimit-nofile",defaultValue: 0)
+  @StringToIntegerConverter()
+  int? rlimitNofile;
   @JsonKey(name: "enable-color",defaultValue: false)
   @StringToBoolConverter()
   bool? enableColor;

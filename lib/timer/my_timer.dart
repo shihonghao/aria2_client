@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:aria2_client/static/vars.dart';
+import 'package:flutter/cupertino.dart';
+
+import '../const/Const.dart';
 
 class MyTimer<T> {
   Timer? timer;
@@ -30,14 +32,11 @@ class MyTimer<T> {
         onTime: (_, __) async {
           return true;
         },
-        duration: duration100ms);
-  }
-
-  pause() {
-    timer?.cancel();
+        duration: Const.duration500ms);
   }
 
   bool resume() {
+    stop();
     timer = _buildTimer();
     return true;
   }
@@ -56,7 +55,7 @@ class MyTimer<T> {
           failedCount++;
         }
         if (failedCount > maxFailedCount) {
-          stop();
+          timer.cancel();
           onError?.call();
         }
       });
@@ -77,7 +76,9 @@ class MyTimer<T> {
     timer = _buildTimer();
   }
 
-  stop() {
-    timer?.cancel();
+  void stop() {
+    if (timer != null) {
+      timer!.cancel();
+    }
   }
 }

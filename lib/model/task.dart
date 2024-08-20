@@ -1,4 +1,6 @@
 import 'package:aria2_client/aria2/model/json/converter.dart';
+import 'package:aria2_client/service/peer_id_parser.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'task.g.dart';
@@ -23,6 +25,7 @@ class Task {
   /// 下载的 GID
   final String gid;
 
+  @JsonKey(includeFromJson: false)
   String? taskName;
 
   /// 下载状态
@@ -115,6 +118,10 @@ class Task {
   /// 如果此下载正在等待在队列中进行哈希检查，则为“true”。此键仅在此下载在队列中时存在
   String? verifyIntegrityPending;
 
+  int? lastDownloadSpeed;
+
+  int? lastUploadSpeed;
+
   Task({
     required this.gid,
     required this.status,
@@ -137,27 +144,35 @@ class Task {
     this.belongsTo,
     this.dir,
     this.files,
+    this.bittorrent,
     this.verifiedLength,
     this.verifyIntegrityPending,
-  }) : lastCompletedLength = 0;
+  })  : lastCompletedLength = 0,
+        lastDownloadSpeed = 0,
+        lastUploadSpeed = 0,
+        taskName = analysisTaskName(bittorrent, files);
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
 
   Map<String?, dynamic> toJson() => _$TaskToJson(this);
 
+  bool isBitTorrent() {
+    return bittorrent != null;
+  }
+
   String formatBytes(int? bytes) {
     if (bytes == null) {
-      return "0b";
+      return "0 b";
     }
-    String res = "0b";
+    String res = "0 b";
     if (bytes >= 1024 && bytes < 1024 * 1024) {
-      res = "${(bytes.toDouble() / 1024).toStringAsFixed(2)}kb";
+      res = "${(bytes.toDouble() / 1024).toStringAsFixed(2)} kb";
     } else if (bytes >= 1024 * 1024 && bytes < 1024 * 1024 * 1024) {
-      res = "${(bytes.toDouble() / 1024 / 1024).toStringAsFixed(2)}mb";
+      res = "${(bytes.toDouble() / 1024 / 1024).toStringAsFixed(2)} mb";
     } else if (bytes >= 1024 * 1024 * 1024) {
-      res = "${(bytes.toDouble() / 1024 / 1024 / 1024).toStringAsFixed(2)}gb";
+      res = "${(bytes.toDouble() / 1024 / 1024 / 1024).toStringAsFixed(2)} gb";
     } else {
-      res = "${bytes}b";
+      res = "$bytes b";
     }
     return res;
   }
@@ -184,30 +199,31 @@ class Task {
     return remainTime;
   }
 
-  analysisTaskName() {
-    if (taskName != null) {
-      return taskName;
-    }
+  static String analysisTaskName(Bittorrent? bittorrent, List<TaskFile>? files) {
+    String? taskName = bittorrent?.info?.name;
 
-    taskName = bittorrent?.info?.name;
-
-    if (taskName == null && files != null && files!.isNotEmpty) {
-      taskName = getFileName(files?[0]);
+    if (taskName == null && files != null && files.isNotEmpty) {
+      taskName = getFileName(files[0]);
     }
     taskName ??= 'Unknown';
+    return taskName;
   }
 
-  String? getFileName(file) {
-    String path = file.path;
+  static String? getFileName(TaskFile file) {
+    String? path = file.path;
     var needUrlDecode = false;
 
-    if (path.isEmpty && file.uris && file.uris.length > 0) {
-      path = file.uris[0].uri;
+    if (path == null ||
+        path.isEmpty && file.uris != null && file.uris!.isNotEmpty) {
+      path = file.uris![0].uri;
       needUrlDecode = true;
     }
 
-    var index = path.lastIndexOf('/');
+    if (path == null) {
+      return "Unknown";
+    }
 
+    int? index = path.lastIndexOf('/');
     if (index <= 0 || index == path.length) {
       return path;
     }
@@ -231,18 +247,60 @@ class Task {
     return fileName;
   }
 
+  static String computedFilePercentage(TaskFile file){
+    return file.completedLength == null || file.length == null
+        ? "0 %"
+        : "${(file.completedLength! / file.length! * 100).toStringAsFixed(2)} %";
+  }
+
   void update(Task task) {
     lastCompletedLength = completedLength;
+    lastUploadSpeed = uploadSpeed;
+    lastDownloadSpeed = downloadSpeed;
+
     completedLength = task.completedLength;
     uploadLength = task.uploadLength;
     downloadSpeed = task.downloadSpeed;
     uploadSpeed = task.uploadSpeed;
+    numPieces = task.numPieces;
+    bitfield = task.bitfield;
+  }
+
+  bool isChanged() {
+    return lastCompletedLength != completedLength ||
+        lastUploadSpeed != uploadSpeed ||
+        lastDownloadSpeed != downloadSpeed;
   }
 
   String computedPercentage() {
     return completedLength == null || totalLength == null
         ? "0 %"
         : "${(completedLength! / totalLength! * 100).toStringAsFixed(2)} %";
+  }
+
+  String? getUri() {
+    if (files != null &&
+        files!.isNotEmpty &&
+        files![0].uris != null &&
+        files![0].uris!.isNotEmpty) {
+      return files![0].uris![0].uri;
+    }
+    return null;
+  }
+
+  String? getDownloadPath() {
+    if (files != null && files!.isNotEmpty) {
+      return files![0].path!.substring(0, files![0].path!.lastIndexOf("/"));
+    }
+    return null;
+  }
+
+  double getShareRatio() {
+    return (completedLength == null
+        ? 0
+        : completedLength! > 0
+            ? (uploadLength ?? 0) / completedLength!
+            : 0);
   }
 }
 
@@ -289,9 +347,9 @@ class TaskUri {
 
 @JsonSerializable()
 class Bittorrent {
-  List<String>? announceList;
+  List<List<String>>? announceList;
   String? comment;
-  String? creationDate;
+  int? creationDate;
   String? mode;
   BittorrentInfo? info;
 
@@ -321,4 +379,72 @@ class BittorrentInfo {
       _$BittorrentInfoFromJson(json);
 
   Map<String?, dynamic> toJson() => _$BittorrentInfoToJson(this);
+}
+
+@JsonSerializable()
+class Peer {
+  String? peerId;
+  String? ip;
+  String? port;
+  String? bitfield;
+  @StringToBoolConverter()
+  bool? amChoking;
+  @StringToBoolConverter()
+  bool? peerChoking;
+  @StringToIntegerConverter()
+  int? downloadSpeed;
+  @StringToIntegerConverter()
+  int? uploadSpeed;
+  @StringToBoolConverter()
+  bool? seeder;
+
+  @JsonKey(includeFromJson: false)
+  String? client;
+
+  Peer({
+    this.peerId,
+    this.ip,
+    this.port,
+    this.bitfield,
+    this.amChoking,
+    this.peerChoking,
+    this.downloadSpeed,
+    this.uploadSpeed,
+    this.seeder,
+  }) : client = getClient(peerId);
+
+  factory Peer.fromJson(Map<String, dynamic> json) => _$PeerFromJson(json);
+
+  Map<String?, dynamic> toJson() => _$PeerToJson(this);
+
+  static String getClient(String? peerId) {
+    if (peerId == null) {
+      return "";
+    }
+    final realPeerId = decodePercentEncodedString(peerId);
+    Map<String, dynamic>? result =
+        PeerIdParser.instance.parsePeerId(realPeerId);
+    if (result == null) {
+      return "";
+    }
+    return "${result["client"]} ${result["version"]}";
+  }
+
+  static String decodePercentEncodedString(String s) {
+    var ret = '';
+
+    for (var i = 0; i < s.length; i++) {
+      var ch = s[i];
+
+      if (ch == '%' && i < s.length - 2) {
+        var code = s.substring(i + 1, i + 3);
+        ret += String.fromCharCode(int.parse(code, radix: 16));
+        i += 2;
+      } else {
+        ret += ch;
+      }
+    }
+
+    return ret;
+  }
 }

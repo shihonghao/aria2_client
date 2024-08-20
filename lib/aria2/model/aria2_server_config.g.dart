@@ -293,7 +293,9 @@ Aria2ServerConfig _$Aria2ServerConfigFromJson(Map<String, dynamic> json) =>
       _$JsonConverterFromJson<String, int>(
               json['dscp'], const StringToIntegerConverter().fromJson) ??
           0,
-      json['rlimit-nofile'] as String? ?? '',
+      _$JsonConverterFromJson<String, int>(json['rlimit-nofile'],
+              const StringToIntegerConverter().fromJson) ??
+          0,
       _$JsonConverterFromJson<String, bool>(
               json['enable-color'], const StringToBoolConverter().fromJson) ??
           false,
@@ -599,7 +601,8 @@ Map<String, dynamic> _$Aria2ServerConfigToJson(Aria2ServerConfig instance) =>
       'download-result': instance.downloadResult,
       'dscp': _$JsonConverterToJson<String, int>(
           instance.dscp, const StringToIntegerConverter().toJson),
-      'rlimit-nofile': instance.rlimitNofile,
+      'rlimit-nofile': _$JsonConverterToJson<String, int>(
+          instance.rlimitNofile, const StringToIntegerConverter().toJson),
       'enable-color': _$JsonConverterToJson<String, bool>(
           instance.enableColor, const StringToBoolConverter().toJson),
       'enable-mmap': _$JsonConverterToJson<String, bool>(

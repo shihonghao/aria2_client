@@ -1,9 +1,12 @@
+import 'package:animations/animations.dart';
 import 'package:aria2_client/model/task.dart';
-import 'package:aria2_client/providers/aria2_model.dart';
+import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/ui/component/expandable_fab.dart';
+import 'package:aria2_client/ui/pages/download/create_task_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
+import '../../../const/Const.dart';
+import '../../../util/Util.dart';
 import 'task_list_view.dart';
 
 class DownloadPage extends StatefulWidget {
@@ -16,25 +19,6 @@ class DownloadPage extends StatefulWidget {
 }
 
 class _DownloadPageState extends State<DownloadPage> {
-  static const _actionTitles = ['Create Post', 'Upload Photo', 'Upload Video'];
-
-  void _showAction(BuildContext context, int index) {
-    showDialog<void>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Text(_actionTitles[index]),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('CLOSE'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,19 +26,33 @@ class _DownloadPageState extends State<DownloadPage> {
           distance: 112,
           children: [
             ActionButton(
-              onPressed: () => _showAction(context, 0),
+              onPressed: () => showModal<void>(
+                configuration: FadeScaleTransitionConfiguration(
+                    transitionDuration: Const.duration500ms,
+                    reverseTransitionDuration: Const.duration200ms),
+                context: context,
+                builder: (BuildContext context) {
+                  return CreateTaskDialog();
+                },
+              ),
               icon: const Icon(Icons.add),
             ),
             ActionButton(
-              onPressed: () => _showAction(context, 1),
+              onPressed: () =>
+                  Util.showTextAlert(context, "确定开始全部任务?", onConfirm: () {
+                Aria2RpcClient.instance.unpauseAll();
+              }),
               icon: const Icon(Icons.play_arrow),
             ),
             ActionButton(
-              onPressed: () => _showAction(context, 2),
+              onPressed: () =>
+                  Util.showTextAlert(context, "确定开始暂停全部任务?", onConfirm: () {
+                Aria2RpcClient.instance.pauseAll();
+              }),
               icon: const Icon(Icons.stop),
             ),
             ActionButton(
-              onPressed: () => _showAction(context, 2),
+              onPressed: () => Util.showTextAlert(context, "确定开始移除全部任务?"),
               icon: const Icon(Icons.remove),
             ),
           ],
@@ -62,76 +60,76 @@ class _DownloadPageState extends State<DownloadPage> {
         // This trailing comma makes auto-formatting nicer for build methods.
         body: DefaultTabController(
             length: 5,
-            child: Scaffold(
-                appBar: TabBar(
-                    // 多个标签时滚动加载
-                    tabAlignment: TabAlignment.center,
-                    isScrollable: true,
-                    // 标签指示器的颜色
-                    indicatorColor: Colors.blue,
-                    // 标签的颜色
-                    labelColor: Colors.blue,
-                    // 未选中标签的颜色
-                    unselectedLabelColor: Colors.black,
-                    // 指示器的大小
-                    indicatorSize: TabBarIndicatorSize.label,
-                    // 指示器的权重，即线条高度
-                    indicatorWeight: 4.0,
-                    onTap: (index) {
-                      changeTaskSubscribe(context, index);
-                    },
-                    tabs: const [
-                      Tab(text: "进行中"),
-                      Tab(text: "等待中"),
-                      Tab(text: "已暂停"),
-                      Tab(text: "已完成"),
-                      Tab(text: "错误"),
-                      // Tab(text: "已删除"),
-                    ]),
-                // 标签页所对应的页面
-                body: TabBarView(children: [
-                  TaskListView(
-                    status: TaskStatus.active,
-                  ),
-                  TaskListView(
-                    status: TaskStatus.waiting,
-                  ),
-                  TaskListView(
-                    status: TaskStatus.paused,
-                  ),
-                  TaskListView(
-                    status: TaskStatus.complete,
-                  ),
-                  TaskListView(
-                    status: TaskStatus.error,
-                  ),
-                  // TaskPage(
-                  //   status: TaskStatus.removed,
-                  // ),
-                ]))));
-  }
-
-  void changeTaskSubscribe(BuildContext context, int index) {
-    TaskStatus taskStatus = TaskStatus.active;
-    switch (index) {
-      case 0:
-        taskStatus = TaskStatus.active;
-        break;
-      case 1:
-        taskStatus = TaskStatus.waiting;
-        break;
-      case 2:
-        taskStatus = TaskStatus.paused;
-        break;
-      case 3:
-        taskStatus = TaskStatus.complete;
-        break;
-      case 4:
-        taskStatus = TaskStatus.error;
-        break;
-      case 5:
-        taskStatus = TaskStatus.removed;
-    }
-    context.read<Aria2Model>().startTaskTimer(taskStatus);
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                Expanded(
+                  child: Scaffold(
+                      appBar: TabBar(
+                          overlayColor: WidgetStateProperty.all<Color>(
+                              Colors.transparent),
+                          splashFactory: NoSplash.splashFactory,
+                          dividerHeight: 0,
+                          // 多个标签时滚动加载
+                          tabAlignment: TabAlignment.fill,
+                          isScrollable: false,
+                          // 标签指示器的颜色
+                          // indicatorColor: Colors.blue,
+                          // 标签的颜色
+                          labelColor: Colors.blue,
+                          // 未选中标签的颜色
+                          unselectedLabelColor: Colors.white,
+                          // 指示器的大小
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          // 指示器的权重，即线条高度
+                          indicatorWeight: 0,
+                          indicatorPadding:
+                              const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                          indicator: BoxDecoration(
+                            color: Theme.of(context).splashColor,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          onTap: (index) {},
+                          tabs: const [
+                            Tab(text: "下载中"),
+                            Tab(text: "等待中"),
+                            Tab(text: "已暂停"),
+                            Tab(text: "已完成"),
+                            Tab(text: "错误"),
+                            // Tab(text: "已删除"),
+                          ]),
+                      // 标签页所对应的页面
+                      body: TabBarView(children: [
+                        TaskListView(
+                          key: UniqueKey(),
+                          status: TaskStatus.active,
+                        ),
+                        TaskListView(
+                          key: UniqueKey(),
+                          status: TaskStatus.waiting,
+                        ),
+                        TaskListView(
+                          key: UniqueKey(),
+                          status: TaskStatus.paused,
+                        ),
+                        TaskListView(
+                          key: UniqueKey(),
+                          status: TaskStatus.complete,
+                        ),
+                        TaskListView(
+                          key: UniqueKey(),
+                          status: TaskStatus.error,
+                        ),
+                        // TaskPage(
+                        //   status: TaskStatus.removed,
+                        // ),
+                      ])),
+                ),
+              ],
+            )));
   }
 }
