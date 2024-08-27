@@ -96,7 +96,7 @@ class Task {
 
   /// 生成为此下载结果的 GID 列表。
   /// 例如，当 aria2 下载一个 Metalink 文件时，会生成 Metalink 中描述的下载（参见 --follow-metalink 选项）。此值对于跟踪自动生成的下载非常有用。如果没有这样的下载，则此键不会包含在响应中
-  String? followedBy;
+  List<String>? followedBy;
 
   /// “followedBy”的反向链接。包含在“followedBy”中的下载在其 following 值中具有该对象的 GID。
   String? following;
@@ -295,12 +295,12 @@ class Task {
     return null;
   }
 
-  double getShareRatio() {
+  String getShareRatio() {
     return (completedLength == null
-        ? 0
+        ? "0.0 %"
         : completedLength! > 0
-            ? (uploadLength ?? 0) / completedLength!
-            : 0);
+            ? "${((uploadLength ?? 0) / completedLength!).toStringAsFixed(2)} %"
+            : "0.0 %");
   }
 }
 

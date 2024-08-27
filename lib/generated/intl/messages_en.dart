@@ -37,7 +37,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "active": MessageLookupByLibrary.simpleMessage("Active"),
-        "advanced": MessageLookupByLibrary.simpleMessage("advanced"),
+        "advanced": MessageLookupByLibrary.simpleMessage("ADVANCED"),
         "all_proxy": MessageLookupByLibrary.simpleMessage("Proxy Server"),
         "all_proxy_passwd":
             MessageLookupByLibrary.simpleMessage("Proxy Password"),
@@ -82,6 +82,9 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Auto Save Interval"),
         "auto_save_interval_tooltip": MessageLookupByLibrary.simpleMessage(
             "Save a control file(*.aria2) every SEC seconds. If 0 is given, a control file is not saved during download. aria2 saves a control file when it stops regardless of the value. The possible values are between 0 to 600."),
+        "baseInfo": MessageLookupByLibrary.simpleMessage("Base Info"),
+        "basic": MessageLookupByLibrary.simpleMessage("BASIC"),
+        "btInfo": MessageLookupByLibrary.simpleMessage("Bittorrent Info"),
         "bt_detach_seed_only":
             MessageLookupByLibrary.simpleMessage("Detach Seed Only"),
         "bt_detach_seed_only_tooltip": MessageLookupByLibrary.simpleMessage(
@@ -166,11 +169,14 @@ class MessageLookup extends MessageLookupByLibrary {
             "BitTorrent Tracker Connect Interval"),
         "bt_tracker_interval_tooltip": MessageLookupByLibrary.simpleMessage(
             "Set the interval in seconds between tracker requests. This completely overrides interval value and aria2 just uses this value and ignores the min interval and interval value in the response of tracker. If 0 is set, aria2 determines interval based on the response of tracker and the download progress."),
+        "bt_tracker_servers":
+            MessageLookupByLibrary.simpleMessage("BT Tracker Servers"),
         "bt_tracker_timeout":
             MessageLookupByLibrary.simpleMessage("BitTorrent Tracker Timeout"),
         "bt_tracker_timeout_tooltip": MessageLookupByLibrary.simpleMessage(""),
         "bt_tracker_tooltip": MessageLookupByLibrary.simpleMessage(
             "Comma separated list of additional BitTorrent tracker\'s announce URI. These URIs are not affected by --bt-exclude-tracker option because they are added after URIs in --bt-exclude-tracker option are removed."),
+        "bytes": MessageLookupByLibrary.simpleMessage("bytes"),
         "cancel": MessageLookupByLibrary.simpleMessage("cancel"),
         "check_certificate":
             MessageLookupByLibrary.simpleMessage("Check Certificate"),
@@ -193,10 +199,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "conf_path": MessageLookupByLibrary.simpleMessage("Configuration File"),
         "conf_path_tooltip": MessageLookupByLibrary.simpleMessage(""),
         "confirm": MessageLookupByLibrary.simpleMessage("confirm"),
+        "connect_error": MessageLookupByLibrary.simpleMessage("connect error"),
         "connect_timeout":
             MessageLookupByLibrary.simpleMessage("Connect Timeout"),
         "connect_timeout_tooltip": MessageLookupByLibrary.simpleMessage(
             "Set the connect timeout in seconds to establish connection to HTTP/FTP/proxy server. After the connection is established, this option makes no effect and --timeout option is used instead."),
+        "connection_info":
+            MessageLookupByLibrary.simpleMessage("Connection information"),
+        "connections": MessageLookupByLibrary.simpleMessage("Connections"),
         "console_log_level":
             MessageLookupByLibrary.simpleMessage("Console Log Level"),
         "console_log_level_tooltip": MessageLookupByLibrary.simpleMessage(""),
@@ -206,9 +216,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "content_disposition_default_utf8_tooltip":
             MessageLookupByLibrary.simpleMessage(
                 "Handle quoted string in Content-Disposition header as UTF-8 instead of ISO-8859-1, for example, the filename parameter, but not the extended version filename."),
-        "continue_": MessageLookupByLibrary.simpleMessage("Resume Download"),
-        "continue_tooltip": MessageLookupByLibrary.simpleMessage(
+        "continue_download":
+            MessageLookupByLibrary.simpleMessage("Resume Download"),
+        "continue_download_tooltip": MessageLookupByLibrary.simpleMessage(
             "Continue downloading a partially downloaded file. Use this option to resume a download started by a web browser or another program which downloads files sequentially from the beginning. Currently this option is only applicable to HTTP(S)/FTP downloads."),
+        "creationDate": MessageLookupByLibrary.simpleMessage("Creation Date"),
         "daemon": MessageLookupByLibrary.simpleMessage("Enable Daemon"),
         "daemon_tooltip": MessageLookupByLibrary.simpleMessage(""),
         "darkTheme": MessageLookupByLibrary.simpleMessage("dark"),
@@ -239,10 +251,16 @@ class MessageLookup extends MessageLookupByLibrary {
         "disk_cache_tooltip": MessageLookupByLibrary.simpleMessage(
             "Enable disk cache. If SIZE is 0, the disk cache is disabled. This feature caches the downloaded data in memory, which grows to at most SIZE bytes. The cache storage is created for aria2 instance and shared by all downloads. The one advantage of the disk cache is reduce the disk I/O because the data are written in larger unit and it is reordered by the offset of the file. If hash checking is involved and the data are cached in memory, we don\'t need to read them from the disk. SIZE can include K or M (1K "),
         "download": MessageLookupByLibrary.simpleMessage("download"),
+        "download_dir":
+            MessageLookupByLibrary.simpleMessage("Download Directory"),
+        "download_path": MessageLookupByLibrary.simpleMessage("Download Path"),
         "download_result":
             MessageLookupByLibrary.simpleMessage("Download Result"),
         "download_result_tooltip": MessageLookupByLibrary.simpleMessage(
             "This option changes the way Download Results is formatted. If OPT is default, print GID, status, average download speed and path/URI. If multiple files are involved, path/URI of first requested file is printed and remaining ones are omitted. If OPT is full, print GID, status, average download speed, percentage of progress and path/URI. The percentage of progress and path/URI are printed for each requested file in each row. If OPT is hide, Download Results is hidden."),
+        "download_speed":
+            MessageLookupByLibrary.simpleMessage("Download Speed"),
+        "download_url": MessageLookupByLibrary.simpleMessage("Download URL"),
         "downloading": MessageLookupByLibrary.simpleMessage("Downloading"),
         "downloading_count": m1,
         "dry_run": MessageLookupByLibrary.simpleMessage("Dry Run"),
@@ -291,6 +309,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("File Allocation Method"),
         "file_allocation_tooltip": MessageLookupByLibrary.simpleMessage(
             "Specify file allocation method. none doesn\'t pre-allocate file space. prealloc pre-allocates file space before download begins. This may take some time depending on the size of the file. If you are using newer file systems such as ext4 (with extents support), btrfs, xfs or NTFS(MinGW build only), falloc is your best choice. It allocates large(few GiB) files almost instantly. Don\'t use falloc with legacy file systems such as ext3 and FAT32 because it takes almost same time as prealloc and it blocks aria2 entirely until allocation finishes. falloc may not be available if your system doesn\'t have posix_fallocate(3) function. trunc uses ftruncate(2) system call or platform-specific counterpart to truncate a file to a specified length. In multi file torrent downloads, the files adjacent forward to the specified files are also allocated if they share the same piece."),
+        "files": MessageLookupByLibrary.simpleMessage("Files"),
         "follow_metalink":
             MessageLookupByLibrary.simpleMessage("Follow Metalink"),
         "follow_metalink_tooltip": MessageLookupByLibrary.simpleMessage(
@@ -373,6 +392,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Console Human Readable Output"),
         "human_readable_tooltip": MessageLookupByLibrary.simpleMessage(
             "Print sizes and speed in human readable format (e.g., 1.2Ki, 3.4Mi) in the console readout."),
+        "info_hash": MessageLookupByLibrary.simpleMessage("Info_hash"),
         "keep_unfinished_download_result": MessageLookupByLibrary.simpleMessage(
             "Keep Unfinished Download Result"),
         "keep_unfinished_download_result_tooltip":
@@ -383,6 +403,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "listen_port": MessageLookupByLibrary.simpleMessage("Listen Port"),
         "listen_port_tooltip": MessageLookupByLibrary.simpleMessage(
             "Set TCP port number for BitTorrent downloads. Multiple ports can be specified by using \",\" for example: 6881,6885. You can also use - to specify a range: 6881-6999. , and - can be used together: 6881-6889,6999."),
+        "local": MessageLookupByLibrary.simpleMessage("Local"),
         "log": MessageLookupByLibrary.simpleMessage("Log File"),
         "log_level": MessageLookupByLibrary.simpleMessage("Log Level"),
         "log_level_tooltip": MessageLookupByLibrary.simpleMessage(""),
@@ -494,6 +515,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "out": MessageLookupByLibrary.simpleMessage("File Name"),
         "out_tooltip": MessageLookupByLibrary.simpleMessage(
             "The file name of the downloaded file. It is always relative to the directory given in --dir option. When the --force-sequential option is used, this option is ignored."),
+        "overview": MessageLookupByLibrary.simpleMessage("Overview"),
         "parameterized_uri":
             MessageLookupByLibrary.simpleMessage("Enable Parameterized URI"),
         "parameterized_uri_tooltip": MessageLookupByLibrary.simpleMessage(
@@ -514,6 +536,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "piece_length": MessageLookupByLibrary.simpleMessage("Piece Length"),
         "piece_length_tooltip": MessageLookupByLibrary.simpleMessage(
             "Set a piece length for HTTP/FTP downloads. This is the boundary when aria2 splits a file. All splits occur at multiple of this length. This option will be ignored in BitTorrent downloads. It will be also ignored if Metalink file contains piece hashes."),
+        "pieces": MessageLookupByLibrary.simpleMessage("Pieces"),
         "proxy_method": MessageLookupByLibrary.simpleMessage("Proxy Method"),
         "proxy_method_tooltip": MessageLookupByLibrary.simpleMessage(
             "Set the method to use in proxy request. METHOD is either GET or TUNNEL. HTTPS downloads always use TUNNEL regardless of this option."),
@@ -526,6 +549,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "referer": MessageLookupByLibrary.simpleMessage("Referer"),
         "referer_tooltip": MessageLookupByLibrary.simpleMessage(
             "Set an http referrer (Referer). This affects all http/https downloads. If * is given, the download URI is also used as the referrer. This may be useful when used together with the --parameterized-uri option."),
+        "remain_time": MessageLookupByLibrary.simpleMessage("Remaining"),
         "remote_time":
             MessageLookupByLibrary.simpleMessage("Remote File Timestamp"),
         "remote_time_tooltip": MessageLookupByLibrary.simpleMessage(
@@ -589,6 +613,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "seed_time": MessageLookupByLibrary.simpleMessage("Min Seed Time"),
         "seed_time_tooltip": MessageLookupByLibrary.simpleMessage(
             "Specify seeding time in (fractional) minutes. Specifying --seed-time"),
+        "seedersAndConnections":
+            MessageLookupByLibrary.simpleMessage("Seeders/Connections"),
         "serverPageTitle": MessageLookupByLibrary.simpleMessage("Servers"),
         "server_stat_of":
             MessageLookupByLibrary.simpleMessage("Server Stat Output"),
@@ -599,6 +625,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "server_stat_timeout_tooltip": MessageLookupByLibrary.simpleMessage(
             "Specifies timeout in seconds to invalidate performance profile of the servers since the last contact to them."),
         "settings": MessageLookupByLibrary.simpleMessage("Settings"),
+        "share_ratio": MessageLookupByLibrary.simpleMessage("Share Ratio"),
         "show_console_readout":
             MessageLookupByLibrary.simpleMessage("Show Console Output"),
         "show_console_readout_tooltip":
@@ -629,6 +656,10 @@ class MessageLookup extends MessageLookupByLibrary {
             "Set interval in seconds to output download progress summary. Setting 0 suppresses the output."),
         "taskRefreshIntervalLabel": MessageLookupByLibrary.simpleMessage(
             "Updating Task Information Interval"),
+        "task_name": MessageLookupByLibrary.simpleMessage("Task Name"),
+        "task_process": MessageLookupByLibrary.simpleMessage("Process"),
+        "task_size": MessageLookupByLibrary.simpleMessage("Task Size"),
+        "task_status": MessageLookupByLibrary.simpleMessage("Task Status"),
         "test": MessageLookupByLibrary.simpleMessage("test"),
         "theme": MessageLookupByLibrary.simpleMessage("Theme"),
         "timeout": MessageLookupByLibrary.simpleMessage("Timeout"),
@@ -638,7 +669,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "truncate_console_readout_tooltip":
             MessageLookupByLibrary.simpleMessage(
                 "Truncate console readout to fit in a single line."),
+        "unCompleted": MessageLookupByLibrary.simpleMessage("Uncompleted"),
+        "unKnown": MessageLookupByLibrary.simpleMessage("UnKnown"),
         "upload": MessageLookupByLibrary.simpleMessage("upload"),
+        "upload_speed": MessageLookupByLibrary.simpleMessage("Upload Speed"),
         "uri_selector":
             MessageLookupByLibrary.simpleMessage("URI Selection Algorithm"),
         "uri_selector_tooltip": MessageLookupByLibrary.simpleMessage(

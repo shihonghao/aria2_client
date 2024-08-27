@@ -1,9 +1,11 @@
 import 'package:aria2_client/const/Const.dart';
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/providers/task_model.dart';
 import 'package:aria2_client/ui/component/animation/my_animated_icon.dart';
 import 'package:aria2_client/ui/component/form/my_form.dart';
+import 'package:aria2_client/ui/pages/servers/detail/detail_page.dart';
 import 'package:flutter/material.dart';
 
 class FileList extends StatefulWidget {
@@ -52,7 +54,7 @@ class _FileListState extends State<FileList> {
                     textColor: Theme.of(context).primaryColor,
                     elevation: 3,
                   ),
-                  title: '文件列表',
+                  title: S.of(context).files,
                   items: task.files!
                       .map(
                         (e) => FormItem<String>(
@@ -60,52 +62,141 @@ class _FileListState extends State<FileList> {
                           key: 'fileName',
                           type: FormItemType.input,
                           value: '',
-                          leadingBuilder: (context) {
+                          contentBuilder: (context) {
+                            final progress = Task.computedFilePercentage(e);
                             return Expanded(
-                              child: Padding(
+                                child: InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () {},
+                              child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10.0),
-                                child: Text(Task.getFileName(e) ?? ""),
-                              ),
-                            );
-                          },
-                          contentBuilder: (context) {
-                            return InkWell(
-                                borderRadius: BorderRadius.circular(10),
-                                onTap: () {},
-                                child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0),
-                                    alignment: Alignment.centerRight,
-                                    child: Row(
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Expanded(
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              Task.getFileName(e) ?? "",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                        const VerticalDivider(color: Colors.transparent,),
+                                        if (task.status == TaskStatus.paused ||
+                                            task.status == TaskStatus.active)
+                                          MyAnimatedIcon(
+                                              auto: true,
+                                              onTap: (controller) {
+                                                if (task.status ==
+                                                    TaskStatus.paused) {
+                                                  controller.forward();
+                                                  changeFileSelected(e);
+                                                }
+                                              },
+                                              icon: !e.selected!
+                                                  ? Icons
+                                                      .check_box_outline_blank
+                                                  : Icons.check_box_outlined,
+                                              duration: Const.duration300ms,
+                                              color: e.selected! &&
+                                                      task.status ==
+                                                          TaskStatus.paused
+                                                  ? Theme.of(context)
+                                                      .indicatorColor
+                                                  : Theme.of(context)
+                                                      .splashColor),
+
+                                      ],
+                                    ),
+                                    const Divider(
+                                      color: Colors.transparent,
+                                    ),
+                                    Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(task.formatBytes(e.length)),
-                                        const SizedBox(width: 10),
-                                        Text(Task.computedFilePercentage(e)),
+                                        Container(
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              task.formatBytes(e.length),
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .indicatorColor),
+                                            )),
+                                        const SizedBox(width: 5),
+                                        // const Padding(
+                                        //   padding:  EdgeInsets.symmetric(horizontal: 5.0),
+                                        //   child:  VerticalDivider(width: 1),
+                                        // ),
+                                        Container(
+                                            constraints: const BoxConstraints(
+                                              minWidth: 60,
+                                            ),
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                                Task.computedFilePercentage(
+                                                    e))),
                                       ],
-                                    )));
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ));
                           },
-                          trailingBuilder: (task.status == TaskStatus.paused ||
-                                  task.status == TaskStatus.active)
-                              ? (context) => MyAnimatedIcon(
-                                  auto: true,
-                                  onTap: (controller) {
-                                    if (task.status == TaskStatus.paused) {
-                                      controller.forward();
-                                      changeFileSelected(e);
-                                    }
-                                  },
-                                  icon: !e.selected!
-                                      ? Icons.check_box_outline_blank
-                                      : Icons.check_box_outlined,
-                                  duration: Const.duration300ms,
-                                  color: e.selected! &&
-                                          task.status == TaskStatus.paused
-                                      ? Theme.of(context).indicatorColor
-                                      : Theme.of(context).splashColor)
-                              : null,
+                          // trailingBuilder: (context) {
+                          //   return Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //     children: [
+                          //       Container(
+                          //         padding: const EdgeInsets.symmetric(horizontal: 5),
+                          //           constraints: const BoxConstraints(
+                          //             minWidth: 50,
+                          //           ),
+                          //           decoration: BoxDecoration(
+                          //             color: Theme.of(context).cardColor,
+                          //             borderRadius: BorderRadius.circular(10),
+                          //           ),
+                          //           alignment: Alignment.centerRight,
+                          //           child: Text(task.formatBytes(e.length))),
+                          //       const SizedBox(width: 5),
+                          //       // const Padding(
+                          //       //   padding:  EdgeInsets.symmetric(horizontal: 5.0),
+                          //       //   child:  VerticalDivider(width: 1),
+                          //       // ),
+                          //       Container(
+                          //           constraints: const BoxConstraints(
+                          //             minWidth: 60,
+                          //           ),
+                          //           alignment: Alignment.centerRight,
+                          //           child:
+                          //               Text(Task.computedFilePercentage(e))),
+                          //     ],
+                          //   );
+                          // },
+                          leadingBuilder: (context)=>Container()
+                          // leadingBuilder: (task.status == TaskStatus.paused ||
+                          //         task.status == TaskStatus.active)
+                          //     ? (context) => MyAnimatedIcon(
+                          //         auto: true,
+                          //         onTap: (controller) {
+                          //           if (task.status == TaskStatus.paused) {
+                          //             controller.forward();
+                          //             changeFileSelected(e);
+                          //           }
+                          //         },
+                          //         icon: !e.selected!
+                          //             ? Icons.check_box_outline_blank
+                          //             : Icons.check_box_outlined,
+                          //         duration: Const.duration300ms,
+                          //         color: e.selected! &&
+                          //                 task.status == TaskStatus.paused
+                          //             ? Theme.of(context).indicatorColor
+                          //             : Theme.of(context).splashColor)
+                          //     : null,
                         ),
                       )
                       .toList(),

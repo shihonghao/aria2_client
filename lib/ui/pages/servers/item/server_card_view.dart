@@ -5,6 +5,8 @@ import 'package:aria2_client/aria2/model/aria2_global_status.dart';
 import 'package:aria2_client/aria2/model/aria2_server_config.dart';
 import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/generated/l10n.dart';
+import 'package:aria2_client/net/aria2_rpc_client.dart';
+import 'package:aria2_client/net/rpc_result.dart';
 import 'package:aria2_client/providers/aria2_model.dart';
 import 'package:aria2_client/providers/server_model.dart';
 import 'package:aria2_client/ui/component/animation/my_animated_icon.dart';
@@ -90,14 +92,7 @@ class _ServerCardViewState extends State<ServerCardView> {
                                         Colors.red,
                                       ])
                                 ],
-                              )
-
-                              // Text(
-                              //   config.uri.toString(),
-                              //   style:
-                              //       TextStyle(color: Theme.of(context).splashColor),
-                              // ),
-                              )
+                              ))
                         ],
                       );
                     },
@@ -284,6 +279,9 @@ class _ServerCardViewState extends State<ServerCardView> {
                                             child: TextField(
                                               controller:
                                                   _downloadLimitSpeedTextController,
+                                              onChanged: (value){
+                                                Aria2RpcClient.instance.changeGlobalOption("max-overall-download-limit", value);
+                                              },
                                               decoration: InputDecoration(
                                                   suffix: const Text("mb/s"),
                                                   fillColor: Theme.of(context)
@@ -318,6 +316,10 @@ class _ServerCardViewState extends State<ServerCardView> {
                                             child: TextField(
                                               controller:
                                                   _uploadLimitSpeedTextController,
+                                              onChanged: (value){
+                                                final limit = int.parse(value);
+                                                Aria2RpcClient.instance.changeGlobalOption("max-overall-upload-limit", (limit * 1024 * 1024).toString());
+                                              },
                                               decoration: InputDecoration(
                                                   suffix: const Text("mb/s"),
                                                   fillColor: Theme.of(context)

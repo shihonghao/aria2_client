@@ -1,9 +1,12 @@
 import 'package:aria2_client/const/Const.dart';
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/store/IHive.dart';
+import 'package:aria2_client/ui/component/animation/my_animated_icon.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 typedef ItemBuilder = Widget Function(BuildContext context, FormItem item);
 typedef GroupBuilder = Widget Function(BuildContext context, FormGroup group);
@@ -68,7 +71,7 @@ class FormGroup {
   });
 }
 
-class FormItem<T> {
+class FormItem<T> extends ChangeNotifier {
   final String key;
   final String? label;
   final FormItemType type;
@@ -110,10 +113,14 @@ class FormItem<T> {
             "Select option can not be empty!!");
 
   void callOnChange() {
-    if ( value == null){
+    if (value == null) {
       return;
     }
     onChange?.call(value as T);
+  }
+
+  void refresh() {
+    notifyListeners();
   }
 }
 
@@ -180,7 +187,7 @@ class _MyFormState extends State<MyForm> {
     for (var item in group.items) {
       items.add(item.builder == null
           ? (group.itemBuilder == null
-              ? _DefaultFormItem(item: item)
+              ? DefaultFormItem(item: item)
               : group.itemBuilder!(context, item))
           : item.builder!(context, item));
       if (item.showDivider) {
@@ -191,10 +198,11 @@ class _MyFormState extends State<MyForm> {
   }
 }
 
-class _DefaultFormItem extends StatefulWidget {
+class DefaultFormItem extends StatefulWidget {
   final FormItem item;
+  final void Function(FormItem item, dynamic value)? onConfirm;
 
-  const _DefaultFormItem({required this.item});
+  const DefaultFormItem({super.key, required this.item, this.onConfirm});
 
   @override
   State<StatefulWidget> createState() {
@@ -202,7 +210,44 @@ class _DefaultFormItem extends StatefulWidget {
   }
 }
 
-class _DefaultFormItemState extends State<_DefaultFormItem> {
+class _DefaultFormItemState extends State<DefaultFormItem> {
+  late void Function(FormItem item, dynamic value) _onConfirm;
+  late  FormItem _item;
+  late GlobalKey<TooltipState> _tooltipKey;
+
+  @override
+  void initState() {
+    super.initState();
+    _item = widget.item;
+    _onConfirm = widget.onConfirm ??
+        (FormItem item, dynamic value) {
+          if (_item.value is int) {
+            _item.value = int.parse(value.toString());
+          } else if (_item.value is double) {
+            _item.value = double.parse(value.toString());
+          } else {
+            _item.value = value;
+          }
+          _item.onChange?.call(_item.value);
+          IHive.settings.put(_item.key, _item.value).then((_) {
+            setState(() {});
+          });
+        };
+
+  }
+
+  @override
+  void didChangeDependencies() {
+
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(covariant DefaultFormItem oldWidget) {
+    _updateItem();
+    super.didUpdateWidget(oldWidget);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -212,21 +257,27 @@ class _DefaultFormItemState extends State<_DefaultFormItem> {
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return IntrinsicHeight(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  (widget.item.leadingBuilder == null
-                          ? buildLeading
-                          : widget.item.leadingBuilder!)
-                      .call(context),
-                  wrapperListenable(widget.item.contentBuilder == null
-                      ? buildContent
-                      : widget.item.contentBuilder!),
-                  (widget.item.trailingBuilder == null
-                          ? buildTrailing
-                          : widget.item.trailingBuilder!)
-                      .call(context),
-                ],
+              child: ListenableBuilder(
+                listenable: _item,
+                builder: (BuildContext context, Widget? child) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      (_item.leadingBuilder == null
+                              ? buildLeading
+                              : _item.leadingBuilder!)
+                          .call(context),
+                      (_item.contentBuilder == null
+                              ? buildContent
+                              : _item.contentBuilder!)
+                          .call(context),
+                      (_item.trailingBuilder == null
+                              ? buildTrailing
+                              : _item.trailingBuilder!)
+                          .call(context),
+                    ],
+                  );
+                },
               ),
             );
           },
@@ -235,37 +286,24 @@ class _DefaultFormItemState extends State<_DefaultFormItem> {
     );
   }
 
-  onConfirm(dynamic value) {
-    if (widget.item.value is int) {
-      widget.item.value = int.parse(value.toString());
-    } else if (widget.item.value is double) {
-      widget.item.value = double.parse(value.toString());
-    } else {
-      widget.item.value = value;
-    }
-    widget.item.onChange?.call(widget.item.value);
-    IHive.settings.put(widget.item.key, widget.item.value).then((_) {
-      setState(() {});
-    });
-  }
-
   void openEditDialog() {
-    switch (widget.item.type) {
+    switch (_item.type) {
       case FormItemType.input:
-        Util.showInputDialog(context,
-            text: widget.item.value.toString(), onConfirm: onConfirm);
+        Util.showInputDialog(context, text: _item.value.toString(),
+            onConfirm: (value) {
+          _onConfirm(_item, value);
+        });
         break;
       case FormItemType.switch_:
-        final newVal = !widget.item.value;
-        if (IHive.settings.get(SettingsHiveKey.optionUpdateConfirm == "1")) {
+        final newVal = !_item.value;
+        if (IHive.settings.get(SettingsHiveKey.optionUpdateConfirm) == "1") {
           Util.showConfirmDialog(context,
-              title: "修改 [ ${widget.item.label} ]",
-              content: "是否修改  [ ${widget.item.label} ]  为  <$newVal>",
-              onConfirm: () {
-            onConfirm(newVal);
+              title: "修改 [ ${_item.label} ]",
+              content: "是否修改  [ ${_item.label} ]  为  <$newVal>", onConfirm: () {
+            _onConfirm(_item, newVal);
           });
         } else {
-          onConfirm(newVal);
+          _onConfirm(_item, newVal);
         }
         break;
       default:
@@ -273,7 +311,7 @@ class _DefaultFormItemState extends State<_DefaultFormItem> {
   }
 
   Widget buildContent(BuildContext context) {
-    if (widget.item.type == FormItemType.select) {
+    if (_item.type == FormItemType.select) {
       return Expanded(
         child: Row(
           children: [
@@ -288,30 +326,32 @@ class _DefaultFormItemState extends State<_DefaultFormItem> {
                     color: Theme.of(context).hintColor,
                   ),
                 ),
-                items: widget.item.options!
-                    .map((FormItemOption item) => DropdownMenuItem<String>(
-                          alignment: AlignmentDirectional.center,
-                          value: item.value,
-                          child: Text(
-                            item.label,
-                            style: const TextStyle(
-                              fontSize: 14,
-                            ),
-                          ),
-                        ))
-                    .toList(),
-                value: widget.item.value,
+                items: _item.options == null
+                    ? []
+                    : _item.options!
+                        .map((FormItemOption item) => DropdownMenuItem<String>(
+                              alignment: AlignmentDirectional.center,
+                              value: item.value,
+                              child: Text(
+                                item.label,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                value: _item.value,
                 onChanged: (String? value) {
                   if (IHive.settings.get(SettingsHiveKey.optionUpdateConfirm) ==
                       "1") {
                     Util.showConfirmDialog(context,
-                        title: "修改 [ ${widget.item.label} ]",
-                        content: "是否修改  [ ${widget.item.label} ]  为  <$value>",
+                        title: "修改 [ ${_item.label} ]",
+                        content: "是否修改  [ ${_item.label} ]  为  <$value>",
                         onConfirm: () {
-                      onConfirm(value);
+                      _onConfirm(_item, value);
                     });
                   } else {
-                    onConfirm(value);
+                    _onConfirm(_item, value);
                   }
                 },
                 buttonStyleData: const ButtonStyleData(
@@ -328,21 +368,21 @@ class _DefaultFormItemState extends State<_DefaultFormItem> {
         ),
       );
     }
-    final text = widget.item.type == FormItemType.switch_
-        ? (widget.item.value ? "是" : "否")
-        : widget.item.value.toString();
+    final text = _item.type == FormItemType.switch_
+        ? (_item.value ? "是" : "否")
+        : _item.value.toString();
     return Expanded(
       child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: () {
-            if (widget.item.readOnly) {
+            if (_item.readOnly) {
               return;
             }
             openEditDialog();
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            alignment: widget.item.alignment,
+            alignment: _item.alignment,
             child: Text(text),
           )),
     );
@@ -355,22 +395,66 @@ class _DefaultFormItemState extends State<_DefaultFormItem> {
   }
 
   Widget buildLeading(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Text(widget.item.label ?? ""),
+    String? label = _item.label;
+    String? tooltip = _item.tooltip;
+    if (label == null) {
+      label = Intl.message(
+        '',
+        name: _item.key.replaceAll("-", "_"),
+        desc: '',
+        args: [],
+      );
+      if (label.isNotEmpty && tooltip == null) {
+        String val = Intl.message(
+          '',
+          name: "${_item.key.replaceAll("-", "_")}_tooltip",
+          desc: '',
+          args: [],
+        );
+        if (val.isNotEmpty) {
+          tooltip = val;
+          _tooltipKey = GlobalKey<TooltipState>();
+        }
+      }else if(tooltip != null){
+        _tooltipKey = GlobalKey<TooltipState>();
+      }
+    }
+    return Row(
+      children: [
+        (tooltip != null
+            ? Tooltip(
+                key: _tooltipKey,
+                triggerMode: TooltipTriggerMode.manual,
+                message: tooltip,
+                child: MyAnimatedIcon(
+                  onTap: (controller) {
+                    controller.forward();
+                    _tooltipKey.currentState!.ensureTooltipVisible();
+                  },
+                  icon: Icons.info_outline_rounded,
+                  color: Theme.of(context).indicatorColor,
+                  size: 20,
+                  duration: Const.duration300ms,
+                ),
+              )
+            : Offstage(
+                offstage: _item.tooltip == null,
+              child:  const Icon(
+                  Icons.info_outline_rounded,
+                  size: 20,
+                  color: Colors.transparent,
+                ),
+            )),
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Text(label)),
+      ],
     );
   }
 
-  Widget wrapperListenable(WidgetBuilder builder) {
-    if (widget.item.listenable != null) {
-      return ListenableBuilder(
-        listenable: widget.item.listenable!,
-        builder: (context, child) {
-          return builder.call(context);
-        },
-      );
-    } else {
-      return builder.call(context);
+  void _updateItem() {
+    if(_item.value != widget.item.value){
+      _item = widget.item;
     }
   }
 }

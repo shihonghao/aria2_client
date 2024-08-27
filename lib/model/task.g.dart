@@ -36,7 +36,9 @@ Task _$TaskFromJson(Map<String, dynamic> json) => Task(
       errorCode: _$JsonConverterFromJson<String, int>(
           json['errorCode'], const StringToIntegerConverter().fromJson),
       errorMessage: json['errorMessage'] as String?,
-      followedBy: json['followedBy'] as String?,
+      followedBy: (json['followedBy'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       following: json['following'] as String?,
       belongsTo: json['belongsTo'] as String?,
       dir: json['dir'] as String?,

@@ -167,7 +167,10 @@ class _ServerListViewState extends State<ServerListView> {
                                 .of(context)
                                 .stopped_count(globalStatus.numStopped),
                           )),
-                      child!
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: child!,
+                      )
                     ])),
                   ],
                 ),

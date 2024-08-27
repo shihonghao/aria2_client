@@ -1,3 +1,4 @@
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/providers/task_model.dart';
@@ -66,7 +67,6 @@ class _TaskDetailCardState extends MyTimerState<TaskDetailCard> {
   @override
   void initState() {
     super.initState();
-    title = "详情";
     piece = ValueNotifier(Piece(numPieces: 0, bitfield: ""));
     isBt = false;
   }
@@ -79,6 +79,7 @@ class _TaskDetailCardState extends MyTimerState<TaskDetailCard> {
 
   @override
   Widget build(BuildContext context) {
+    title = getTitle(0);
     return Scaffold(
         appBar: AppBar(
           title: Text(title),
@@ -111,13 +112,13 @@ class _TaskDetailCardState extends MyTimerState<TaskDetailCard> {
   String getTitle(int index) {
     switch (index) {
       case 1:
-        return "文件列表";
+        return S.of(context).files;
       case 2:
-        return "分块信息";
+        return S.of(context).pieces;
       case 3:
-        return "种子信息";
+        return S.of(context).btInfo;
       default:
-        return "详情";
+        return S.of(context).overview;
     }
   }
 }

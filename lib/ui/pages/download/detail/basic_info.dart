@@ -1,3 +1,4 @@
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/providers/task_model.dart';
 import 'package:aria2_client/ui/component/form/my_form.dart';
@@ -54,18 +55,16 @@ class _BasicInfoState extends State<BasicInfo> {
                   ),
                   expanded: true,
                   showDivider: false,
-                  title: '基本信息',
+                  title: S.of(context).baseInfo,
                   items: [
                     FormItem<String>(
                         readOnly: true,
-                        key: 'title',
-                        label: '任务名称',
+                        key: 'task_name',
                         type: FormItemType.input,
                         value: task.taskName),
                     FormItem<String>(
                         readOnly: true,
-                        key: 'length',
-                        label: '任务大小',
+                        key: 'task_size',
                         type: FormItemType.input,
                         value: "${totalLength.first}",
                         trailingBuilder: (context) => buildUnitTrailing(
@@ -73,8 +72,7 @@ class _BasicInfoState extends State<BasicInfo> {
                             color: Theme.of(context).cardColor)),
                     FormItem<String>(
                         readOnly: true,
-                        key: 'status',
-                        label: '任务状态',
+                        key: 'task_status',
                         type: FormItemType.input,
                         value: '',
                         trailingBuilder: (context) => buildUnitTrailing(
@@ -83,16 +81,14 @@ class _BasicInfoState extends State<BasicInfo> {
                     //进度
                     FormItem<String>(
                       readOnly: true,
-                      key: 'progress',
-                      label: '任务进度',
+                      key: 'task_process',
                       type: FormItemType.input,
                       value: task.computedPercentage(),
                     ),
                     if (task.status == TaskStatus.active)
                       FormItem<String>(
                         readOnly: true,
-                        key: 'speed',
-                        label: '下载速度',
+                        key: 'download_speed',
                         type: FormItemType.input,
                         value: downloadSpeed.first.toString(),
                         trailingBuilder: (context) {
@@ -104,8 +100,7 @@ class _BasicInfoState extends State<BasicInfo> {
                     if (task.isBitTorrent())
                       FormItem<String>(
                         readOnly: true,
-                        key: 'speed',
-                        label: '上传速度',
+                        key: 'upload_speed',
                         type: FormItemType.input,
                         value: uploadSpeed.first.toString(),
                         trailingBuilder: (context) {
@@ -117,16 +112,14 @@ class _BasicInfoState extends State<BasicInfo> {
                     if (task.isBitTorrent())
                       FormItem<String>(
                         readOnly: true,
-                        key: 'sharedRatio',
-                        label: '分享率',
+                        key: 'share_ratio',
                         type: FormItemType.input,
-                        value: "${task.getShareRatio()} %",
+                        value: task.getShareRatio(),
                       ),
                     if (task.isBitTorrent() && task.status == TaskStatus.active)
                       FormItem<String>(
                         readOnly: true,
                         key: 'seedersAndConnections',
-                        label: '种子数/连接数',
                         type: FormItemType.input,
                         value: "${task.numSeeders} / ${task.connections}",
                       ),
@@ -134,7 +127,6 @@ class _BasicInfoState extends State<BasicInfo> {
                       FormItem<String>(
                         readOnly: true,
                         key: 'creationDate',
-                        label: '种子创建日期',
                         type: FormItemType.input,
                         value: DateTime.fromMillisecondsSinceEpoch(
                                 task.bittorrent!.creationDate! * 1000)
@@ -143,15 +135,13 @@ class _BasicInfoState extends State<BasicInfo> {
                     if (task.isBitTorrent())
                       FormItem<String>(
                           readOnly: true,
-                          key: 'infoHash',
-                          label: '特征值',
+                          key: 'info_hash',
                           type: FormItemType.input,
                           value: task.infoHash),
                     if (task.status == TaskStatus.active)
                       FormItem(
                         readOnly: true,
-                        key: 'eta',
-                        label: '预计剩余时间',
+                        key: 'remain_time',
                         type: FormItemType.input,
                         value: task.getRemainTime(),
                       ),
@@ -161,7 +151,6 @@ class _BasicInfoState extends State<BasicInfo> {
                       FormItem(
                         readOnly: true,
                         key: 'connections',
-                        label: '连接数',
                         type: FormItemType.input,
                         value: task.connections.toString(),
                       ),
@@ -170,14 +159,12 @@ class _BasicInfoState extends State<BasicInfo> {
                       FormItem<String>(
                           readOnly: true,
                           key: 'download_url',
-                          label: '下载地址',
                           type: FormItemType.input,
                           value: task.getUri()),
                     //下载路径
                     FormItem<String>(
                         readOnly: true,
                         key: 'download_path',
-                        label: '下载路径',
                         type: FormItemType.input,
                         showDivider: false,
                         value: task.dir),

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:aria2_client/aria2/model/aria2_config.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -38,6 +39,13 @@ class IHive {
     Hive.registerAdapter(Aria2ConfigAdapter());
     settings = await Hive.openBox(IHiveKey.settings);
     aria2s = await Hive.openBox<Aria2Config>(IHiveKey.aria2);
-    settings.clear();
+
+    if (settings.isEmpty) {
+      await settings.put(SettingsHiveKey.language, "zh");
+      await settings.put(SettingsHiveKey.themeMode, "dark");
+      await settings.put(SettingsHiveKey.globalRefreshInterval, 1);
+      await settings.put(SettingsHiveKey.taskRefreshInterval, 1);
+      await settings.put(SettingsHiveKey.optionUpdateConfirm, '1');
+    }
   }
 }

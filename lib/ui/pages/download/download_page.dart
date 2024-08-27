@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/ui/component/expandable_fab.dart';
@@ -94,12 +95,12 @@ class _DownloadPageState extends State<DownloadPage> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           onTap: (index) {},
-                          tabs: const [
-                            Tab(text: "下载中"),
-                            Tab(text: "等待中"),
-                            Tab(text: "已暂停"),
-                            Tab(text: "已完成"),
-                            Tab(text: "错误"),
+                          tabs:  [
+                            Tab(text: S.of(context).downloading),
+                            Tab(text: S.of(context).waiting),
+                            Tab(text: S.of(context).paused),
+                            Tab(text: S.of(context).completed),
+                            Tab(text: S.of(context).error),
                             // Tab(text: "已删除"),
                           ]),
                       // 标签页所对应的页面

@@ -13,7 +13,7 @@ class MyAnimatedIcon extends MyAnimation {
   final double? size;
   final void Function(AnimationController controller)? onTap;
 
-  MyAnimatedIcon(
+  const MyAnimatedIcon(
       {super.key,
       super.duration,
       super.curve,

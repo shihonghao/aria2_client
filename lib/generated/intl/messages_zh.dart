@@ -73,6 +73,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "auto_save_interval": MessageLookupByLibrary.simpleMessage("自动保存间隔"),
         "auto_save_interval_tooltip": MessageLookupByLibrary.simpleMessage(
             "每隔设置的秒数自动保存控制文件(*.aria2). 如果设置为 0, 下载期间控制文件不会自动保存. 不论设置的值为多少, aria2 会在任务结束时保存控制文件. 可以设置的值为 0 到 600."),
+        "baseInfo": MessageLookupByLibrary.simpleMessage("基本信息"),
+        "basic": MessageLookupByLibrary.simpleMessage("基础设置"),
+        "btInfo": MessageLookupByLibrary.simpleMessage("种子信息"),
         "bt_detach_seed_only": MessageLookupByLibrary.simpleMessage("分离仅做种任务"),
         "bt_detach_seed_only_tooltip": MessageLookupByLibrary.simpleMessage(
             "统计当前活动下载任务(参见 -j 选项) 时排除仅做种的任务. 这意味着, 如果参数设置为 -j3, 此选项打开并且当前有 3 个正在活动的任务, 并且其中有 1 个进入做种模式, 那么其会从正在下载的数量中排除(即数量会变为 2), 在队列中等待的下一个任务将会开始执行. 但要知道, 在 RPC 方法中, 做种的任务仍然被认为是活动的下载任务."),
@@ -145,11 +148,13 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("BT 服务器连接间隔时间"),
         "bt_tracker_interval_tooltip": MessageLookupByLibrary.simpleMessage(
             "设置请求 BT 服务器的间隔时间 (秒). 此选项将完全覆盖服务器返回的最小间隔时间和间隔时间, aria2 仅使用此选项的值.如果设置为 0, aria2 将根据服务器的响应情况和下载进程决定时间间隔."),
+        "bt_tracker_servers": MessageLookupByLibrary.simpleMessage("BT服务器列表"),
         "bt_tracker_timeout":
             MessageLookupByLibrary.simpleMessage("BT 服务器超时时间"),
         "bt_tracker_timeout_tooltip": MessageLookupByLibrary.simpleMessage(""),
         "bt_tracker_tooltip": MessageLookupByLibrary.simpleMessage(
             "逗号分隔的 BT 服务器地址. 这些地址不受 --bt-exclude-tracker 选项的影响, 因为这些地址在 --bt-exclude-tracker 选项排除掉其他地址之后才会添加."),
+        "bytes": MessageLookupByLibrary.simpleMessage("字节"),
         "cancel": MessageLookupByLibrary.simpleMessage("取消"),
         "check_certificate": MessageLookupByLibrary.simpleMessage("检查证书"),
         "check_certificate_tooltip": MessageLookupByLibrary.simpleMessage(""),
@@ -168,9 +173,12 @@ class MessageLookup extends MessageLookupByLibrary {
         "conf_path": MessageLookupByLibrary.simpleMessage("配置文件路径"),
         "conf_path_tooltip": MessageLookupByLibrary.simpleMessage(""),
         "confirm": MessageLookupByLibrary.simpleMessage("确认"),
+        "connect_error": MessageLookupByLibrary.simpleMessage("连接错误"),
         "connect_timeout": MessageLookupByLibrary.simpleMessage("连接超时时间"),
         "connect_timeout_tooltip": MessageLookupByLibrary.simpleMessage(
             "设置建立 HTTP/FTP/代理服务器 连接的超时时间(秒). 当连接建立后, 此选项不再生效, 请使用 --timeout 选项."),
+        "connection_info": MessageLookupByLibrary.simpleMessage("连接信息"),
+        "connections": MessageLookupByLibrary.simpleMessage("连接数"),
         "console_log_level": MessageLookupByLibrary.simpleMessage("控制台日志级别"),
         "console_log_level_tooltip": MessageLookupByLibrary.simpleMessage(""),
         "content_disposition_default_utf8":
@@ -179,9 +187,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "content_disposition_default_utf8_tooltip":
             MessageLookupByLibrary.simpleMessage(
                 "处理 \"Content-Disposition\" 头中的字符串时使用 UTF-8 字符集来代替 ISO-8859-1, 例如, 文件名参数, 但不是扩展版本的文件名."),
-        "continue_": MessageLookupByLibrary.simpleMessage("断点续传"),
-        "continue_tooltip": MessageLookupByLibrary.simpleMessage(
+        "continue_download": MessageLookupByLibrary.simpleMessage("断点续传"),
+        "continue_download_tooltip": MessageLookupByLibrary.simpleMessage(
             "继续下载部分完成的文件. 启用此选项可以继续下载从浏览器或其他程序按顺序下载的文件. 此选项目前只支持 HTTP(S)/FTP 下载的文件."),
+        "creationDate": MessageLookupByLibrary.simpleMessage("种子创建日期"),
         "daemon": MessageLookupByLibrary.simpleMessage("启用后台进程"),
         "daemon_tooltip": MessageLookupByLibrary.simpleMessage(""),
         "darkTheme": MessageLookupByLibrary.simpleMessage("深色"),
@@ -209,9 +218,13 @@ class MessageLookup extends MessageLookupByLibrary {
         "disk_cache_tooltip": MessageLookupByLibrary.simpleMessage(
             "启用磁盘缓存. 如果设置为 0, 将禁用磁盘缓存. 此功能将下载的数据缓存在内存中, 最多占用此选项设置的字节数. 缓存存储由 aria2 实例创建并对所有下载共享. 由于数据以较大的单位写入并按文件的偏移重新排序, 所以磁盘缓存的一个优点是减少磁盘的 I/O. 如果调用哈希检查时并且数据缓存在内存中时, 将不需要从磁盘中读取. 大小可以包含 K 或 M (1K "),
         "download": MessageLookupByLibrary.simpleMessage("下载"),
+        "download_dir": MessageLookupByLibrary.simpleMessage("下载目录"),
+        "download_path": MessageLookupByLibrary.simpleMessage("下载路径"),
         "download_result": MessageLookupByLibrary.simpleMessage("下载结果"),
         "download_result_tooltip": MessageLookupByLibrary.simpleMessage(
             "此选项将修改下载结果的格式. 如果设置为\"默认\", 将打印 GID, 状态, 平均下载速度和路径/URI. 如果涉及多个文件, 仅打印第一个请求文件的路径/URI, 其余的将被忽略. 如果设置为\"完整\", 将打印 GID, 状态, 平均下载速度, 下载进度和路径/URI. 其中, 下载进度和路径/URI 将会每个文件打印一行. 如果设置为\"隐藏\", 下载结果将会隐藏."),
+        "download_speed": MessageLookupByLibrary.simpleMessage("下载速度"),
+        "download_url": MessageLookupByLibrary.simpleMessage("下载地址"),
         "downloading": MessageLookupByLibrary.simpleMessage("下载中"),
         "downloading_count": m1,
         "dry_run": MessageLookupByLibrary.simpleMessage("模拟运行"),
@@ -255,6 +268,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "file_allocation": MessageLookupByLibrary.simpleMessage("文件分配方法"),
         "file_allocation_tooltip": MessageLookupByLibrary.simpleMessage(
             "指定文件分配方法. \"无\" 不会预先分配文件空间. \"prealloc\"会在下载开始前预先分配空间. 这将会根据文件的大小需要一定的时间. 如果您使用的是较新的文件系统, 例如 ext4 (带扩展支持), btrfs, xfs 或 NTFS (仅 MinGW 构建), \"falloc\" 是最好的选择. 其几乎可以瞬间分配大(数 GiB)文件. 不要在旧的文件系统, 例如 ext3 和 FAT32 上使用 falloc, 因为与 prealloc 花费的时间相同, 并且其会阻塞 aria2 直到分配完成. 当您的系统不支持 posix_fallocate(3) 函数时, falloc 可能无法使用. \"trunc\" 使用 ftruncate(2) 系统调用或平台特定的实现将文件截取到特定的长度. 在多文件的 BitTorrent 下载中, 若某文件与其相邻的文件共享相同的分片时, 则相邻的文件也会被分配."),
+        "files": MessageLookupByLibrary.simpleMessage("文件列表"),
         "follow_metalink":
             MessageLookupByLibrary.simpleMessage("下载 Metalink 中的文件"),
         "follow_metalink_tooltip": MessageLookupByLibrary.simpleMessage(
@@ -325,6 +339,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "human_readable": MessageLookupByLibrary.simpleMessage("控制台可读输出"),
         "human_readable_tooltip": MessageLookupByLibrary.simpleMessage(
             "在控制台输出可读格式的大小和速度 (例如, 1.2Ki, 3.4Mi)."),
+        "info_hash": MessageLookupByLibrary.simpleMessage("特征值"),
         "keep_unfinished_download_result":
             MessageLookupByLibrary.simpleMessage("保留未完成的任务"),
         "keep_unfinished_download_result_tooltip":
@@ -335,6 +350,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "listen_port": MessageLookupByLibrary.simpleMessage("监听端口"),
         "listen_port_tooltip": MessageLookupByLibrary.simpleMessage(
             "设置 BT 下载的 TCP 端口. 多个端口可以使用逗号 \",\" 分隔, 例如: 6881,6885. 您还可以使用短横线 \"-\" 表示范围: 6881-6999, 或可以一起使用: 6881-6889, 6999."),
+        "local": MessageLookupByLibrary.simpleMessage("本机"),
         "log": MessageLookupByLibrary.simpleMessage("日志文件"),
         "log_level": MessageLookupByLibrary.simpleMessage("日志级别"),
         "log_level_tooltip": MessageLookupByLibrary.simpleMessage(""),
@@ -439,6 +455,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "out": MessageLookupByLibrary.simpleMessage("文件名"),
         "out_tooltip": MessageLookupByLibrary.simpleMessage(
             "下载文件的文件名. 其总是相对于 --dir 选项中设置的路径. 当使用 --force-sequential 参数时此选项无效."),
+        "overview": MessageLookupByLibrary.simpleMessage("概览"),
         "parameterized_uri":
             MessageLookupByLibrary.simpleMessage("启用参数化 URI 支持"),
         "parameterized_uri_tooltip": MessageLookupByLibrary.simpleMessage(
@@ -457,6 +474,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "piece_length": MessageLookupByLibrary.simpleMessage("文件分片大小"),
         "piece_length_tooltip": MessageLookupByLibrary.simpleMessage(
             "设置 HTTP/FTP 下载的分配大小. aria2 根据这个边界分割文件. 所有的分割都是这个长度的倍数. 此选项不适用于 BitTorrent 下载. 如果 Metalink 文件中包含分片哈希的结果此选项也不适用."),
+        "pieces": MessageLookupByLibrary.simpleMessage("分块信息"),
         "proxy_method": MessageLookupByLibrary.simpleMessage("代理服务器请求方法"),
         "proxy_method_tooltip": MessageLookupByLibrary.simpleMessage(
             "设置用来请求代理服务器的方法. 方法可设置为 GET 或 TUNNEL. HTTPS 下载将忽略此选项并总是使用 TUNNEL."),
@@ -469,6 +487,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "referer": MessageLookupByLibrary.simpleMessage("请求来源"),
         "referer_tooltip": MessageLookupByLibrary.simpleMessage(
             "设置 HTTP 请求来源 (Referer). 此选项将影响所有 HTTP/HTTPS 下载. 如果设置为 *, 请求来源将设置为下载链接. 此选项可以配合 --parameterized-uri 选项使用."),
+        "remain_time": MessageLookupByLibrary.simpleMessage("预计剩余时间"),
         "remote_time": MessageLookupByLibrary.simpleMessage("获取服务器文件时间"),
         "remote_time_tooltip": MessageLookupByLibrary.simpleMessage(
             "从 HTTP/FTP 服务获取远程文件的时间戳, 如果可用将设置到本地文件"),
@@ -524,6 +543,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "seed_time": MessageLookupByLibrary.simpleMessage("最小做种时间"),
         "seed_time_tooltip": MessageLookupByLibrary.simpleMessage(
             "以 (小数形式的) 分钟指定做种时间. 此选项设置为 0 时, 将在 BT 任务下载完成后不进行做种."),
+        "seedersAndConnections":
+            MessageLookupByLibrary.simpleMessage("种子数/连接数"),
         "serverPageTitle": MessageLookupByLibrary.simpleMessage("服务器"),
         "server_stat_of": MessageLookupByLibrary.simpleMessage("服务器状态保存文件"),
         "server_stat_of_tooltip": MessageLookupByLibrary.simpleMessage(
@@ -532,6 +553,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "server_stat_timeout_tooltip":
             MessageLookupByLibrary.simpleMessage("指定服务器状态的过期时间 (单位为秒)."),
         "settings": MessageLookupByLibrary.simpleMessage("设置"),
+        "share_ratio": MessageLookupByLibrary.simpleMessage("共享率"),
         "show_console_readout": MessageLookupByLibrary.simpleMessage("显示控制台输出"),
         "show_console_readout_tooltip":
             MessageLookupByLibrary.simpleMessage(""),
@@ -557,6 +579,10 @@ class MessageLookup extends MessageLookupByLibrary {
             "设置下载进度摘要的输出间隔(秒). 设置为 0 禁止输出."),
         "taskRefreshIntervalLabel":
             MessageLookupByLibrary.simpleMessage("任务刷新间隔"),
+        "task_name": MessageLookupByLibrary.simpleMessage("任务名称"),
+        "task_process": MessageLookupByLibrary.simpleMessage("任务进度"),
+        "task_size": MessageLookupByLibrary.simpleMessage("任务大小"),
+        "task_status": MessageLookupByLibrary.simpleMessage("任务状态"),
         "test": MessageLookupByLibrary.simpleMessage("测试"),
         "theme": MessageLookupByLibrary.simpleMessage("主题"),
         "timeout": MessageLookupByLibrary.simpleMessage("超时时间"),
@@ -565,7 +591,10 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("缩短控制台输出内容"),
         "truncate_console_readout_tooltip":
             MessageLookupByLibrary.simpleMessage("缩短控制台输出的内容在一行中."),
+        "unCompleted": MessageLookupByLibrary.simpleMessage("未完成"),
+        "unKnown": MessageLookupByLibrary.simpleMessage("未知"),
         "upload": MessageLookupByLibrary.simpleMessage("上传"),
+        "upload_speed": MessageLookupByLibrary.simpleMessage("上传速度"),
         "uri_selector": MessageLookupByLibrary.simpleMessage("URI 选择算法"),
         "uri_selector_tooltip": MessageLookupByLibrary.simpleMessage(
             "指定 URI 选择的算法. 可选的值包括 \"按顺序\", \"反馈\" 和 \"自适应\". 如果设置为\"按顺序\", URI 将按列表中出现的顺序使用. 如果设置为\"反馈\", aria2 将根据之前的下载速度选择 URI 列表中下载速度最快的服务器. 同时也将有效跳过无效镜像. 之前统计的下载速度将作为服务器状态文件的一部分, 参见 --server-stat-of 和 --server-stat-if 选项. 如果设置为\"自适应\", 将从最好的镜像和保留的连接里选择一项. 补充说明, 其返回的镜像没有被测试过, 同时如果每个镜像都已经被测试过时, 返回的镜像还会被重新测试. 否则, 其将不会选择其他镜像. 例如\"反馈\", 其使用服务器状态文件."),

@@ -93,7 +93,6 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
           _listKey.currentState!.insertItem(_models.length - 1,
               duration: const Duration(milliseconds: 500));
         });
-
   }
 
   @override

@@ -4,6 +4,7 @@ import 'package:aria2_client/framework/lifecycle.dart';
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/providers/task_model.dart';
+import 'package:aria2_client/ui/component/my_open_container.dart';
 import 'package:aria2_client/ui/pages/download/detail/detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +35,8 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
   BoxBorder? border;
   late VoidCallback action;
   late TaskModel model;
+  Widget? _detailWidget;
+  Widget? _overviewWidget;
 
   @override
   void initState() {

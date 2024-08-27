@@ -1,3 +1,4 @@
+import 'package:aria2_client/generated/l10n.dart';
 import 'package:flutter/cupertino.dart';
 
 enum PiecesInfoType { bar, grid }
@@ -34,33 +35,36 @@ class _PieceBarState extends State<PieceBar> {
               widget.activeColor, widget.inactiveColor)
           : _PieceGridPainter(widget.bitfield, widget.numPieces,
               widget.activeColor, widget.inactiveColor),
-      child: RepaintBoundary(
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width,
-          height: h,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-                width: len,
-                height: len,
-                color: widget.activeColor ?? const Color(0xFF1665EE),
+      child: widget.type == PiecesInfoType.bar
+          ? null
+          : RepaintBoundary(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: h,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        width: len,
+                        height: len,
+                        color: widget.activeColor ?? const Color(0xFF1665EE),
+                      ),
+                      Text(S.of(context).completed),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        width: len,
+                        height: len,
+                        color: widget.inactiveColor ?? const Color(0xFFF6ABAB),
+                      ),
+                      Text(S.of(context).unCompleted),
+                    ],
+                  ),
+                ),
               ),
-              const Text("已下载"),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-                width: len,
-                height: len,
-                color:widget.inactiveColor ?? const Color(0xFFF6ABAB),
-              ),
-              const Text("未下载"),
-            ],),
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

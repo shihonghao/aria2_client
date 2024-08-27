@@ -180,6 +180,16 @@ class S {
     );
   }
 
+  /// `bytes`
+  String get bytes {
+    return Intl.message(
+      'bytes',
+      name: 'bytes',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `min`
   String get minute {
     return Intl.message(
@@ -520,11 +530,31 @@ class S {
     );
   }
 
-  /// `advanced`
+  /// `connect error`
+  String get connect_error {
+    return Intl.message(
+      'connect error',
+      name: 'connect_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `ADVANCED`
   String get advanced {
     return Intl.message(
-      'advanced',
+      'ADVANCED',
       name: 'advanced',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `BASIC`
+  String get basic {
+    return Intl.message(
+      'BASIC',
+      name: 'basic',
       desc: '',
       args: [],
     );
@@ -611,20 +641,20 @@ class S {
   }
 
   /// `Resume Download`
-  String get continue_ {
+  String get continue_download {
     return Intl.message(
       'Resume Download',
-      name: 'continue_',
+      name: 'continue_download',
       desc: '',
       args: [],
     );
   }
 
   /// `Continue downloading a partially downloaded file. Use this option to resume a download started by a web browser or another program which downloads files sequentially from the beginning. Currently this option is only applicable to HTTP(S)/FTP downloads.`
-  String get continue_tooltip {
+  String get continue_download_tooltip {
     return Intl.message(
       'Continue downloading a partially downloaded file. Use this option to resume a download started by a web browser or another program which downloads files sequentially from the beginning. Currently this option is only applicable to HTTP(S)/FTP downloads.',
-      name: 'continue_tooltip',
+      name: 'continue_download_tooltip',
       desc: '',
       args: [],
     );
@@ -3725,6 +3755,256 @@ class S {
     return Intl.message(
       'Truncate console readout to fit in a single line.',
       name: 'truncate_console_readout_tooltip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Overview`
+  String get overview {
+    return Intl.message(
+      'Overview',
+      name: 'overview',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Files`
+  String get files {
+    return Intl.message(
+      'Files',
+      name: 'files',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pieces`
+  String get pieces {
+    return Intl.message(
+      'Pieces',
+      name: 'pieces',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bittorrent Info`
+  String get btInfo {
+    return Intl.message(
+      'Bittorrent Info',
+      name: 'btInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Base Info`
+  String get baseInfo {
+    return Intl.message(
+      'Base Info',
+      name: 'baseInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Task Name`
+  String get task_name {
+    return Intl.message(
+      'Task Name',
+      name: 'task_name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Task Status`
+  String get task_status {
+    return Intl.message(
+      'Task Status',
+      name: 'task_status',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Task Size`
+  String get task_size {
+    return Intl.message(
+      'Task Size',
+      name: 'task_size',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Process`
+  String get task_process {
+    return Intl.message(
+      'Process',
+      name: 'task_process',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Download Speed`
+  String get download_speed {
+    return Intl.message(
+      'Download Speed',
+      name: 'download_speed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Upload Speed`
+  String get upload_speed {
+    return Intl.message(
+      'Upload Speed',
+      name: 'upload_speed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share Ratio`
+  String get share_ratio {
+    return Intl.message(
+      'Share Ratio',
+      name: 'share_ratio',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remaining`
+  String get remain_time {
+    return Intl.message(
+      'Remaining',
+      name: 'remain_time',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Seeders/Connections`
+  String get seedersAndConnections {
+    return Intl.message(
+      'Seeders/Connections',
+      name: 'seedersAndConnections',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Creation Date`
+  String get creationDate {
+    return Intl.message(
+      'Creation Date',
+      name: 'creationDate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Info_hash`
+  String get info_hash {
+    return Intl.message(
+      'Info_hash',
+      name: 'info_hash',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Download Directory`
+  String get download_dir {
+    return Intl.message(
+      'Download Directory',
+      name: 'download_dir',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `BT Tracker Servers`
+  String get bt_tracker_servers {
+    return Intl.message(
+      'BT Tracker Servers',
+      name: 'bt_tracker_servers',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connections`
+  String get connections {
+    return Intl.message(
+      'Connections',
+      name: 'connections',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Download URL`
+  String get download_url {
+    return Intl.message(
+      'Download URL',
+      name: 'download_url',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Download Path`
+  String get download_path {
+    return Intl.message(
+      'Download Path',
+      name: 'download_path',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Uncompleted`
+  String get unCompleted {
+    return Intl.message(
+      'Uncompleted',
+      name: 'unCompleted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `UnKnown`
+  String get unKnown {
+    return Intl.message(
+      'UnKnown',
+      name: 'unKnown',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connection information`
+  String get connection_info {
+    return Intl.message(
+      'Connection information',
+      name: 'connection_info',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Local`
+  String get local {
+    return Intl.message(
+      'Local',
+      name: 'local',
       desc: '',
       args: [],
     );
