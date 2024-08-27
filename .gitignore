@@ -47,9 +47,12 @@ aria2_client.iml
 
 /android/local.properties
 
-/ios
 
-/macos
+/macos/
 
 
 /pubspec.lock
+/ios/
+/windows/
+/web/
+/linux/
