@@ -1,19 +1,13 @@
-import 'dart:async';
-
 import 'package:animations/animations.dart';
+import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/event/base_event.dart';
 import 'package:aria2_client/event/event_bus_manager.dart';
 import 'package:aria2_client/generated/l10n.dart';
-import 'package:aria2_client/providers/aria2_model.dart';
+import 'package:aria2_client/main.dart';
+import 'package:aria2_client/providers/application.dart';
 import 'package:aria2_client/ui/pages/servers/server_add_page.dart';
 import 'package:aria2_client/ui/pages/servers/server_content.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../../aria2/model/aria2.dart';
-import '../../../const/Const.dart';
-import '../../../providers/server_model.dart';
-import 'event/server_event.dart';
 
 class ServerPage extends StatefulWidget {
   const ServerPage({super.key});
@@ -25,27 +19,13 @@ class ServerPage extends StatefulWidget {
 }
 
 class _ServerPageState extends State<ServerPage> {
-  late List<Aria2> aria2s;
-  late ValueNotifier<bool> _isCardView;
-  late StreamSubscription<ServerEvent> subscription;
-
   @override
   void initState() {
     super.initState();
-    _isCardView = ValueNotifier(false);
-    subscription = EventBusManager.eventBus.on<ServerEvent>().listen((event) {
-      if (event.eventType == ServerEventType.CHANGE_CURRENT) {
-        if (mounted) {
-          final model = event.value as ServerModel;
-          context.read<Aria2Model>().setCurrentServer(model);
-        }
-      }
-    });
   }
 
   @override
   void dispose() {
-    subscription.cancel();
     super.dispose();
   }
 
@@ -54,14 +34,14 @@ class _ServerPageState extends State<ServerPage> {
     return Scaffold(
       body: Container(
         margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
-        decoration: BoxDecoration(color: Theme.of(context).cardColor),
+        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
         child: Column(
           children: [
             Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: buildActions()),
-             Row(
+            Row(
               children: [
                 SizedBox(
                   height: 110,
@@ -69,8 +49,8 @@ class _ServerPageState extends State<ServerPage> {
                     padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
                     child: Text(
                       S.of(context).serverPageTitle,
-                      style:
-                      const TextStyle(fontSize: 70, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 70, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.start,
                     ),
                   ),
@@ -78,15 +58,12 @@ class _ServerPageState extends State<ServerPage> {
               ],
             ),
             Expanded(
-                child: ValueListenableBuilder<bool>(
-              valueListenable: _isCardView,
-              builder: (BuildContext context, bool value, Widget? child) {
+                child: ValueListenableBuilder<ViewType>(
+              valueListenable: Application.instance.serverViewType,
+              builder: (BuildContext context, ViewType type, Widget? child) {
                 return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
-                    child: ServerContent(
-                        key: UniqueKey(),
-                        type:
-                            _isCardView.value ? ViewType.card : ViewType.list));
+                    child: ServerContent(key: UniqueKey(), type: type));
               },
             )),
           ],
@@ -106,10 +83,7 @@ class _ServerPageState extends State<ServerPage> {
           child: Row(children: [
             IconButton(
               onPressed: () {
-                EventBusManager.eventBus.fire(ServerEvent(
-                  scope: EventScope.All,
-                  eventType: ServerEventType.CHECK_AVAILABLE,
-                ));
+                EventBusManager.eventBus.fire(CheckAvailableEvent());
               },
               icon: const Icon(
                 Icons.refresh,
@@ -118,18 +92,20 @@ class _ServerPageState extends State<ServerPage> {
             ),
             IconButton(
                 onPressed: () {
-                  _isCardView.value = !_isCardView.value;
+                  Application.instance.switchServerViewType();
                 },
-                icon: ValueListenableBuilder<bool>(
-                  valueListenable: _isCardView,
-                  builder: (BuildContext context, bool value, Widget? child) {
+                icon: ValueListenableBuilder<ViewType>(
+                  valueListenable: Application.instance.serverViewType,
+                  builder:
+                      (BuildContext context, ViewType viewType, Widget? child) {
+                    IconData icon = viewType == ViewType.list
+                        ? Icons.format_list_numbered_sharp
+                        : Icons.credit_card;
                     return Center(
                         child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 200),
                             child: Icon(
-                              value
-                                  ? Icons.format_list_numbered_sharp
-                                  : Icons.credit_card,
+                              icon,
                               key: UniqueKey(),
                             )));
                   },

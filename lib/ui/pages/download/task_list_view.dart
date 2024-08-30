@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../model/task.dart';
-import '../../../providers/aria2_model.dart';
+import '../../../providers/application.dart';
 import '../../../util/Util.dart';
 
 class TaskListView extends StatefulWidget {
@@ -35,7 +35,7 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
 
   @override
   void onResume() {
-    if (Aria2Model.instance.currentServer != null) {
+    if (Application.instance.selectedServer.value != null) {
       Aria2RpcClient.instance.tell(widget.status).then((result) {
         if (result.success) {
           List<TaskModel> newModels = [];
@@ -77,7 +77,7 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
   void updateModels(List<TaskModel> newModels) {
     Util.compareListAndFetch(_models, newModels,
         compare: (o1, o2) => o1.task.gid == o2.task.gid,
-        onRemove: (list,removedItem) {
+        onRemove: (list, removedItem) {
           final removedIndex = _models.indexOf(removedItem);
           _listKey.currentState!.removeItem(removedIndex, (context, animation) {
             final item = buildItem(context, removedIndex, animation);
@@ -88,7 +88,7 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
         fetch: (o1, o2) {
           o1.update(o2.task);
         },
-        onInsert: (list,item) {
+        onInsert: (list, item) {
           list.add(item);
           _listKey.currentState!.insertItem(_models.length - 1,
               duration: const Duration(milliseconds: 500));
@@ -97,13 +97,15 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<Aria2Model, String?>(
-        selector: (context, model) => model.currentServer?.aria2.config.name,
+    return Selector<Application, String?>(
+        selector: (context, application) =>
+            application.selectedServer.value?.aria2.config.name,
         shouldRebuild: (oldVal, newVal) {
           return oldVal != newVal;
         },
         builder: (BuildContext context, String? value, Widget? child) {
           return Scaffold(
+            backgroundColor: Theme.of(context).primaryColor,
               body: AnimatedList(
             key: _listKey,
             itemBuilder: buildItem,

@@ -1,35 +1,34 @@
 import 'dart:io';
 
-import 'package:aria2_client/providers/aria2_model.dart';
+import 'package:aria2_client/ui/pages/download/download_page.dart';
+import 'package:aria2_client/ui/pages/servers/server_page.dart';
+import 'package:aria2_client/ui/pages/settings/settings_page.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class PlatformedHomePage extends StatefulWidget {
-  final List<CNavigationItem> navigationItems;
-  final List<Widget> pages;
-  final AppBar? appBar;
-  int selectedIndex;
-  final PageController pageController = PageController(initialPage: 0);
+  final int initialPageIndex;
 
-  PlatformedHomePage(
-      {super.key,
-      this.appBar,
-      required this.navigationItems,
-      required this.pages,
-      this.selectedIndex = 0});
+  const PlatformedHomePage({super.key, this.initialPageIndex = 0});
 
   @override
   State<StatefulWidget> createState() => _PlatformedHomePageState();
 }
 
 class _PlatformedHomePageState extends State<PlatformedHomePage> {
+  final PageController _pageController = PageController(initialPage: 0);
+  late int _selectedIndex;
+
+  @override
+  initState() {
+    super.initState();
+    _selectedIndex = widget.initialPageIndex;
+  }
+
   onSelected(int index) {
-    setState(() {
-      widget.selectedIndex = index;
-    });
-    widget.pageController.jumpToPage(index);
+    _pageController.jumpToPage(index);
   }
 
   @override
@@ -39,7 +38,7 @@ class _PlatformedHomePageState extends State<PlatformedHomePage> {
 
   Widget buildHomePage(BuildContext context) {
     if (kIsWeb) {
-      return createLeftNavigationHomePage(context);
+      throw Exception("unsupported");
     } else if (Platform.isWindows) {
       throw Exception("unsupported");
     } else if (Platform.isMacOS) {
@@ -57,73 +56,27 @@ class _PlatformedHomePageState extends State<PlatformedHomePage> {
     }
   }
 
-  Widget createLeftNavigationHomePage(BuildContext context) {
-    final List<NavigationRailDestination> destinations =
-        widget.navigationItems.map((e) {
-      return NavigationRailDestination(icon: e.icon, label: Text(e.label));
-    }).toList();
-
-    return Scaffold(
-        appBar: widget.appBar,
-        body: Row(
-          children: [
-            GestureDetector(
-                child: NavigationRail(
-              onDestinationSelected: onSelected,
-              destinations: destinations,
-              selectedIndex: widget.selectedIndex,
-              labelType: NavigationRailLabelType.none,
-              groupAlignment: -1.0,
-              selectedLabelTextStyle: const TextStyle(color: Colors.blue),
-              selectedIconTheme:
-                  const IconThemeData(color: Colors.blue, fill: 1),
-              unselectedLabelTextStyle: const TextStyle(color: Colors.white),
-              unselectedIconTheme: const IconThemeData(color: Colors.white),
-              useIndicator: false,
-              indicatorShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                side: const BorderSide(color: Colors.yellow, width: 2.0),
-              ),
-              backgroundColor: Colors.black,
-              extended: false,
-            )),
-            Expanded(
-                child: PageView(
-              controller: widget.pageController,
-              children: widget.pages,
-            ))
-          ],
-        ));
-  }
-
   Widget createBottomNavigationHomePage(BuildContext context) {
-    final List<Widget> items = widget.navigationItems.map((e) {
-      return e.icon;
-    }).toList();
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: Theme.of(context).secondaryHeaderColor,
         color: Theme.of(context).scaffoldBackgroundColor,
-        index: widget.selectedIndex,
-        items: items,
+        index: _selectedIndex,
+        items: const [
+          Icon(TDIcons.server),
+          Icon(Icons.download),
+          Icon(Icons.settings),
+        ],
         onTap: onSelected,
       ),
       body: PageView(
-        controller: widget.pageController,
-        children: widget.pages,
+        controller: _pageController,
+        children: const [
+          ServerPage(),
+          DownloadPage(),
+          SettingsPage(),
+        ],
       ),
     );
   }
-}
-
-class CNavigationItem {
-  final String label;
-  final Icon icon;
-  Icon? activeIcon;
-  Color? activeColor;
-
-  CNavigationItem({
-    required this.label,
-    required this.icon,
-  });
 }

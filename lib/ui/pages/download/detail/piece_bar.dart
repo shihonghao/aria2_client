@@ -128,6 +128,9 @@ class _PieceBarPainter extends CustomPainter {
     canvas.clipRRect(RRect.fromRectAndRadius(rect, const Radius.circular(5)));
 
     var combinedPieces = getCombinedPieces(bitfield, numPieces);
+    if(combinedPieces.isEmpty){
+      canvas.drawRect(rect,paint..color=inactiveColor ?? const Color(0xFFF6ABAB));
+    }
     var posX = 0.0;
     for (var i = 0; i < combinedPieces.length; i++) {
       var piece = combinedPieces[i];

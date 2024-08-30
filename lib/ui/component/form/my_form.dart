@@ -1,5 +1,4 @@
 import 'package:aria2_client/const/Const.dart';
-import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/store/IHive.dart';
 import 'package:aria2_client/ui/component/animation/my_animated_icon.dart';
 import 'package:aria2_client/util/Util.dart';
@@ -79,7 +78,7 @@ class FormItem<T> extends ChangeNotifier {
   final WidgetBuilder? contentBuilder;
   final WidgetBuilder? trailingBuilder;
   final Widget? option;
-  T? value;
+  T? _value;
   final bool showDivider;
   final bool readOnly;
   final String? tooltip;
@@ -89,12 +88,19 @@ class FormItem<T> extends ChangeNotifier {
   final ValueChanged<T>? onChange;
   final Listenable? listenable;
 
+  set value(T? val) {
+    _value = val;
+    notifyListeners();
+  }
+
+  T? get value => _value;
+
   FormItem(
       {required this.key,
       required this.type,
       this.listenable,
       this.label,
-      this.value,
+      T? value,
       this.leadingBuilder,
       this.trailingBuilder,
       this.contentBuilder,
@@ -106,21 +112,18 @@ class FormItem<T> extends ChangeNotifier {
       this.showDivider = true,
       this.onChange,
       this.options})
-      : assert(
+      : _value = value,
+        assert(
             (type == FormItemType.select &&
                     (options != null && options.isNotEmpty)) ||
                 type != FormItemType.select,
             "Select option can not be empty!!");
 
   void callOnChange() {
-    if (value == null) {
+    if (_value == null) {
       return;
     }
-    onChange?.call(value as T);
-  }
-
-  void refresh() {
-    notifyListeners();
+    onChange?.call(_value as T);
   }
 }
 
@@ -212,7 +215,7 @@ class DefaultFormItem extends StatefulWidget {
 
 class _DefaultFormItemState extends State<DefaultFormItem> {
   late void Function(FormItem item, dynamic value) _onConfirm;
-  late  FormItem _item;
+  late FormItem _item;
   late GlobalKey<TooltipState> _tooltipKey;
 
   @override
@@ -233,12 +236,10 @@ class _DefaultFormItemState extends State<DefaultFormItem> {
             setState(() {});
           });
         };
-
   }
 
   @override
   void didChangeDependencies() {
-
     super.didChangeDependencies();
   }
 
@@ -415,7 +416,7 @@ class _DefaultFormItemState extends State<DefaultFormItem> {
           tooltip = val;
           _tooltipKey = GlobalKey<TooltipState>();
         }
-      }else if(tooltip != null){
+      } else if (tooltip != null) {
         _tooltipKey = GlobalKey<TooltipState>();
       }
     }
@@ -439,12 +440,12 @@ class _DefaultFormItemState extends State<DefaultFormItem> {
               )
             : Offstage(
                 offstage: _item.tooltip == null,
-              child:  const Icon(
+                child: const Icon(
                   Icons.info_outline_rounded,
                   size: 20,
                   color: Colors.transparent,
                 ),
-            )),
+              )),
         Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: Text(label)),
@@ -453,7 +454,7 @@ class _DefaultFormItemState extends State<DefaultFormItem> {
   }
 
   void _updateItem() {
-    if(_item.value != widget.item.value){
+    if (_item.value != widget.item.value) {
       _item = widget.item;
     }
   }

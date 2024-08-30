@@ -18,7 +18,7 @@ class Aria2RpcClient {
   bool connected = false;
   late Aria2Config config;
 
-  updateServer(Aria2Config config) {
+  switchServer(Aria2Config config) {
     this.config = config;
   }
 

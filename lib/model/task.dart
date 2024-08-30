@@ -248,7 +248,7 @@ class Task {
   }
 
   static String computedFilePercentage(TaskFile file){
-    return file.completedLength == null || file.length == null
+    return file.completedLength == null || file.length == null || file.length == 0
         ? "0 %"
         : "${(file.completedLength! / file.length! * 100).toStringAsFixed(2)} %";
   }
@@ -273,7 +273,7 @@ class Task {
   }
 
   String computedPercentage() {
-    return completedLength == null || totalLength == null
+    return completedLength == null || totalLength == null || totalLength == 0
         ? "0 %"
         : "${(completedLength! / totalLength! * 100).toStringAsFixed(2)} %";
   }

@@ -3,9 +3,9 @@ import 'package:aria2_client/framework/lifecycle.dart';
 import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/net/aria2_request.dart';
 import 'package:aria2_client/net/aria2_websocket_request.dart';
-import 'package:aria2_client/providers/aria2_model.dart';
+import 'package:aria2_client/providers/application.dart';
 import 'package:aria2_client/store/IHive.dart';
-import 'package:aria2_client/ui/home.dart';
+import 'package:aria2_client/ui/platformed_home.dart';
 import 'package:aria2_client/ui/routes/route.dart';
 import 'package:aria2_client/ui/theme/theme_provider.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -20,25 +20,25 @@ import 'net/aria2_http_request.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await IHive.init();
-  Aria2Model aria2model = await initAria2();
+  Application aria2model = await initAria2();
   runApp(MyApp(aria2model: aria2model));
 }
 
-Future<Aria2Model> initAria2() async {
+Future<Application> initAria2() async {
   Aria2Request.register(Aria2Constants.PROTOCOL_HTTP, Aria2HttpRequest());
   Aria2Request.register(
       Aria2Constants.PROTOCOL_WEBSOCKET, Aria2WebSocketRequest());
   Aria2Request.register(Aria2Constants.PROTOCOL_HTTPS, Aria2HttpRequest());
   Aria2Request.register(
       Aria2Constants.PROTOCOL_WEBSOCKET_SECURE, Aria2WebSocketRequest());
-  Aria2Model aria2model = Aria2Model.instance;
+  Application aria2model = Application.instance;
   await SharedPreferences.getInstance();
   await aria2model.init();
   return aria2model;
 }
 
 class MyApp extends StatelessWidget {
-  Aria2Model aria2model;
+  Application aria2model;
 
   MyApp({super.key, required this.aria2model});
 
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
-      ChangeNotifierProvider<Aria2Model>(
+      ChangeNotifierProvider<Application>(
         create: (context) => aria2model,
         lazy: false,
       )
@@ -72,12 +72,7 @@ class MyApp extends StatelessWidget {
       // To use the Playground font, add GoogleFonts package and uncomment
       // fontFamily: GoogleFonts.notoSans().fontFamily,
     );
-    return
-        // I18nApp(
-        // builder: (context, locale, child) {
-        //   return
-
-        ThemeProvider(
+    return ThemeProvider(
       builder: (BuildContext context, ThemeMode mode) {
         return ValueListenableBuilder(
           valueListenable: IHive.aria2s.listenable(),
@@ -116,8 +111,9 @@ class MyApp extends StatelessWidget {
               S.delegate
             ],
             supportedLocales: S.delegate.supportedLocales,
-            // locale: locale,
-            home: MyHomePage(title: 'Aria2'),
+            home: const PlatformedHomePage(
+              initialPageIndex: 0,
+            ),
           ),
         );
       },

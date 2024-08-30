@@ -33,7 +33,7 @@ class _DownloadPageState extends State<DownloadPage> {
                     reverseTransitionDuration: Const.duration200ms),
                 context: context,
                 builder: (BuildContext context) {
-                  return CreateTaskDialog();
+                  return const CreateTaskDialog();
                 },
               ),
               icon: const Icon(Icons.add),

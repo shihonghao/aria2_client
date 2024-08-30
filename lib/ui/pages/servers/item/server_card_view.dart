@@ -6,19 +6,22 @@ import 'package:aria2_client/aria2/model/aria2_server_config.dart';
 import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
-import 'package:aria2_client/net/rpc_result.dart';
-import 'package:aria2_client/providers/aria2_model.dart';
+import 'package:aria2_client/providers/application.dart';
 import 'package:aria2_client/providers/server_model.dart';
 import 'package:aria2_client/ui/component/animation/my_animated_icon.dart';
 import 'package:aria2_client/ui/component/animation/my_colorize_text.dart';
 import 'package:aria2_client/ui/pages/servers/detail/detail_page.dart';
+import 'package:aria2_client/ui/pages/servers/item/global_limit_setting.dart';
 import 'package:aria2_client/ui/pages/servers/item/server_item.dart';
 import 'package:aria2_client/util/Util.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ServerCardView extends StatefulWidget {
-  const ServerCardView({super.key});
+  final ValueNotifier<bool> isSelected;
+
+  const ServerCardView({super.key, required this.isSelected});
 
   static final List<String> enabledFeatures = [
     "Async DNS",
@@ -39,22 +42,13 @@ class ServerCardView extends StatefulWidget {
 }
 
 class _ServerCardViewState extends State<ServerCardView> {
-  late TextEditingController _uploadLimitSpeedTextController;
-  late TextEditingController _downloadLimitSpeedTextController;
 
-  @override
-  void initState() {
-    super.initState();
-    _uploadLimitSpeedTextController = TextEditingController();
-    _downloadLimitSpeedTextController = TextEditingController();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = TextStyle(color: Theme.of(context).colorScheme.secondary);
     return Card(
-      color: Theme.of(context).highlightColor,
-      elevation: 5,
+      surfaceTintColor: Theme.of(context).primaryColor,
+      elevation: 10,
       margin: const EdgeInsets.all(10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       child: Stack(children: [
@@ -104,6 +98,10 @@ class _ServerCardViewState extends State<ServerCardView> {
             Selector<ServerModel, Aria2GlobalStatus>(
               selector: (context, model) => model.globalStatus,
               builder: (context, globalStatus, child) {
+                final textStyle = TextStyle(
+                    color: !widget.isSelected.value
+                        ? Theme.of(context).splashColor
+                        : Theme.of(context).colorScheme.secondary);
                 String downloadSpeed = globalStatus.calcSpeed(true);
                 String uploadSpeed = globalStatus.calcSpeed();
                 return Container(
@@ -166,8 +164,11 @@ class _ServerCardViewState extends State<ServerCardView> {
                                               CrossAxisAlignment.center,
                                           children: [
                                             Icon(Icons.arrow_downward,
-                                                color: Theme.of(context)
-                                                    .indicatorColor),
+                                                color: !widget.isSelected.value
+                                                    ? Theme.of(context)
+                                                        .splashColor
+                                                    : Theme.of(context)
+                                                        .indicatorColor),
                                             Padding(
                                               padding:
                                                   const EdgeInsets.fromLTRB(
@@ -191,8 +192,11 @@ class _ServerCardViewState extends State<ServerCardView> {
                                           children: [
                                             Icon(
                                               Icons.arrow_upward,
-                                              color: Theme.of(context)
-                                                  .indicatorColor,
+                                              color: !widget.isSelected.value
+                                                  ? Theme.of(context)
+                                                      .splashColor
+                                                  : Theme.of(context)
+                                                      .indicatorColor,
                                             ),
                                             Padding(
                                               padding:
@@ -234,122 +238,7 @@ class _ServerCardViewState extends State<ServerCardView> {
                   );
                 },
                 selector: (_, model) => model.aria2.serverConfig),
-            Selector<ServerModel, Aria2ServerConfig>(
-                builder: (_, config, child) {
-                  _uploadLimitSpeedTextController.text =
-                      config.maxUploadLimit.toString();
-                  _downloadLimitSpeedTextController.text =
-                      config.maxDownloadLimit.toString();
-                  return Container(
-                    constraints: const BoxConstraints(minHeight: 50),
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(20)),
-                    margin: const EdgeInsets.fromLTRB(25, 15, 25, 15),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.fromLTRB(10, 0, 40, 0),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      S.of(context).global_limit,
-                                      style: TextStyle(
-                                          color:
-                                              Theme.of(context).indicatorColor),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text("${S.of(context).download} ："),
-                                        SizedBox(
-                                            width: 80,
-                                            height: 45,
-                                            child: TextField(
-                                              controller:
-                                                  _downloadLimitSpeedTextController,
-                                              onChanged: (value){
-                                                Aria2RpcClient.instance.changeGlobalOption("max-overall-download-limit", value);
-                                              },
-                                              decoration: InputDecoration(
-                                                  suffix: const Text("mb/s"),
-                                                  fillColor: Theme.of(context)
-                                                      .cardColor,
-                                                  focusedBorder:
-                                                      const UnderlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide.none),
-                                                  contentPadding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          0, 0, 15, 0),
-                                                  enabledBorder:
-                                                      const UnderlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide.none),
-                                                  border: InputBorder.none),
-                                            )),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text("${S.of(context).upload} ： "),
-                                        SizedBox(
-                                            width: 80,
-                                            height: 45,
-                                            child: TextField(
-                                              controller:
-                                                  _uploadLimitSpeedTextController,
-                                              onChanged: (value){
-                                                final limit = int.parse(value);
-                                                Aria2RpcClient.instance.changeGlobalOption("max-overall-upload-limit", (limit * 1024 * 1024).toString());
-                                              },
-                                              decoration: InputDecoration(
-                                                  suffix: const Text("mb/s"),
-                                                  fillColor: Theme.of(context)
-                                                      .cardColor,
-                                                  focusedBorder:
-                                                      const UnderlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide.none),
-                                                  enabledBorder:
-                                                      const UnderlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide.none),
-                                                  contentPadding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          0, 0, 15, 0),
-                                                  border: InputBorder.none),
-                                            )),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                selector: (_, model) => model.aria2.serverConfig),
+            GlobalLimitSetting(isSelected: widget.isSelected),
             Container(
               decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
@@ -359,15 +248,14 @@ class _ServerCardViewState extends State<ServerCardView> {
                 iconSize: 30,
                 icon: const Icon(Icons.close),
                 onPressed: () {
-                  context
-                      .read<Aria2Model>()
+                  Application.instance
                       .removeAria2(context.read<ServerModel>().aria2.config);
                 },
               ),
             )
           ],
         ),
-        ServerItem.buildCheckBox(),
+        ServerItem.buildCheckBox(widget.isSelected),
         Positioned(
           bottom: 10,
           right: 10,
@@ -389,11 +277,13 @@ class _ServerCardViewState extends State<ServerCardView> {
                   onTap: (controller) {
                     controller.forward();
                     Future.delayed(Const.duration400ms, () {
-                      if (context.read<ServerModel>().isCurrent) {
+                      if (widget.isSelected.value) {
                         action();
                       } else {
-                        Util.showTextAlert(
-                            context, S.of(context).check_firstly);
+                        if (mounted) {
+                          Util.showTextAlert(
+                              context, S.of(context).check_firstly);
+                        }
                       }
                     });
                   },
@@ -423,8 +313,9 @@ class _ServerCardViewState extends State<ServerCardView> {
     int count = 0;
     Widget? widget1;
     Widget? widget2;
+    final isSelected = widget.isSelected.value;
     for (var feature in ServerCardView.enabledFeatures) {
-      Color color = features.contains(feature)
+      Color color = (features.contains(feature) && isSelected)
           ? Theme.of(context).indicatorColor
           : Theme.of(context).splashColor;
       Widget widget = Container(

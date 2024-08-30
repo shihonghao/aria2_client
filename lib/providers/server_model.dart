@@ -70,6 +70,7 @@ class ServerModel extends ChangeNotifier {
         numWaiting: 0,
         numStopped: 0,
         numStoppedTotal: 0);
+    notifyListeners();
   }
 
   Future<bool> checkServerAvailable([bool force = false]) async {

@@ -2,40 +2,34 @@ import 'dart:async';
 
 import 'package:aria2_client/aria2/model/aria2_config.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
-import 'package:aria2_client/net/rpc_result.dart';
 import 'package:aria2_client/providers/server_model.dart';
 import 'package:aria2_client/providers/task_model.dart';
 import 'package:aria2_client/store/IHive.dart';
+import 'package:aria2_client/timer/my_timer_manager.dart';
+import 'package:aria2_client/ui/pages/servers/server_content.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../aria2/model/aria2.dart';
 import '../aria2/model/aria2_server_config.dart';
-import '../model/task.dart';
 
-typedef RpcRequestCallBack = void Function(dynamic data);
+class Application extends ChangeNotifier {
+  Application._();
 
-class Aria2Model extends ChangeNotifier {
-  Aria2Model._() {
-    aria2s = {};
-  }
+  static Application? _instance;
 
-  static Aria2Model? _instance;
-
-  static Aria2Model get instance {
-    _instance ??= Aria2Model._();
+  static Application get instance {
+    _instance ??= Application._();
     return _instance!;
   }
 
-  late final Map<String, ServerModel> aria2s;
+  final ValueNotifier<ViewType> serverViewType = ValueNotifier(ViewType.list);
 
-  ServerModel? currentServer;
+  final ValueNotifier<ServerModel?> selectedServer = ValueNotifier(null);
 
-  TaskModel? currentTask;
+  final ValueNotifier<TaskModel?> selectedTask = ValueNotifier(null);
 
-  TaskStatus? subscribeStatus;
-
-  int disconnectCount = 0;
+  final Map<String, ServerModel> aria2s = {};
 
   init() async {
     aria2s.clear();
@@ -49,27 +43,33 @@ class Aria2Model extends ChangeNotifier {
   Future<void> addAria2(Aria2Config config) async {
     if (!aria2s.containsKey(config.key)) {
       aria2s[config.key] = ServerModel(aria2: Aria2(config: config));
-      await IHive.aria2s.put(config.key, config).then((_) => notifyListeners());
+      IHive.aria2s.put(config.key, config);
+      notifyListeners();
     }
   }
 
   Future<void> removeAria2(Aria2Config config) async {
-    if (currentServer != null) {
-      if (currentServer!.key == config.key) {
-        setCurrentServer(null);
+    if (selectedServer.value != null) {
+      if (selectedServer.value!.key == config.key) {
+        changeServer(null);
       }
     }
+
     if (aria2s.containsKey(config.key)) {
       aria2s.remove(config.key);
-      await IHive.aria2s.delete(config.key).then((_) => notifyListeners());
+      IHive.aria2s.delete(config.key);
+      notifyListeners();
     }
   }
 
-  Future<bool> changeServer() async {
-    if (currentServer == null) {
+  Future<bool> changeServer(ServerModel? model) async {
+    if (model == null) {
+      selectedServer.value = model;
       return true;
     }
-    Aria2RpcClient.instance.updateServer(currentServer!.aria2.config);
+
+    Aria2RpcClient.instance.switchServer(model.aria2.config);
+
     List<dynamic>? enabledFeatures;
     String? version;
     return await Aria2RpcClient.instance.connect().then((result) {
@@ -85,35 +85,20 @@ class Aria2Model extends ChangeNotifier {
             .addAll({"version": version, "enabledFeatures": enabledFeatures});
         Aria2ServerConfig serverConfig =
             Aria2ServerConfig.fromJson(result.data);
-        currentServer?.aria2.serverConfig = serverConfig;
-        notifyListeners();
+        model.aria2.serverConfig = serverConfig;
+        selectedServer.value = model;
         return true;
       }
       throw Exception();
     }).catchError((error) {
       Util.showErrorToast(
-          "Can not connect to server ${currentServer!.aria2.config.name}");
+          "Can not connect to server ${selectedServer.value!.aria2.config.name}");
       return false;
     });
   }
 
-  bool processRpcRequest(RpcResult result, RpcRequestCallBack callback) {
-    if (result.success) {
-      disconnectCount = 0;
-      callback(result.data);
-      return true;
-    }
-    disconnectCount++;
-    if (disconnectCount > 3) {
-      Util.showErrorToast(
-          "Can not connect to server ${currentServer?.aria2.config.uri}");
-    }
-    return false;
-  }
-
-  setCurrentServer(ServerModel? model) {
-    currentServer = model;
-    changeServer();
-    notifyListeners();
+  Future<void> switchServerViewType() async {
+    serverViewType.value =
+        serverViewType.value == ViewType.list ? ViewType.card : ViewType.list;
   }
 }

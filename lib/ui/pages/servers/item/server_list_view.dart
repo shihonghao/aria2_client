@@ -7,10 +7,10 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
-typedef BoolCallBack = Future<bool> Function();
-
 class ServerListView extends StatefulWidget {
-  const ServerListView({super.key});
+  final ValueNotifier<bool> isSelected;
+
+  const ServerListView({super.key, required this.isSelected});
 
   @override
   State<StatefulWidget> createState() {
@@ -31,7 +31,7 @@ class _ServerListViewState extends State<ServerListView> {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(30))),
       elevation: 10,
-      color: themeData.highlightColor,
+      surfaceTintColor: Theme.of(context).secondaryHeaderColor,
       margin: EdgeInsets.zero,
       child: Stack(
         children: [
@@ -60,7 +60,7 @@ class _ServerListViewState extends State<ServerListView> {
             ),
             buildOverview()
           ]),
-          ServerItem.buildCheckBox()
+          ServerItem.buildCheckBox(widget.isSelected)
         ],
       ),
     );
@@ -68,131 +68,120 @@ class _ServerListViewState extends State<ServerListView> {
 
   Widget buildOverview() {
     final textStyle = TextStyle(color: Theme.of(context).colorScheme.secondary);
-    return Selector<ServerModel, String>(
-        selector: (context, model) => model.aria2.config.name,
-        builder: (context, name, child) {
-          return Expanded(
-              child: Column(children: [
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 8, 0),
-                  child: Text(name, style: const TextStyle(fontSize: 30)),
-                ),
-              ],
-            ),
-            child!
-          ]));
-        },
-        child: Selector<ServerModel, Aria2GlobalStatus>(
-            selector: (context, model) => model.globalStatus,
-            builder: (context, globalStatus, child) {
-              String downloadSpeed = globalStatus.calcSpeed(true);
-              String uploadSpeed = globalStatus.calcSpeed();
-
-              return Expanded(
-                child: Row(
-                  children: [
+    return Expanded(
+        child: Column(children: [
+      Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 8, 0),
+            child: Text(context.read<ServerModel>().aria2.config.name,
+                style: const TextStyle(fontSize: 30)),
+          ),
+        ],
+      ),
+      Selector<ServerModel, Aria2GlobalStatus>(
+          selector: (context, model) => model.globalStatus,
+          builder: (context, globalStatus, child) {
+            String downloadSpeed = globalStatus.calcSpeed(true);
+            String uploadSpeed = globalStatus.calcSpeed();
+            return Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                      child: Column(children: [
+                    Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Text(
+                          style: textStyle,
+                          S
+                              .of(context)
+                              .downloading_count(globalStatus.numActive),
+                        )),
                     Expanded(
-                        child: Column(children: [
-                      Container(
+                      child: Container(
                           padding: const EdgeInsets.all(8),
-                          child: Text(
-                            style: textStyle,
-                            S
-                                .of(context)
-                                .downloading_count(globalStatus.numActive),
-                          )),
-                      Expanded(
-                        child: Container(
-                            padding: const EdgeInsets.all(8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(Icons.arrow_downward,
-                                    color: Theme.of(context).indicatorColor),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 4, 0, 0),
-                                  child: Text(
-                                    style: textStyle,
-                                    downloadSpeed,
-                                  ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_downward,
+                                  color: Theme.of(context).indicatorColor),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+                                child: Text(
+                                  style: textStyle,
+                                  downloadSpeed,
                                 ),
-                              ],
-                            )),
-                      )
-                    ])),
+                              ),
+                            ],
+                          )),
+                    )
+                  ])),
+                  Expanded(
+                      child: Column(children: [
+                    Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Text(
+                          style: textStyle,
+                          S.of(context).waiting_count(globalStatus.numWaiting),
+                        )),
                     Expanded(
-                        child: Column(children: [
-                      Container(
+                      child: Container(
                           padding: const EdgeInsets.all(8),
-                          child: Text(
-                            style: textStyle,
-                            S
-                                .of(context)
-                                .waiting_count(globalStatus.numWaiting),
-                          )),
-                      Expanded(
-                        child: Container(
-                            padding: const EdgeInsets.all(8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.arrow_upward,
-                                  color: Theme.of(context).indicatorColor,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.arrow_upward,
+                                color: Theme.of(context).indicatorColor,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+                                child: Text(
+                                  style: textStyle,
+                                  uploadSpeed,
                                 ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 4, 0, 0),
-                                  child: Text(
-                                    style: textStyle,
-                                    uploadSpeed,
-                                  ),
-                                ),
-                              ],
-                            )),
-                      )
-                    ])),
-                    Expanded(
-                        child: Column(children: [
-                      Container(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(
-                            style: textStyle,
-                            S
-                                .of(context)
-                                .stopped_count(globalStatus.numStopped),
+                              ),
+                            ],
                           )),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: child!,
-                      )
-                    ])),
-                  ],
-                ),
+                    )
+                  ])),
+                  Expanded(
+                      child: Column(children: [
+                    Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Text(
+                          style: textStyle,
+                          S.of(context).stopped_count(globalStatus.numStopped),
+                        )),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: child!,
+                    )
+                  ])),
+                ],
+              ),
+            );
+          },
+          child: Selector<ServerModel, bool>(
+            selector: (context, model) => model.isTesting,
+            builder: (context, isTesting, child) {
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                switchInCurve: Curves.easeInBack,
+                switchOutCurve: Curves.linear,
+                child: !isTesting
+                    ? Text(
+                        context.read<ServerModel>().isAvailable
+                            ? S.of(context).online
+                            : S.of(context).offline,
+                        style: const TextStyle(fontSize: 20))
+                    : LoadingAnimationWidget.staggeredDotsWave(
+                        color: Colors.red, size: 35),
               );
             },
-            child: Selector<ServerModel, bool>(
-              selector: (context, model) => model.isTesting,
-              builder: (context, isTesting, child) {
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  switchInCurve: Curves.easeInBack,
-                  switchOutCurve: Curves.linear,
-                  child: !isTesting
-                      ? Text(
-                          context.read<ServerModel>().isAvailable
-                              ? S.of(context).online
-                              : S.of(context).offline,
-                          style: const TextStyle(fontSize: 20))
-                      : LoadingAnimationWidget.staggeredDotsWave(
-                          color: Colors.red, size: 35),
-                );
-              },
-            )));
+          ))
+    ]));
   }
 }

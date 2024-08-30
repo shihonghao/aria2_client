@@ -6,13 +6,12 @@ import 'package:aria2_client/event/base_event.dart';
 import 'package:aria2_client/event/event_bus_manager.dart';
 import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
-import 'package:aria2_client/providers/aria2_model.dart';
+import 'package:aria2_client/providers/application.dart';
 import 'package:aria2_client/providers/server_model.dart';
 import 'package:aria2_client/store/IHive.dart';
 import 'package:aria2_client/timer/my_timer.dart';
 import 'package:aria2_client/timer/my_timer_state.dart';
 import 'package:aria2_client/ui/component/overlay/my_clip_overlay.dart';
-import 'package:aria2_client/ui/pages/servers/event/server_event.dart';
 import 'package:aria2_client/ui/pages/servers/item/server_list_view.dart';
 import 'package:aria2_client/ui/pages/servers/server_content.dart';
 import 'package:aria2_client/util/Util.dart';
@@ -36,40 +35,37 @@ class ServerItem extends StatefulWidget {
       required this.width,
       required this.height});
 
-  static Widget buildCheckBox() {
+  static Widget buildCheckBox(ValueNotifier<bool> isSelected) {
     return Positioned(
         top: 10,
         right: 20,
-        child: Selector<ServerModel, bool>(
-          builder: (context, isCurrent, child) {
-            return GestureDetector(
-                onTap: () {
-                  if (!isCurrent) {
-                    EventBusManager.eventBus.fire(ServerEvent<ServerModel>(
-                        scope: EventScope.All,
-                        value: context.read<ServerModel>(),
-                        eventType: ServerEventType.CHANGE_CURRENT));
-                  }
-                },
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  switchInCurve: Curves.easeInBack,
-                  switchOutCurve: Curves.linear,
-                  transitionBuilder: (child, animation) {
-                    animation = animation.drive(Tween(begin: 1.0, end: 1.2));
-                    return ScaleTransition(scale: animation, child: child);
+        child: ValueListenableBuilder(
+            valueListenable: isSelected,
+            builder: (context, value, child) {
+              return GestureDetector(
+                  onTap: () {
+                    if (!value) {
+                      Application.instance
+                          .changeServer(context.read<ServerModel>());
+                    }
                   },
-                  child: Icon(
-                    key: UniqueKey(),
-                    Icons.check_circle_outline,
-                    color: isCurrent
-                        ? Theme.of(context).indicatorColor
-                        : Theme.of(context).splashColor,
-                  ),
-                ));
-          },
-          selector: (context, model) => model.isCurrent,
-        ));
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    switchInCurve: Curves.easeInBack,
+                    switchOutCurve: Curves.linear,
+                    transitionBuilder: (child, animation) {
+                      animation = animation.drive(Tween(begin: 1.0, end: 1.2));
+                      return ScaleTransition(scale: animation, child: child);
+                    },
+                    child: Icon(
+                      key: UniqueKey(),
+                      Icons.check_circle_outline,
+                      color: value
+                          ? Theme.of(context).indicatorColor
+                          : Theme.of(context).splashColor,
+                    ),
+                  ));
+            }));
   }
 
   @override
@@ -81,7 +77,9 @@ class ServerItem extends StatefulWidget {
 class _ServerItemState extends MyTimerState<ServerItem>
     with TickerProviderStateMixin {
   late GlobalKey<MyClipOverlayState> overlayKey;
-  late StreamSubscription<ServerEvent> subscription;
+  late StreamSubscription<CheckAvailableEvent> subscription;
+  late VoidCallback _currentChangeCallBack;
+  late ValueNotifier<bool> _isSelected;
 
   @override
   MyTimer initTimer() {
@@ -108,27 +106,23 @@ class _ServerItemState extends MyTimerState<ServerItem>
   void initState() {
     super.initState();
     overlayKey = GlobalKey<MyClipOverlayState>();
-    subscription = EventBusManager.eventBus.on<ServerEvent>().listen((event) {
-      if (widget.model.key == event.key || event.scope == EventScope.All) {
-        switch (event.eventType) {
-          case ServerEventType.CHECK_AVAILABLE:
-            widget.model.checkServerAvailable(true).then((value) {
-              event.executeCallback();
-            });
-            break;
-          case ServerEventType.CHANGE_CURRENT:
-            widget.model.setCurrent(event.value == widget.model);
-            if (event.value == widget.model) {
-              startTimer();
-            } else {
-              pauseTimer();
-            }
-            break;
-          default:
-            break;
-        }
-      }
+    _isSelected =
+        ValueNotifier(Application.instance.selectedServer.value == widget.model);
+    subscription =
+        EventBusManager.eventBus.on<CheckAvailableEvent>().listen((event) {
+      widget.model.checkServerAvailable(true);
     });
+    _currentChangeCallBack = () {
+      if (Application.instance.selectedServer.value == widget.model) {
+        _isSelected.value = true;
+        startTimer();
+      } else {
+        _isSelected.value = false;
+        pauseTimer();
+        widget.model.resetGlobalStatus();
+      }
+    };
+    Application.instance.selectedServer.addListener(_currentChangeCallBack);
   }
 
   @override
@@ -140,8 +134,9 @@ class _ServerItemState extends MyTimerState<ServerItem>
 
   @override
   void dispose() {
-    super.dispose();
     subscription.cancel();
+    Application.instance.selectedServer.removeListener(_currentChangeCallBack);
+    super.dispose();
   }
 
   @override
@@ -171,7 +166,7 @@ class _ServerItemState extends MyTimerState<ServerItem>
                   onPressed: () {
                     overlayKey.currentState!.hidden();
                     context
-                        .read<Aria2Model>()
+                        .read<Application>()
                         .removeAria2(widget.model.aria2.config);
                   },
                   child: Text(S.of(context).delete),
@@ -200,10 +195,16 @@ class _ServerItemState extends MyTimerState<ServerItem>
                           .drive(Tween(begin: 1.0, end: 1.06)),
                       child: child)));
         },
-        child: const ServerListView(),
+        child: ServerListView(
+          isSelected: _isSelected,
+        ),
       );
     } else {
-      return SizedBox(width: widget.width, child: const ServerCardView());
+      return SizedBox(
+          width: widget.width,
+          child: ServerCardView(
+            isSelected: _isSelected,
+          ));
     }
   }
 }

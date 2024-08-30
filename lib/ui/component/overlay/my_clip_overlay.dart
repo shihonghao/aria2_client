@@ -122,9 +122,9 @@ class MyClipOverlayState extends MyAnimationState<MyClipOverlay, double> {
     );
     return MyClipper(
         left: position.left + 5,
-        top: position.top+ 5,
+        top: position.top+ 10,
         right: position.right + 5,
-        bottom: position.bottom+ 5,
+        bottom: position.bottom + 10,
         radius: const Radius.circular(30));
   }
 }
@@ -178,10 +178,11 @@ class MyClipperPainter extends CustomPainter {
           ..fillType = PathFillType.evenOdd,
         Paint()
           ..colorFilter =
-              ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.srcIn)
-          ..strokeWidth = 1
-          ..color = Colors.white
-          ..style = PaintingStyle.stroke);
+              ColorFilter.mode(Colors.white.withOpacity(0.5), BlendMode.srcIn)
+          // ..strokeWidth = 1
+          ..color = Colors.transparent
+          // ..style = PaintingStyle.stroke
+    );
   }
 
   @override

@@ -1,5 +1,5 @@
 import 'package:aria2_client/net/aria2_rpc_client.dart';
-import 'package:aria2_client/providers/aria2_model.dart';
+import 'package:aria2_client/providers/application.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -220,7 +220,7 @@ class _ServerAddPageState extends State<ServerAddPage> {
                             ? null
                             : () {
                                 context
-                                    .read<Aria2Model>()
+                                    .read<Application>()
                                     .addAria2(widget.config)
                                     .then((_) {
                                   Navigator.pop(context);

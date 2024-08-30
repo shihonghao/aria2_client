@@ -9,6 +9,7 @@ buildBasic(BuildContext context, Aria2ServerConfig config) {
         Aria2RpcClient.instance
             .changeGlobalOption(item.key, value.toString())
             .then((result) {
+              debugPrint(result.success.toString());
           if (result.success) {
             if (item.value is int) {
               item.value = int.parse(value.toString());
@@ -17,7 +18,6 @@ buildBasic(BuildContext context, Aria2ServerConfig config) {
             } else {
               item.value = value;
             }
-            item.refresh();
           } else {
             Util.showErrorToast(S.of(context).connect_error);
           }
@@ -31,7 +31,7 @@ buildBasic(BuildContext context, Aria2ServerConfig config) {
       textColor: Theme.of(context).primaryColor,
       elevation: 3,
     ),
-    expanded: true,
+    expanded: false,
     leading: CircleAvatar(
       backgroundColor: Colors.lightGreen,
       child: Text(

@@ -1,6 +1,6 @@
 import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
-import 'package:aria2_client/providers/aria2_model.dart';
+import 'package:aria2_client/providers/application.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:aria2_client/util/url_util.dart';
 import 'package:flutter/material.dart';
@@ -31,11 +31,11 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
 
   @override
   Widget build(BuildContext context) {
-    if (context.read<Aria2Model>().currentServer != null &&
-        context.read<Aria2Model>().currentServer!.aria2.serverConfig.dir !=
+    if (context.read<Application>().selectedServer.value != null &&
+        context.read<Application>().selectedServer.value!.aria2.serverConfig.dir !=
             null) {
       _downloadPathController.text =
-          context.read<Aria2Model>().currentServer!.aria2.serverConfig.dir!;
+          context.read<Application>().selectedServer.value!.aria2.serverConfig.dir!;
     }
 
     return AlertDialog(

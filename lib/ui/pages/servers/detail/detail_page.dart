@@ -34,6 +34,7 @@ class _DetailPageState extends State<DetailPage> {
   late Aria2ServerConfig _config;
   bool firstTime = true;
   Widget? _form;
+  late List<FormItem> basicItems;
 
   @override
   void initState() {

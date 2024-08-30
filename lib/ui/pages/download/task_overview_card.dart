@@ -63,7 +63,6 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
       child: Stack(
         children: [
           Card(
-              color: Theme.of(context).splashColor,
               margin: const EdgeInsets.all(3.0),
               clipBehavior: Clip.antiAlias,
               shape: RoundedRectangleBorder(
@@ -169,7 +168,7 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
           action.call();
         },
         child: Container(
-          color: Theme.of(context).splashColor,
+          color: Theme.of(context).cardColor,
           child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -272,7 +271,7 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
                                         task.status == TaskStatus.active
                                             ? Colors.blue
                                             : Colors.amber),
-                                    value: task.totalLength == null
+                                    value: task.totalLength == null || task.totalLength == 0
                                         ? 0.0
                                         : task.completedLength! /
                                             task.totalLength!,
@@ -312,7 +311,7 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
                                                             TaskStatus.active
                                                         ? Colors.blue
                                                         : Colors.amber),
-                                                value: task.totalLength == null
+                                                value: task.totalLength == null || task.totalLength == 0
                                                     ? 0.0
                                                     : value / task.totalLength!,
                                               );

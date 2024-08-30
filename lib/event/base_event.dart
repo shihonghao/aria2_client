@@ -3,17 +3,12 @@ enum EventScope { Single, All }
 typedef EventValueCallBack<T> = Function(T value);
 
 abstract class BaseEvent<T> {
-  String? key;
-  EventScope scope;
+  String key;
   T? value;
-  EventValueCallBack<T?>? callBack;
 
-  executeCallback() {
-    callBack?.call(value);
-  }
+  BaseEvent({required this.key, this.value});
+}
 
-  BaseEvent(
-      {this.key, this.value, this.scope = EventScope.Single, this.callBack})
-      : assert(scope == EventScope.Single ? key != null : true,
-            "event key can not be null with Single scope");
+class CheckAvailableEvent extends BaseEvent {
+  CheckAvailableEvent() : super(key: 'CHECK_AVAILABLE');
 }

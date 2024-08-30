@@ -4,7 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
 import '../../aria2/aria2_constants.dart';
-import '../../providers/aria2_model.dart';
+import '../../providers/application.dart';
 
 class Aria2ServerAddDialog extends Dialog {
   final Aria2Config config = Aria2Config(key: "", name: "");
@@ -229,7 +229,7 @@ class Aria2ServerAddDialog extends Dialog {
 
   confirm(BuildContext context) {
     config.uri();
-    context.read<Aria2Model>().addAria2(config);
+    context.read<Application>().addAria2(config);
     Navigator.pop(context);
   }
 }

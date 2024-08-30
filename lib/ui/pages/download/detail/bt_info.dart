@@ -123,7 +123,7 @@ class _BtInfoState extends MyTimerState<BtInfo> {
   }
 
   String calcPeerPercent(String? bitfield, int? numPieces) {
-    if (bitfield == null || numPieces == null) {
+    if (bitfield == null  || numPieces == null || numPieces == 0) {
       return "0%";
     }
     int count = 0;
