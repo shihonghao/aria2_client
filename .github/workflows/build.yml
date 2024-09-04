@@ -42,6 +42,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          token: ${{ secrets.ACTION_TOKEN }}
+          token: ${{ secrets.WF_ACTION_TOKEN }}
           artifacts: "ios-release.ipa"
           tag: ${{ github.event.inputs.TAG }}
