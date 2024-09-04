@@ -38,21 +38,16 @@ app.*.symbols
 app.*.map.json
 
 # Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-android/local.properties
+
 aria2_client.iml
 
 
-/android/local.properties
+
 
 
 /macos/
 
-/android/
 /pubspec.lock
-/ios/
 /windows/
 /web/
 /linux/
