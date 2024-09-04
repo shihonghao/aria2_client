@@ -43,5 +43,5 @@ jobs:
         with:
           allowUpdates: true
           artifacts: "ios-release.ipa"
-          token: ${{ secrets.WF_ACTION_TOKEN }}
+          token: ${{ secrets.ACTION_TOKEN }}
           tag: ${{ github.event.inputs.TAG }}
