@@ -11,6 +11,7 @@ import 'package:aria2_client/ui/theme/theme_provider.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -79,41 +80,45 @@ class MyApp extends StatelessWidget {
           builder: (context, value, child) {
             return child!;
           },
-          child: MaterialApp(
-            title: 'Aria2',
-            themeMode: mode,
-            theme: FlexThemeData.light(
-              scheme: FlexScheme.materialBaseline,
-              surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-              blendLevel: 7,
-              subThemesData: const FlexSubThemesData(
-                blendOnLevel: 10,
-                blendOnColors: false,
-                useTextTheme: true,
-                useM2StyleDividerInM3: true,
-                alignedDropdown: true,
-                useInputDecoratorThemeInDialogs: true,
-              ),
-              visualDensity: FlexColorScheme.comfortablePlatformDensity,
-              useMaterial3: true,
-              swapLegacyOnMaterial3: true,
+          child: ScreenUtilInit(
+            builder: (context, child) {
+              return MaterialApp(
+                title: 'Aria2',
+                themeMode: mode,
+                theme: FlexThemeData.light(
+                  scheme: FlexScheme.materialBaseline,
+                  surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+                  blendLevel: 7,
+                  subThemesData: const FlexSubThemesData(
+                    blendOnLevel: 10,
+                    blendOnColors: false,
+                    useTextTheme: true,
+                    useM2StyleDividerInM3: true,
+                    alignedDropdown: true,
+                    useInputDecoratorThemeInDialogs: true,
+                  ),
+                  visualDensity: FlexColorScheme.comfortablePlatformDensity,
+                  useMaterial3: true,
+                  swapLegacyOnMaterial3: true,
 
-              // To use the Playground font, add GoogleFonts package and uncomment
-              // fontFamily: GoogleFonts.notoSans().fontFamily,
-            ),
-            navigatorObservers: [Lifecycle.lifecycleRouteObserver],
-            darkTheme: darkThemeData,
-            routes: routes,
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-              S.delegate
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            home: const PlatformedHomePage(
-              initialPageIndex: 0,
-            ),
+                  // To use the Playground font, add GoogleFonts package and uncomment
+                  // fontFamily: GoogleFonts.notoSans().fontFamily,
+                ),
+                navigatorObservers: [Lifecycle.lifecycleRouteObserver],
+                darkTheme: darkThemeData,
+                routes: routes,
+                localizationsDelegates: const [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                  S.delegate
+                ],
+                supportedLocales: S.delegate.supportedLocales,
+                home: const PlatformedHomePage(
+                  initialPageIndex: 0,
+                ),
+              );
+            },
           ),
         );
       },

@@ -3,11 +3,11 @@ import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/event/base_event.dart';
 import 'package:aria2_client/event/event_bus_manager.dart';
 import 'package:aria2_client/generated/l10n.dart';
-import 'package:aria2_client/main.dart';
 import 'package:aria2_client/providers/application.dart';
 import 'package:aria2_client/ui/pages/servers/server_add_page.dart';
 import 'package:aria2_client/ui/pages/servers/server_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ServerPage extends StatefulWidget {
   const ServerPage({super.key});
@@ -33,30 +33,34 @@ class _ServerPageState extends State<ServerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
-        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+        padding: EdgeInsets.only(top: 10.w),
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(colors: [
+          Color.fromRGBO(15, 23, 42, 1.00),
+          Color.fromRGBO(51, 65, 85, 1.00)
+        ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
         child: Column(
           children: [
             Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: buildActions()),
-            Row(
               children: [
                 SizedBox(
-                  height: 110,
+                  height: 80.h,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                    padding: EdgeInsets.only(left: 20.w),
                     child: Text(
                       S.of(context).serverPageTitle,
-                      style: const TextStyle(
-                          fontSize: 70, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 50.sp, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.start,
                     ),
                   ),
                 ),
               ],
             ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: buildActions()),
             Expanded(
                 child: ValueListenableBuilder<ViewType>(
               valueListenable: Application.instance.serverViewType,
@@ -75,19 +79,18 @@ class _ServerPageState extends State<ServerPage> {
   List<Widget> buildActions() {
     return [
       Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20.h),
         child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape: Const.roundedRectangleBorder30,
           color: Theme.of(context).highlightColor,
           child: Row(children: [
             IconButton(
               onPressed: () {
                 EventBusManager.eventBus.fire(CheckAvailableEvent());
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.refresh,
-                size: 30,
+                size: 20.h,
               ),
             ),
             IconButton(
@@ -103,7 +106,7 @@ class _ServerPageState extends State<ServerPage> {
                         : Icons.credit_card;
                     return Center(
                         child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 200),
+                            duration: Const.duration200ms,
                             child: Icon(
                               icon,
                               key: UniqueKey(),
@@ -122,9 +125,9 @@ class _ServerPageState extends State<ServerPage> {
                     onPressed: () {
                       action();
                     },
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.add,
-                      size: 30,
+                      size: 20.h,
                     ));
               },
               openBuilder: (context, action) {

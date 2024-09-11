@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
+import 'package:aria2_client/ui/component/animation/code_rain_effect.dart';
 import 'package:aria2_client/ui/component/expandable_fab.dart';
 import 'package:aria2_client/ui/pages/download/create_task_dialog.dart';
 import 'package:flutter/material.dart';
@@ -70,66 +71,77 @@ class _DownloadPageState extends State<DownloadPage> {
                 ),
                 Expanded(
                   child: Scaffold(
-                      appBar: TabBar(
-                          overlayColor: WidgetStateProperty.all<Color>(
-                              Colors.transparent),
-                          splashFactory: NoSplash.splashFactory,
-                          dividerHeight: 0,
-                          // 多个标签时滚动加载
-                          tabAlignment: TabAlignment.fill,
-                          isScrollable: false,
-                          // 标签指示器的颜色
-                          // indicatorColor: Colors.blue,
-                          // 标签的颜色
-                          labelColor: Colors.blue,
-                          // 未选中标签的颜色
-                          unselectedLabelColor: Colors.white,
-                          // 指示器的大小
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          // 指示器的权重，即线条高度
-                          indicatorWeight: 0,
-                          indicatorPadding:
-                              const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                          indicator: BoxDecoration(
-                            color: Theme.of(context).splashColor,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          onTap: (index) {},
-                          tabs:  [
-                            Tab(text: S.of(context).downloading),
-                            Tab(text: S.of(context).waiting),
-                            Tab(text: S.of(context).paused),
-                            Tab(text: S.of(context).completed),
-                            Tab(text: S.of(context).error),
-                            // Tab(text: "已删除"),
+                    appBar: TabBar(
+                        overlayColor:
+                            WidgetStateProperty.all<Color>(Colors.transparent),
+                        splashFactory: NoSplash.splashFactory,
+                        dividerHeight: 0,
+                        // 多个标签时滚动加载
+                        tabAlignment: TabAlignment.fill,
+                        isScrollable: false,
+                        // 标签指示器的颜色
+                        // indicatorColor: Colors.blue,
+                        // 标签的颜色
+                        labelColor: Colors.blue,
+                        // 未选中标签的颜色
+                        unselectedLabelColor: Colors.white,
+                        // 指示器的大小
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        // 指示器的权重，即线条高度
+                        indicatorWeight: 0,
+                        indicatorPadding:
+                            const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                        indicator: BoxDecoration(
+                          color: Theme.of(context).splashColor,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        onTap: (index) {},
+                        tabs: [
+                          Tab(text: S.of(context).downloading),
+                          Tab(text: S.of(context).waiting),
+                          Tab(text: S.of(context).paused),
+                          Tab(text: S.of(context).completed),
+                          Tab(text: S.of(context).error),
+                          // Tab(text: "已删除"),
+                        ]),
+                    // 标签页所对应的页面
+                    body: Scaffold(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        body: CodeRainEffect(
+                          setting: CodeRainEffectSetting(
+                              count: 70,
+                              maxLength: 30,
+                              minLength: 10,
+                              moveSpeed: 5,
+                              transformDuration: 1),
+                          child: TabBarView(children: [
+                            TaskListView(
+                              key: UniqueKey(),
+                              status: TaskStatus.active,
+                            ),
+                            TaskListView(
+                              key: UniqueKey(),
+                              status: TaskStatus.waiting,
+                            ),
+                            TaskListView(
+                              key: UniqueKey(),
+                              status: TaskStatus.paused,
+                            ),
+                            TaskListView(
+                              key: UniqueKey(),
+                              status: TaskStatus.complete,
+                            ),
+                            TaskListView(
+                              key: UniqueKey(),
+                              status: TaskStatus.error,
+                            ),
+                            // TaskPage(
+                            //   status: TaskStatus.removed,
+                            // ),
                           ]),
-                      // 标签页所对应的页面
-                      body: TabBarView(children: [
-                        TaskListView(
-                          key: UniqueKey(),
-                          status: TaskStatus.active,
-                        ),
-                        TaskListView(
-                          key: UniqueKey(),
-                          status: TaskStatus.waiting,
-                        ),
-                        TaskListView(
-                          key: UniqueKey(),
-                          status: TaskStatus.paused,
-                        ),
-                        TaskListView(
-                          key: UniqueKey(),
-                          status: TaskStatus.complete,
-                        ),
-                        TaskListView(
-                          key: UniqueKey(),
-                          status: TaskStatus.error,
-                        ),
-                        // TaskPage(
-                        //   status: TaskStatus.removed,
-                        // ),
-                      ])),
-                ),
+                        )),
+                  ),
+                )
               ],
             )));
   }

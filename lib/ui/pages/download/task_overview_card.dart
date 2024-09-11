@@ -1,9 +1,13 @@
+import 'dart:ui';
+
 import 'package:animations/animations.dart';
 import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/framework/lifecycle.dart';
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/providers/task_model.dart';
+import 'package:aria2_client/ui/component/animation/code_rain_effect.dart';
+import 'package:aria2_client/ui/component/animation/star_effect.dart';
 import 'package:aria2_client/ui/component/my_open_container.dart';
 import 'package:aria2_client/ui/pages/download/detail/detail_page.dart';
 import 'package:flutter/material.dart';
@@ -63,11 +67,12 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
       child: Stack(
         children: [
           Card(
+              color:  Theme.of(context).splashColor,
               margin: const EdgeInsets.all(3.0),
               clipBehavior: Clip.antiAlias,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5.0),
-                  side: const BorderSide(width: 1.0, color: Colors.black)),
+                  side:  BorderSide(width: 2.0, color: Theme.of(context).splashColor)),
               elevation: 8.0,
               child: Selector<TaskModel, Task>(
                 shouldRebuild: (oldVal, newVal) => newVal.isChanged(),
@@ -150,223 +155,231 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
   }
 
   Widget buildOverview() {
-    return InkWell(
-        onTap: () {
-          isSelected = !isSelected;
-          widget.onSelected?.call(isSelected);
-          if (isSelected) {
-            padding = 1;
-            border =
-                Border.all(color: Theme.of(context).indicatorColor, width: 2);
-          } else {
-            padding = 0;
-            border = null;
-          }
-          setState(() {});
-        },
-        onDoubleTap: () {
-          action.call();
-        },
-        child: Container(
-          color: Theme.of(context).cardColor,
-          child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 3,sigmaY: 3),
+        child: InkWell(
+            onTap: () {
+              isSelected = !isSelected;
+              widget.onSelected?.call(isSelected);
+              if (isSelected) {
+                padding = 1;
+                border =
+                    Border.all(color: Theme.of(context).indicatorColor, width: 2);
+              } else {
+                padding = 0;
+                border = null;
+              }
+              setState(() {});
+            },
+            onDoubleTap: () {
+              action.call();
+            },
+            child: Container(
+              // color: Theme.of(context).cardColor,
+              child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(
-                            task.taskName ?? "",
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 25),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                task.taskName ?? "",
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 25),
+                              ),
+                            ),
                           ),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: options,
+                            ),
+                          ),
+                        ],
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: options,
-                        ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          size: 20,
+                                          Icons.arrow_upward_outlined,
+                                          color: Theme.of(context).indicatorColor,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(2.0),
+                                          child: Text(
+                                              "${task.formatBytes(task.uploadSpeed)}/s",
+                                              style: const TextStyle(
+                                                  color: Colors.grey)),
+                                        ),
+                                        Icon(
+                                          size: 20,
+                                          Icons.arrow_downward_outlined,
+                                          color: Theme.of(context).indicatorColor,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(2.0),
+                                          child: Text(
+                                              "${task.formatBytes(task.downloadSpeed)}/s",
+                                              style: const TextStyle(
+                                                  color: Colors.grey)),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          size: 20,
+                                          Icons.equalizer,
+                                          color: Theme.of(context).indicatorColor,
+                                        ),
+                                        Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 5),
+                                            child: Text(
+                                              "${task.formatBytes(task.completedLength)} / ${task.formatBytes(task.totalLength)}",
+                                              style: const TextStyle(
+                                                  color: Colors.grey),
+                                            )),
+                                      ],
+                                    )
+                                  ],
+                                )
+                              ])),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 20),
+                                  child: TweenAnimationBuilder(
+                                    builder: (ctx, value, cd) {
+                                      return LinearProgressIndicator(
+                                        minHeight: 10,
+                                        borderRadius: BorderRadius.circular(50),
+                                        backgroundColor: Colors.grey,
+                                        valueColor: AlwaysStoppedAnimation(
+                                            task.status == TaskStatus.active
+                                                ? Colors.blue
+                                                : Colors.amber),
+                                        value: task.totalLength == null ||
+                                                task.totalLength == 0
+                                            ? 0.0
+                                            : task.completedLength! /
+                                                task.totalLength!,
+                                      );
+                                    },
+                                    tween: IntTween(
+                                        begin: task.lastCompletedLength,
+                                        end: task.completedLength),
+                                    duration: Const.duration1s,
+                                  ))),
+                        ],
                       ),
-                    ],
-                  ),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      size: 20,
-                                      Icons.arrow_upward_outlined,
-                                      color: Theme.of(context).indicatorColor,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Text(
-                                          "${task.formatBytes(task.uploadSpeed)}/s",
-                                          style: const TextStyle(
-                                              color: Colors.grey)),
-                                    ),
-                                    Icon(
-                                      size: 20,
-                                      Icons.arrow_downward_outlined,
-                                      color: Theme.of(context).indicatorColor,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Text(
-                                          "${task.formatBytes(task.downloadSpeed)}/s",
-                                          style: const TextStyle(
-                                              color: Colors.grey)),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      size: 20,
-                                      Icons.equalizer,
-                                      color: Theme.of(context).indicatorColor,
-                                    ),
-                                    Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5),
-                                        child: Text(
-                                          "${task.formatBytes(task.completedLength)} / ${task.formatBytes(task.totalLength)}",
-                                          style: const TextStyle(
-                                              color: Colors.grey),
-                                        )),
-                                  ],
-                                )
-                              ],
-                            )
-                          ])),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: TweenAnimationBuilder(
-                                builder: (ctx, value, cd) {
-                                  return LinearProgressIndicator(
-                                    minHeight: 10,
-                                    borderRadius: BorderRadius.circular(50),
-                                    backgroundColor: Colors.grey,
-                                    valueColor: AlwaysStoppedAnimation(
-                                        task.status == TaskStatus.active
-                                            ? Colors.blue
-                                            : Colors.amber),
-                                    value: task.totalLength == null || task.totalLength == 0
-                                        ? 0.0
-                                        : task.completedLength! /
-                                            task.totalLength!,
-                                  );
-                                },
-                                tween: IntTween(
-                                    begin: task.lastCompletedLength,
-                                    end: task.completedLength),
-                                duration: Const.duration1s,
-                              ))),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(3.0),
-                                    child: task.status != TaskStatus.active
-                                        ? TweenAnimationBuilder(
-                                            builder: (ctx, value, cd) {
-                                              return CircularProgressIndicator(
+                            Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(3.0),
+                                        child: task.status != TaskStatus.active
+                                            ? TweenAnimationBuilder(
+                                                builder: (ctx, value, cd) {
+                                                  return CircularProgressIndicator(
+                                                    backgroundColor:
+                                                        const Color.fromRGBO(
+                                                            84, 84, 84, 1.0),
+                                                    strokeWidth: 3,
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation(task
+                                                                    .status ==
+                                                                TaskStatus.active
+                                                            ? Colors.blue
+                                                            : Colors.amber),
+                                                    value: task.totalLength ==
+                                                                null ||
+                                                            task.totalLength == 0
+                                                        ? 0.0
+                                                        : value / task.totalLength!,
+                                                  );
+                                                },
+                                                tween: IntTween(
+                                                    begin: task.lastCompletedLength,
+                                                    end: task.completedLength),
+                                                duration: Const.duration1s,
+                                              )
+                                            : CircularProgressIndicator(
                                                 backgroundColor:
                                                     const Color.fromRGBO(
                                                         84, 84, 84, 1.0),
                                                 strokeWidth: 3,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation(task
-                                                                .status ==
-                                                            TaskStatus.active
+                                                valueColor: AlwaysStoppedAnimation(
+                                                    task.status == TaskStatus.active
                                                         ? Colors.blue
                                                         : Colors.amber),
-                                                value: task.totalLength == null || task.totalLength == 0
-                                                    ? 0.0
-                                                    : value / task.totalLength!,
-                                              );
-                                            },
-                                            tween: IntTween(
-                                                begin: task.lastCompletedLength,
-                                                end: task.completedLength),
-                                            duration: Const.duration1s,
-                                          )
-                                        : CircularProgressIndicator(
-                                            backgroundColor:
-                                                const Color.fromRGBO(
-                                                    84, 84, 84, 1.0),
-                                            strokeWidth: 3,
-                                            valueColor: AlwaysStoppedAnimation(
-                                                task.status == TaskStatus.active
-                                                    ? Colors.blue
-                                                    : Colors.amber),
-                                          ),
-                                  )),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                child: Text(task.computedPercentage(),
-                                    style: const TextStyle(color: Colors.grey)),
-                              )
-                            ]),
-                        task.status == TaskStatus.active
-                            ? Expanded(
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                    Icon(
-                                      size: 20,
-                                      Icons.schedule,
-                                      color: Theme.of(context).indicatorColor,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Text(task.getRemainTime(),
-                                          style: const TextStyle(
-                                              color: Colors.grey)),
-                                    ),
-                                  ]))
-                            : const SizedBox(width: 0, height: 0),
-                      ],
-                    ),
+                                              ),
+                                      )),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(horizontal: 5),
+                                    child: Text(task.computedPercentage(),
+                                        style: const TextStyle(color: Colors.grey)),
+                                  )
+                                ]),
+                            task.status == TaskStatus.active
+                                ? Expanded(
+                                    child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                        Icon(
+                                          size: 20,
+                                          Icons.schedule,
+                                          color: Theme.of(context).indicatorColor,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(2.0),
+                                          child: Text(task.getRemainTime(),
+                                              style: const TextStyle(
+                                                  color: Colors.grey)),
+                                        ),
+                                      ]))
+                                : const SizedBox(width: 0, height: 0),
+                          ],
+                        ),
+                      )
+                    ],
                   )
-                ],
-              )
-              // }),
-              ),
-        ));
+                  // }),
+                  ),
+            )),
+      ),
+    );
   }
 
   Widget buildDetail() {

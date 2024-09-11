@@ -3,6 +3,7 @@ import 'package:aria2_client/providers/task_model.dart';
 import 'package:aria2_client/store/IHive.dart';
 import 'package:aria2_client/timer/my_timer.dart';
 import 'package:aria2_client/timer/my_timer_state.dart';
+import 'package:aria2_client/ui/component/animation/code_rain_effect.dart';
 import 'package:aria2_client/ui/pages/download/task_overview_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -104,13 +105,11 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
           return oldVal != newVal;
         },
         builder: (BuildContext context, String? value, Widget? child) {
-          return Scaffold(
-            backgroundColor: Theme.of(context).primaryColor,
-              body: AnimatedList(
+          return AnimatedList(
             key: _listKey,
             itemBuilder: buildItem,
             initialItemCount: _models.length,
-          ));
+          );
         });
   }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:aria2_client/aria2/model/aria2_config.dart';
+import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/providers/server_model.dart';
 import 'package:aria2_client/providers/task_model.dart';
@@ -9,6 +10,7 @@ import 'package:aria2_client/timer/my_timer_manager.dart';
 import 'package:aria2_client/ui/pages/servers/server_content.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 
 import '../aria2/model/aria2.dart';
 import '../aria2/model/aria2_server_config.dart';
@@ -31,6 +33,8 @@ class Application extends ChangeNotifier {
 
   final Map<String, ServerModel> aria2s = {};
 
+  int? fps;
+
   init() async {
     aria2s.clear();
     for (Aria2Config config in IHive.aria2s.values) {
@@ -38,6 +42,8 @@ class Application extends ChangeNotifier {
         aria2s[config.key] = ServerModel(aria2: Aria2(config: config));
       }
     }
+    final DisplayMode displayMode = await FlutterDisplayMode.active;
+    fps = displayMode.refreshRate.toInt();
   }
 
   Future<void> addAria2(Aria2Config config) async {
@@ -72,6 +78,8 @@ class Application extends ChangeNotifier {
 
     List<dynamic>? enabledFeatures;
     String? version;
+    model.setTesting(true);
+    bool available = false;
     return await Aria2RpcClient.instance.connect().then((result) {
       if (result.success) {
         enabledFeatures = result.data["enabledFeatures"] as List<dynamic>?;
@@ -87,6 +95,7 @@ class Application extends ChangeNotifier {
             Aria2ServerConfig.fromJson(result.data);
         model.aria2.serverConfig = serverConfig;
         selectedServer.value = model;
+        available = true;
         return true;
       }
       throw Exception();
@@ -94,6 +103,11 @@ class Application extends ChangeNotifier {
       Util.showErrorToast(
           "Can not connect to server ${selectedServer.value!.aria2.config.name}");
       return false;
+    }).whenComplete((){
+      Future.delayed(Const.duration2s,(){
+        model.setAvailable(available);
+        model.setTesting(false);
+      });
     });
   }
 

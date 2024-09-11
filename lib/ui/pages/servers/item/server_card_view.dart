@@ -5,7 +5,6 @@ import 'package:aria2_client/aria2/model/aria2_global_status.dart';
 import 'package:aria2_client/aria2/model/aria2_server_config.dart';
 import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/generated/l10n.dart';
-import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/providers/application.dart';
 import 'package:aria2_client/providers/server_model.dart';
 import 'package:aria2_client/ui/component/animation/my_animated_icon.dart';
@@ -14,7 +13,6 @@ import 'package:aria2_client/ui/pages/servers/detail/detail_page.dart';
 import 'package:aria2_client/ui/pages/servers/item/global_limit_setting.dart';
 import 'package:aria2_client/ui/pages/servers/item/server_item.dart';
 import 'package:aria2_client/util/Util.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,8 +40,6 @@ class ServerCardView extends StatefulWidget {
 }
 
 class _ServerCardViewState extends State<ServerCardView> {
-
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -238,7 +234,10 @@ class _ServerCardViewState extends State<ServerCardView> {
                   );
                 },
                 selector: (_, model) => model.aria2.serverConfig),
-            GlobalLimitSetting(isSelected: widget.isSelected),
+            GlobalLimitSetting(
+              isSelected: widget.isSelected,
+              serverConfig: context.read<ServerModel>().aria2.serverConfig,
+            ),
             Container(
               decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,

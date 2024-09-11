@@ -6,6 +6,7 @@ import 'package:aria2_client/ui/pages/servers/item/server_item.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum ViewType { card, list }
 
@@ -32,7 +33,7 @@ class _ServerContentState extends State<ServerContent>
   void initState() {
     super.initState();
     if (widget.type == ViewType.list) {
-      _interval = 550;
+      _interval = 105.h;
       _listKey = GlobalKey<AnimatedListState>();
       _scrollController = ScrollController();
     } else {
@@ -73,6 +74,7 @@ class _ServerContentState extends State<ServerContent>
         },
         child: widget.type == ViewType.list
             ? AnimatedList(
+                padding: EdgeInsets.symmetric(horizontal: 3.w),
                 initialItemCount: _models.length,
                 scrollDirection: Axis.vertical,
                 key: _listKey,
@@ -107,8 +109,8 @@ class _ServerContentState extends State<ServerContent>
       model: _models[index],
       type: widget.type,
       onTap: () => _handleItemTap(index),
-      width: 550,
-      height: 140,
+      width: 550.w,
+      height: 105.h,
     );
   }
 

@@ -16,6 +16,7 @@ import 'package:aria2_client/ui/pages/servers/item/server_list_view.dart';
 import 'package:aria2_client/ui/pages/servers/server_content.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import 'server_card_view.dart';
@@ -35,7 +36,8 @@ class ServerItem extends StatefulWidget {
       required this.width,
       required this.height});
 
-  static Widget buildCheckBox(ValueNotifier<bool> isSelected) {
+  static Widget buildCheckBox(ValueNotifier<bool> isSelected,
+      [ValueChanged<bool>? callback]) {
     return Positioned(
         top: 10,
         right: 20,
@@ -47,6 +49,7 @@ class ServerItem extends StatefulWidget {
                     if (!value) {
                       Application.instance
                           .changeServer(context.read<ServerModel>());
+                      callback?.call(value);
                     }
                   },
                   child: AnimatedSwitcher(
@@ -81,6 +84,9 @@ class _ServerItemState extends MyTimerState<ServerItem>
   late VoidCallback _currentChangeCallBack;
   late ValueNotifier<bool> _isSelected;
 
+  late double _containerWidth;
+  late double _containerHeight;
+
   @override
   MyTimer initTimer() {
     return MyTimer(
@@ -105,9 +111,11 @@ class _ServerItemState extends MyTimerState<ServerItem>
   @override
   void initState() {
     super.initState();
+    _containerWidth = widget.width;
+    _containerHeight = widget.height;
     overlayKey = GlobalKey<MyClipOverlayState>();
-    _isSelected =
-        ValueNotifier(Application.instance.selectedServer.value == widget.model);
+    _isSelected = ValueNotifier(
+        Application.instance.selectedServer.value == widget.model);
     subscription =
         EventBusManager.eventBus.on<CheckAvailableEvent>().listen((event) {
       widget.model.checkServerAvailable(true);
@@ -147,58 +155,57 @@ class _ServerItemState extends MyTimerState<ServerItem>
 
   Widget buildContent() {
     if (widget.type == ViewType.list) {
-      return MyClipOverlay(
-        key: overlayKey,
-        duration: Const.duration500ms,
-        overlayContentBuilder: (leftTop, bottomRight, animation) {
-          return Positioned(
-              bottom: bottomRight.dx - 40,
-              right: bottomRight.dy + 15,
-              child: Container(
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(30)),
-                width: 100,
-                height: 30 * animation.value,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).splashColor,
-                  ),
-                  onPressed: () {
-                    overlayKey.currentState!.hidden();
-                    context
-                        .read<Application>()
-                        .removeAria2(widget.model.aria2.config);
-                  },
-                  child: Text(S.of(context).delete),
+      return Container(
+              margin: EdgeInsets.all(10.w),
+              height: _containerHeight,
+              child: MyClipOverlay(
+                key: overlayKey,
+                duration: Const.duration500ms,
+                overlayContentBuilder: (leftTop, bottomRight, animation) {
+                  return Positioned(
+                      bottom: bottomRight.dy - 25.h,
+                      right: bottomRight.dx + 10.w,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30)),
+                        width: 80.w,
+                        height: (20 * animation.value).h,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).splashColor,
+                          ),
+                          onPressed: () {
+                            overlayKey.currentState!.hidden();
+                            Application.instance
+                                .removeAria2(widget.model.aria2.config);
+                          },
+                          child: Text(S.of(context).delete),
+                        ),
+                      ));
+                },
+                builder: (context, animation, child) {
+                  return GestureDetector(
+                      onLongPress: () {
+                        if (!overlayKey.currentState!.isDisplay) {
+                          if (widget.onTap != null) {
+                            widget.onTap!.call().then((_) {
+                              overlayKey.currentState!.display();
+                            });
+                          } else {
+                            overlayKey.currentState!.display();
+                          }
+                        }
+                      },
+                      child: ScaleTransition(
+                          scale: animation
+                              .drive(CurveTween(curve: Curves.easeInOutBack))
+                              .drive(Tween(begin: 1.0, end: 1.06)),
+                          child: child));
+                },
+                child: ServerListView(
+                  isSelected: _isSelected,
                 ),
               ));
-        },
-        builder: (context, animation, child) {
-          return GestureDetector(
-              onLongPress: () {
-                if (!overlayKey.currentState!.isDisplay) {
-                  if (widget.onTap != null) {
-                    widget.onTap!.call().then((_) {
-                      overlayKey.currentState!.display();
-                    });
-                  } else {
-                    overlayKey.currentState!.display();
-                  }
-                }
-              },
-              child: Container(
-                  margin: const EdgeInsets.all(10),
-                  height: widget.height,
-                  child: ScaleTransition(
-                      scale: animation
-                          .drive(CurveTween(curve: Curves.easeInOutBack))
-                          .drive(Tween(begin: 1.0, end: 1.06)),
-                      child: child)));
-        },
-        child: ServerListView(
-          isSelected: _isSelected,
-        ),
-      );
     } else {
       return SizedBox(
           width: widget.width,

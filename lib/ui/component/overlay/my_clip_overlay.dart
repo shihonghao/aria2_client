@@ -86,7 +86,7 @@ class MyClipOverlayState extends MyAnimationState<MyClipOverlay, double> {
                         ),
                         widget.overlayContentBuilder?.call(
                                 Offset(clipper.left, clipper.top),
-                                Offset(clipper.bottom, clipper.right),
+                                Offset(clipper.right, clipper.bottom),
                                 animation) ??
                             Container()
                       ],
@@ -121,10 +121,10 @@ class MyClipOverlayState extends MyAnimationState<MyClipOverlay, double> {
       Offset.zero & overlay.size,
     );
     return MyClipper(
-        left: position.left + 5,
-        top: position.top+ 10,
-        right: position.right + 5,
-        bottom: position.bottom + 10,
+        left: position.left,
+        top: position.top,
+        right: position.right,
+        bottom: position.bottom,
         radius: const Radius.circular(30));
   }
 }
@@ -181,8 +181,8 @@ class MyClipperPainter extends CustomPainter {
               ColorFilter.mode(Colors.white.withOpacity(0.5), BlendMode.srcIn)
           // ..strokeWidth = 1
           ..color = Colors.transparent
-          // ..style = PaintingStyle.stroke
-    );
+        // ..style = PaintingStyle.stroke
+        );
   }
 
   @override

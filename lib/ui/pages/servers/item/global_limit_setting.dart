@@ -1,17 +1,18 @@
 import 'package:animations/animations.dart';
+import 'package:aria2_client/aria2/model/aria2_server_config.dart';
 import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/generated/l10n.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
-import 'package:aria2_client/providers/server_model.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class GlobalLimitSetting extends StatefulWidget {
   final ValueNotifier<bool> isSelected;
+  final Aria2ServerConfig serverConfig;
 
-  const GlobalLimitSetting({super.key, required this.isSelected});
+  const GlobalLimitSetting(
+      {super.key, required this.isSelected, required this.serverConfig});
 
   @override
   State<StatefulWidget> createState() {
@@ -28,7 +29,7 @@ class _GlobalLimitSetting extends State<GlobalLimitSetting> {
   @override
   void initState() {
     super.initState();
-    final serverConfig = context.read<ServerModel>().aria2.serverConfig;
+    final serverConfig = widget.serverConfig;
     final uploadLimit = Util.formatBytes(serverConfig.maxOverallUploadLimit);
     final downloadLimit =
         Util.formatBytes(serverConfig.maxOverallDownloadLimit);
