@@ -42,8 +42,9 @@ class Application extends ChangeNotifier {
         aria2s[config.key] = ServerModel(aria2: Aria2(config: config));
       }
     }
-    final DisplayMode displayMode = await FlutterDisplayMode.active;
-    fps = displayMode.refreshRate.toInt();
+    // final DisplayMode displayMode = await FlutterDisplayMode.active;
+    // fps = displayMode.refreshRate.toInt();
+    fps = 60;
   }
 
   Future<void> addAria2(Aria2Config config) async {
@@ -103,8 +104,8 @@ class Application extends ChangeNotifier {
       Util.showErrorToast(
           "Can not connect to server ${selectedServer.value!.aria2.config.name}");
       return false;
-    }).whenComplete((){
-      Future.delayed(Const.duration2s,(){
+    }).whenComplete(() {
+      Future.delayed(Const.duration2s, () {
         model.setAvailable(available);
         model.setTesting(false);
       });
