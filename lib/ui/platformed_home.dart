@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:aria2_client/ui/pages/download/download_page.dart';
+import 'package:aria2_client/ui/pages/main_page.dart';
 import 'package:aria2_client/ui/pages/servers/server_page.dart';
 import 'package:aria2_client/ui/pages/settings/settings_page.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -46,7 +47,8 @@ class _PlatformedHomePageState extends State<PlatformedHomePage> {
     } else if (Platform.isLinux) {
       throw Exception("unsupported");
     } else if (Platform.isAndroid) {
-      return createBottomNavigationHomePage(context);
+      // return createBottomNavigationHomePage(context);
+      return const MainPage();
     } else if (Platform.isIOS) {
       return createBottomNavigationHomePage(context);
     } else if (Platform.isFuchsia) {

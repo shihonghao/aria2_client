@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-class StartEffectController {
+class StartEffectController extends ChangeNotifier {
   bool _run = false;
   bool _runRotation = false;
 
@@ -13,18 +13,22 @@ class StartEffectController {
 
   void pause() {
     _run = false;
+    notifyListeners();
   }
 
   void active() {
     _run = true;
+    notifyListeners();
   }
 
   void rotation() {
     _runRotation = true;
+    notifyListeners();
   }
 
   void pauseRotation() {
     _runRotation = false;
+    notifyListeners();
   }
 }
 

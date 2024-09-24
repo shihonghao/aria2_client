@@ -12,6 +12,7 @@ import 'package:aria2_client/ui/pages/download/detail/pieces_info.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TaskDetailCard extends StatefulWidget {
   final TaskModel model;
@@ -81,32 +82,33 @@ class _TaskDetailCardState extends MyTimerState<TaskDetailCard> {
   Widget build(BuildContext context) {
     title = getTitle(0);
     return Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        body: Swiper.children(
-          onIndexChanged: (index) {
-            title = getTitle(index);
-            setState(() {});
+      appBar: AppBar(
+        title: Hero(tag:"test",child: Text(widget.model.task.taskName??"")),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
           },
-          pagination: SwiperPagination(
-              builder: DotSwiperPaginationBuilder(
-                  activeColor: Theme.of(context).indicatorColor)),
-          children: [
-            BasicInfo(taskModel: widget.model),
-            FileList(taskModel: widget.model),
-            PiecesInfo(
-              piece: widget.model.piece,
-            ),
-            if (isBt) BtInfo(taskModel: widget.model)
-          ],
-        ));
+        ),
+      ),
+      body: Swiper.children(
+        onIndexChanged: (index) {
+          title = getTitle(index);
+          setState(() {});
+        },
+        pagination: SwiperPagination(
+            builder: DotSwiperPaginationBuilder(
+                activeColor: Theme.of(context).indicatorColor)),
+        children: [
+          BasicInfo(taskModel: widget.model),
+          FileList(taskModel: widget.model),
+          PiecesInfo(
+            piece: widget.model.piece,
+          ),
+          if (isBt) BtInfo(taskModel: widget.model)
+        ],
+      ),
+    );
   }
 
   String getTitle(int index) {

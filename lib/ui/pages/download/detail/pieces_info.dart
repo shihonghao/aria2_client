@@ -20,9 +20,7 @@ class PiecesInfo extends StatefulWidget {
 class _PiecesInfoState extends State<PiecesInfo> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Theme.of(context).splashColor,
-      child: Padding(
+    return  Padding(
         padding: const EdgeInsets.all(8.0),
         child: ValueListenableBuilder(
           valueListenable: widget.piece,
@@ -37,7 +35,6 @@ class _PiecesInfoState extends State<PiecesInfo> {
             ));
           },
         ),
-      ),
     );
   }
 }

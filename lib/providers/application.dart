@@ -29,6 +29,8 @@ class Application extends ChangeNotifier {
 
   final ValueNotifier<ServerModel?> selectedServer = ValueNotifier(null);
 
+  final ValueNotifier<ServerModel?> candidateServer = ValueNotifier(null);
+
   final ValueNotifier<TaskModel?> selectedTask = ValueNotifier(null);
 
   final Map<String, ServerModel> aria2s = {};
@@ -58,7 +60,7 @@ class Application extends ChangeNotifier {
   Future<void> removeAria2(Aria2Config config) async {
     if (selectedServer.value != null) {
       if (selectedServer.value!.key == config.key) {
-        changeServer(null);
+        changeCandidateServer(null);
       }
     }
 
@@ -69,47 +71,53 @@ class Application extends ChangeNotifier {
     }
   }
 
-  Future<bool> changeServer(ServerModel? model) async {
+  void changeCandidateServer(ServerModel? model) {
+    candidateServer.value = model;
+  }
+
+  void changeServer(ServerModel? model) {
     if (model == null) {
       selectedServer.value = model;
-      return true;
+      return;
     }
 
     Aria2RpcClient.instance.switchServer(model.aria2.config);
 
-    List<dynamic>? enabledFeatures;
-    String? version;
-    model.setTesting(true);
-    bool available = false;
-    return await Aria2RpcClient.instance.connect().then((result) {
-      if (result.success) {
-        enabledFeatures = result.data["enabledFeatures"] as List<dynamic>?;
-        version = result.data["version"];
-        return Aria2RpcClient.instance.getGlobalOption();
-      }
-      throw Exception();
-    }).then((result) {
-      if (result.success) {
-        result.data
-            .addAll({"version": version, "enabledFeatures": enabledFeatures});
-        Aria2ServerConfig serverConfig =
-            Aria2ServerConfig.fromJson(result.data);
-        model.aria2.serverConfig = serverConfig;
-        selectedServer.value = model;
-        available = true;
-        return true;
-      }
-      throw Exception();
-    }).catchError((error) {
-      Util.showErrorToast(
-          "Can not connect to server ${selectedServer.value!.aria2.config.name}");
-      return false;
-    }).whenComplete(() {
-      Future.delayed(Const.duration2s, () {
-        model.setAvailable(available);
-        model.setTesting(false);
-      });
-    });
+    selectedServer.value = model;
+
+    // List<dynamic>? enabledFeatures;
+    // String? version;
+    // model.setTesting(true);
+    // bool available = false;
+    // return await Aria2RpcClient.instance.connect().then((result) {
+    //   if (result.success) {
+    //     enabledFeatures = result.data["enabledFeatures"] as List<dynamic>?;
+    //     version = result.data["version"];
+    //     return Aria2RpcClient.instance.getGlobalOption();
+    //   }
+    //   throw Exception();
+    // }).then((result) {
+    //   if (result.success) {
+    //     result.data
+    //         .addAll({"version": version, "enabledFeatures": enabledFeatures});
+    //     Aria2ServerConfig serverConfig =
+    //         Aria2ServerConfig.fromJson(result.data);
+    //     model.aria2.serverConfig = serverConfig;
+    //     selectedServer.value = model;
+    //     available = true;
+    //     return true;
+    //   }
+    //   throw Exception();
+    // }).catchError((error) {
+    //   Util.showErrorToast(
+    //       "Can not connect to server ${model.aria2.config.name}");
+    //   return false;
+    // }).whenComplete(() {
+    //   Future.delayed(Const.duration2s, () {
+    //     model.setAvailable(available);
+    //     model.setTesting(false);
+    //   });
+    // });
   }
 
   Future<void> switchServerViewType() async {

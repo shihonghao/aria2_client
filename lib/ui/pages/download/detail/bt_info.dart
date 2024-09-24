@@ -9,6 +9,7 @@ import 'package:aria2_client/ui/component/form/my_form.dart';
 import 'package:aria2_client/ui/pages/download/detail/piece_bar.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BtInfo extends StatefulWidget {
   final TaskModel taskModel;
@@ -78,17 +79,15 @@ class _BtInfoState extends MyTimerState<BtInfo> {
   @override
   Widget build(BuildContext context) {
     task = widget.taskModel.task;
-    return Card(
-      margin: EdgeInsets.zero,
-      color: Theme.of(context).highlightColor,
-      child: SingleChildScrollView(
-        child: MyForm(
+    return  SingleChildScrollView(
+        child: Padding(
+        padding: EdgeInsets.all( 10.h),
+    child: MyForm(
           groups: [
             FormGroup(
               style: FormGroupStyle(
-                backgroundColor: Theme.of(context).splashColor,
-                collapsedBackgroundColor: Theme.of(context).highlightColor,
-                textColor: Theme.of(context).primaryColor,
+                backgroundColor: Theme.of(context).cardColor,
+                collapsedBackgroundColor: Theme.of(context).primaryColor,
                 elevation: 3,
               ),
               title: S.of(context).bt_tracker_servers,
@@ -108,17 +107,15 @@ class _BtInfoState extends MyTimerState<BtInfo> {
             FormGroup(
               showDivider: false,
               style: FormGroupStyle(
-                backgroundColor: Theme.of(context).splashColor,
-                collapsedBackgroundColor: Theme.of(context).highlightColor,
-                textColor: Theme.of(context).primaryColor,
+                backgroundColor: Theme.of(context).cardColor,
+                collapsedBackgroundColor: Theme.of(context).primaryColor,
                 elevation: 3,
               ),
               title: S.of(context).connection_info,
               items: buildPeersItem(),
             ),
           ],
-        ),
-      ),
+        )),
     );
   }
 

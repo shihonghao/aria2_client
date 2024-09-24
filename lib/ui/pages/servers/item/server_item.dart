@@ -48,7 +48,7 @@ class ServerItem extends StatefulWidget {
                   onTap: () {
                     if (!value) {
                       Application.instance
-                          .changeServer(context.read<ServerModel>());
+                          .changeCandidateServer(context.read<ServerModel>());
                       callback?.call(value);
                     }
                   },

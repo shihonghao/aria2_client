@@ -8,11 +8,9 @@ import 'package:aria2_client/store/IHive.dart';
 import 'package:aria2_client/ui/platformed_home.dart';
 import 'package:aria2_client/ui/routes/route.dart';
 import 'package:aria2_client/ui/theme/theme_provider.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,51 +53,34 @@ class MyApp extends StatelessWidget {
   }
 
   Widget buildMaterialApp(BuildContext context) {
-    final darkThemeData = FlexThemeData.dark(
-      scheme: FlexScheme.materialBaseline,
-      surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-      blendLevel: 13,
-      subThemesData: const FlexSubThemesData(
-        blendOnLevel: 20,
-        useTextTheme: true,
-        useM2StyleDividerInM3: true,
-        alignedDropdown: true,
-        useInputDecoratorThemeInDialogs: true,
-      ),
-      visualDensity: FlexColorScheme.comfortablePlatformDensity,
-      useMaterial3: true,
-      swapLegacyOnMaterial3: true,
-
-      // To use the Playground font, add GoogleFonts package and uncomment
-      // fontFamily: GoogleFonts.notoSans().fontFamily,
-    );
     return ThemeProvider(builder: (BuildContext context, ThemeMode mode) {
       return ScreenUtilInit(
+        designSize: const Size(430, 932),
         builder: (context, child) {
           return MaterialApp(
+            key: UniqueKey(),
             title: 'Aria2',
             themeMode: mode,
-            theme: FlexThemeData.light(
-              scheme: FlexScheme.materialBaseline,
-              surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-              blendLevel: 7,
-              subThemesData: const FlexSubThemesData(
-                blendOnLevel: 10,
-                blendOnColors: false,
-                useTextTheme: true,
-                useM2StyleDividerInM3: true,
-                alignedDropdown: true,
-                useInputDecoratorThemeInDialogs: true,
-              ),
-              visualDensity: FlexColorScheme.comfortablePlatformDensity,
-              useMaterial3: true,
-              swapLegacyOnMaterial3: true,
-
-              // To use the Playground font, add GoogleFonts package and uncomment
-              // fontFamily: GoogleFonts.notoSans().fontFamily,
-            ),
+            theme: ThemeData(
+                appBarTheme:
+                    const AppBarTheme(backgroundColor: Color(0xFFDFE2DA)),
+                brightness: Brightness.light,
+                primaryColor: const Color(0xFFDFE2DA),
+                scaffoldBackgroundColor: const Color(0xFFCBCDCB),
+                cardColor: const Color(0xFFFFDAD4),
+                indicatorColor: const Color(0xFF9714A1),
+         ),
             navigatorObservers: [Lifecycle.lifecycleRouteObserver],
-            darkTheme: darkThemeData,
+            darkTheme: ThemeData(
+              appBarTheme:
+                  const AppBarTheme(backgroundColor: Color(0xFF2E3133)),
+              brightness: Brightness.dark,
+              scaffoldBackgroundColor: const Color(0xFF1F333C),
+              primaryColor: const Color(0xFF2E3133),
+              cardColor: const Color(0xFF1A1E21),
+              indicatorColor: Colors.cyan,
+              // highlightColor: const Color(0xFF377E07),
+            ),
             routes: routes,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
@@ -108,7 +89,8 @@ class MyApp extends StatelessWidget {
               S.delegate
             ],
             supportedLocales: S.delegate.supportedLocales,
-            home: const PlatformedHomePage(
+            home: PlatformedHomePage(
+              key: UniqueKey(),
               initialPageIndex: 0,
             ),
           );

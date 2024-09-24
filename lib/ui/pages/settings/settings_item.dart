@@ -63,7 +63,9 @@ class _SettingsItemState extends State<SettingsItem> {
     }
     widget.formItem.callOnChange();
     IHive.settings.put(widget.formItem.key, widget.formItem.value).then((_) {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -185,7 +187,8 @@ buildUnitTrailing(BuildContext context, String unit, {Color? color}) {
   return Container(
     constraints: const BoxConstraints(minWidth: 40),
     child: Card(
-        color: color ?? Theme.of(context).splashColor,
+      elevation: 10,
+        color: color ?? Theme.of(context).cardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),

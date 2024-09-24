@@ -6,6 +6,7 @@ import 'package:aria2_client/ui/component/animation/my_colorize_text.dart';
 import 'package:aria2_client/ui/component/form/my_form.dart';
 import 'package:aria2_client/ui/pages/settings/settings_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -21,7 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Card(
-        color: Theme.of(context).highlightColor,
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: Container(
           margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
           child: Column(
@@ -44,6 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               Expanded(
                 child: Card(
+                  elevation: 10,
                   margin: const EdgeInsets.all(10),
                   color: Theme.of(context).cardColor,
                   child: ListView(
@@ -139,6 +141,7 @@ class _SettingsPageState extends State<SettingsPage> {
               Expanded(
                   child: SizedBox.expand(
                 child: Card(
+                  elevation: 10,
                   margin: const EdgeInsets.all(10),
                   color: Theme.of(context).cardColor,
                   child: Center(
@@ -151,8 +154,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         animatedTexts: [
                           MyColorizeAnimatedText("Aria2-Flutter-UI",
                               speed: Const.duration100ms,
-                              textStyle: const TextStyle(
-                                  fontSize: 50, fontWeight: FontWeight.bold),
+                              textStyle:  TextStyle(
+                                  fontSize: 30.w, fontWeight: FontWeight.bold),
                               colors: [
                                 Colors.white38,
                                 Colors.red,
@@ -161,15 +164,15 @@ class _SettingsPageState extends State<SettingsPage> {
                               ])
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      const Text(
+                       SizedBox(height: 20.h),
+                       Text(
                         "Version: 0.0.1",
                         style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.bold),
+                            fontSize: 15.w, fontWeight: FontWeight.bold),
                       ),
-                      const Text("Author: hhsmtx",
+                       Text("Author: hhsmtx",
                           style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold)),
+                              fontSize: 15.w, fontWeight: FontWeight.bold)),
                     ],
                   )),
                 ),
