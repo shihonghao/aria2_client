@@ -50,7 +50,7 @@ class _PlatformedHomePageState extends State<PlatformedHomePage> {
       // return createBottomNavigationHomePage(context);
       return const MainPage();
     } else if (Platform.isIOS) {
-      return createBottomNavigationHomePage(context);
+      return const MainPage();
     } else if (Platform.isFuchsia) {
       throw Exception("unsupported");
     } else {
