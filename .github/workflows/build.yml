@@ -19,7 +19,36 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  build-apk:
+    name: Release APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Setup flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Build apks
+        run: |
+          flutter pub get
+          flutter build apk --release --tree-shake-icons
+          flutter build apk --target-platform android-arm,android-arm64,android-x64 --split-per-abi --release --tree-shake-icons
+          mkdir -p releases
+          mv -f build/app/outputs/flutter-apk/*-release.apk releases
+          mv -f releases/app-release.apk releases/app-universal-release.apk
+      - name: Release to github
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: "releases/*-release.apk"
+          token: ${{ secrets.WF_ACTION_TOKEN }}
+          tag: ${{ github.event.inputs.TAG }}
+  build-ios:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
