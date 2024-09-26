@@ -62,7 +62,6 @@ class _ServerAddPageState extends State<ServerAddPage> {
                       (BuildContext context, AsyncSnapshot<bool> snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.requireData) {
-
                         return const Text("ok");
                       } else {
                         return const Text("无法连接");
@@ -128,12 +127,12 @@ class _ServerAddPageState extends State<ServerAddPage> {
                         Expanded(
                           child: FormBuilderTextField(
                               name: 'domain',
-                              initialValue: "127.0.0.1",
+                              validator: FormBuilderValidators.compose(
+                                  [FormBuilderValidators.required()]),
                               decoration: InputDecoration(
                                 fillColor: Colors.transparent,
                                 icon: const Icon(Icons.add_task),
                                 labelText: S.of(context).aria2_rpc_url,
-                                hintText: '127.0.0.1',
                                 // border: OutlineInputBorder(),
                               ),
                               onChanged: (text) {
@@ -157,7 +156,6 @@ class _ServerAddPageState extends State<ServerAddPage> {
                                 fillColor: Colors.transparent,
                                 icon: const Icon(Icons.crop_portrait),
                                 labelText: S.of(context).aria2_rpc_port,
-                                hintText: '6800',
                               ),
                               keyboardType: TextInputType.number,
                               onChanged: (text) {
@@ -180,7 +178,6 @@ class _ServerAddPageState extends State<ServerAddPage> {
                                 fillColor: Colors.transparent,
                                 icon: const Icon(Icons.add_road),
                                 labelText: S.of(context).aria2_rpc_path,
-                                hintText: '/jsonrpc',
                                 // border: OutlineInputBorder(),
                               ),
                               onChanged: (text) {
@@ -218,15 +215,12 @@ class _ServerAddPageState extends State<ServerAddPage> {
                       initialValue: Aria2Constants.PROTOCOL_HTTP,
                       alignment: WrapAlignment.spaceBetween,
                       labelPadding: EdgeInsets.zero,
-                      // shadowColor: Colors.black.withOpacity(0.25),
-                      // backgroundColor: Colors.blue.withOpacity(0.25),
-                      // // selectedColor: Colors.black.withOpacity(0.25),
-                      // selectedShadowColor: Colors.transparent,
+
                       options: [
                         Aria2Constants.PROTOCOL_HTTP,
                         Aria2Constants.PROTOCOL_HTTPS,
-                        Aria2Constants.PROTOCOL_WEBSOCKET,
-                        Aria2Constants.PROTOCOL_WEBSOCKET_SECURE
+                        // Aria2Constants.PROTOCOL_WEBSOCKET,
+                        // Aria2Constants.PROTOCOL_WEBSOCKET_SECURE
                       ]
                           .map((val) => FormBuilderChipOption(
                                 value: val,

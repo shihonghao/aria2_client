@@ -7,10 +7,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import '../../../aria2/aria2_constants.dart';
-import '../../../aria2/model/aria2_config.dart';
-import '../../../generated/l10n.dart';
-import '../../../util/Util.dart';
+import '../../../../aria2/aria2_constants.dart';
+import '../../../../aria2/model/aria2_config.dart';
+import '../../../../generated/l10n.dart';
+import '../../../../util/Util.dart';
 
 class ServerAddPage extends StatefulWidget {
   const ServerAddPage({super.key});
@@ -47,7 +47,6 @@ class _ServerAddPageState extends State<ServerAddPage> {
             Navigator.pop(context);
           },
         ),
-        // actions: [ElevatedButton(onPressed: () {}, child: const Text("确认"))],
       ),
       body: FormBuilder(
         onChanged: () {
@@ -59,14 +58,6 @@ class _ServerAddPageState extends State<ServerAddPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Card(
-            //   elevation: 5,
-            //   child: Column(
-            //     children: [
-            //
-            //     ],
-            //   ),
-            // ),
             Padding(
                 padding: EdgeInsets.fromLTRB(10.h, 10.h, 10.h, 10.h),
                 child: FormBuilderTextField(
@@ -85,12 +76,12 @@ class _ServerAddPageState extends State<ServerAddPage> {
               padding: EdgeInsets.fromLTRB(10.h, 10.h, 10.h, 10.h),
               child: FormBuilderTextField(
                 name: 'domain',
-                initialValue: "127.0.0.1",
+                validator: FormBuilderValidators.compose(
+                    [FormBuilderValidators.required()]),
                 decoration: InputDecoration(
                   fillColor: Colors.transparent,
                   icon: const Icon(Icons.add_task),
                   labelText: S.of(context).aria2_rpc_url,
-                  hintText: '127.0.0.1',
                   // border: OutlineInputBorder(),
                 ),
               ),
@@ -109,7 +100,6 @@ class _ServerAddPageState extends State<ServerAddPage> {
                   fillColor: Colors.transparent,
                   icon: const Icon(Icons.crop_portrait),
                   labelText: S.of(context).aria2_rpc_port,
-                  hintText: '6800',
                 ),
                 keyboardType: TextInputType.number,
               ),
@@ -123,7 +113,6 @@ class _ServerAddPageState extends State<ServerAddPage> {
                   fillColor: Colors.transparent,
                   icon: const Icon(Icons.add_road),
                   labelText: S.of(context).aria2_rpc_path,
-                  hintText: '/jsonrpc',
                   // border: OutlineInputBorder(),
                 ),
               ),
@@ -144,19 +133,19 @@ class _ServerAddPageState extends State<ServerAddPage> {
                 options: [
                   Aria2Constants.PROTOCOL_HTTP,
                   Aria2Constants.PROTOCOL_HTTPS,
-                  Aria2Constants.PROTOCOL_WEBSOCKET,
-                  Aria2Constants.PROTOCOL_WEBSOCKET_SECURE
+                  // Aria2Constants.PROTOCOL_WEBSOCKET,
+                  // Aria2Constants.PROTOCOL_WEBSOCKET_SECURE
                 ]
                     .map((val) => FormBuilderChipOption(
-                  value: val,
-                  avatar: const Icon(Icons.ac_unit_outlined),
-                  child: SizedBox(
-                    width: 70.w,
-                    height: 30.h,
-                    child: Center(
-                        child: Text(val, textAlign: TextAlign.center)),
-                  ),
-                ))
+                          value: val,
+                          avatar: const Icon(Icons.ac_unit_outlined),
+                          child: SizedBox(
+                            width: 70.w,
+                            height: 30.h,
+                            child: Center(
+                                child: Text(val, textAlign: TextAlign.center)),
+                          ),
+                        ))
                     .toList(growable: false),
               ),
             ),
@@ -179,14 +168,13 @@ class _ServerAddPageState extends State<ServerAddPage> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 10
+                      style: ElevatedButton.styleFrom(elevation: 10
                           // backgroundColor: Theme.of(context).splashColor
-                      ),
+                          ),
                       onPressed: () {
                         if (validateAndSaveValue()) {
                           _isConnecting.value = true;
-                          Future.delayed(Const.duration2s,(){
+                          Future.delayed(Const.duration2s, () {
                             Aria2RpcClient.instance
                                 .connect(_config)
                                 .then((result) {
@@ -199,7 +187,6 @@ class _ServerAddPageState extends State<ServerAddPage> {
                               _isConnecting.value = false;
                             });
                           });
-
                         }
                       },
                       child: Text(S.of(context).test),
@@ -232,7 +219,9 @@ class _ServerAddPageState extends State<ServerAddPage> {
                                               key: Util.generateId("ARIA2"),
                                               name: 'new');
                                           _formKey.currentState!.reset();
-                                          Navigator.pop(context);
+                                          if (mounted) {
+                                            Navigator.pop(this.context);
+                                          }
                                         }
                                       });
                                     },

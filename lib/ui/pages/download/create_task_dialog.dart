@@ -5,7 +5,7 @@ import 'package:aria2_client/util/Util.dart';
 import 'package:aria2_client/util/url_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CreateTaskDialog extends StatefulWidget {
   const CreateTaskDialog({super.key});
@@ -31,14 +31,16 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
 
   @override
   Widget build(BuildContext context) {
-    if (context.read<Application>().selectedServer.value != null &&
-        context.read<Application>().selectedServer.value!.aria2.serverConfig.dir !=
+    if (Application.instance.selectedServer.value != null &&
+        Application.instance.selectedServer.value!.aria2.serverConfig.dir !=
             null) {
       _downloadPathController.text =
-          context.read<Application>().selectedServer.value!.aria2.serverConfig.dir!;
+          Application.instance.selectedServer.value!.aria2.serverConfig.dir!;
     }
 
     return AlertDialog(
+        elevation: 10,
+        backgroundColor: Theme.of(context).cardColor,
         title: Text(
           _showSettings ? "下载设置" : "新建",
         ),
@@ -55,13 +57,19 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
   List<Widget> buildActions() {
     return _showSettings
         ? [
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
               onPressed: () => toggle(),
               child: const Text('返回'),
             ),
           ]
         : [
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
               onPressed: () {
                 String text = _controller.document.toPlainText();
                 final lines = text.split("\n");
@@ -81,13 +89,18 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
                   Aria2RpcClient.instance.createTask(downloadUrls, {
                     "dir": _downloadPathController.text,
                   }).then((_) {
-                    Navigator.of(context).pop();
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
                   });
                 }
               },
               child: const Text('确定'),
             ),
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('取消'),
             ),
@@ -110,12 +123,11 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
         ),
       );
     } else {
-      return Container(
-        key: UniqueKey(),
-        color: Theme.of(context).cardColor,
-        child: Column(
-          children: [
-            QuillEditor.basic(
+      return Column(
+        children: [
+          Expanded(
+            flex: 4,
+            child: QuillEditor.basic(
               controller: _controller,
               configurations: QuillEditorConfigurations(
                   builder: (context, editor) {
@@ -136,21 +148,24 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
                     return const TextStyle();
                   },
                   placeholder: "支持多个链接，每个链接占一行",
-                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                  padding: EdgeInsets.fromLTRB(5.w, 10.h, 10.w, 5.h),
                   scrollable: true,
                   maxHeight: 200,
                   minHeight: 200),
             ),
-            // const Padding(
-            //   padding: EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-            //   child: Row(
-            //     children: [
-            //       Text("下载链接数 : 3"),
-            //     ],
-            //   ),
-            // ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(5, 10, 5, 5),
+          ),
+          // const Padding(
+          //   padding: EdgeInsets.symmetric(vertical: 3, horizontal: 5),
+          //   child: Row(
+          //     children: [
+          //       Text("下载链接数 : 3"),
+          //     ],
+          //   ),
+          // ),
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 10.h, 5.w, 10.h),
               child: Row(
                 children: [
                   const Text("下载路径 : "),
@@ -164,21 +179,23 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
                 ],
               ),
             ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => toggle(),
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(0)),
-                    child: const Text("高级"),
-                  )
-                ],
-              ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () => toggle(),
+                  style: ElevatedButton.styleFrom(
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)))),
+                  child: const Text("高级"),
+                )
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       );
     }
   }

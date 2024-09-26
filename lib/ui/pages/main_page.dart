@@ -1,5 +1,5 @@
 import 'package:aria2_client/ui/pages/my_action_bar.dart';
-import 'package:aria2_client/ui/pages/servers/server_add_page_v2.dart';
+import 'package:aria2_client/ui/pages/servers/v2/server_add_page_v2.dart';
 import 'package:aria2_client/ui/pages/settings/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

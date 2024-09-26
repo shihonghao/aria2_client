@@ -8,6 +8,7 @@ import 'package:aria2_client/ui/component/animation/animated_tap.dart';
 import 'package:aria2_client/ui/component/animation/cloud_effect.dart';
 import 'package:aria2_client/ui/component/animation/my_animated_icon.dart';
 import 'package:aria2_client/ui/component/animation/star_effect.dart';
+import 'package:aria2_client/ui/pages/download/create_task_dialog.dart';
 import 'package:aria2_client/ui/pages/servers/detail/detail_page.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:flutter/material.dart';
@@ -103,9 +104,8 @@ class _ServersBar extends State<MyActionBar> {
                         child: content)),
               );
             },
-            child: SizedBox(
-                height: constraints.minHeight,
-                child: widget.content),
+            child:
+                SizedBox(height: constraints.minHeight, child: widget.content),
           );
         },
       ),
@@ -128,14 +128,13 @@ Future<bool> checkServerAvailable(ServerModel? model) async {
     }
     throw Exception();
   }).catchError((error) {
-    Util.showErrorToast(
-        "Can not connect to ${model.aria2.config.name}");
+    Util.showErrorToast("Can not connect to ${model.aria2.config.name}");
     return false;
   }).then((isAvailable) {
     available = isAvailable;
-    if(isAvailable){
+    if (isAvailable) {
       Application.instance.changeServer(model);
-    }else {
+    } else {
       Application.instance.candidateServer.value = null;
     }
     return isAvailable;
@@ -234,6 +233,23 @@ class _MyActionBarContent extends State<MyActionBarContent> {
           ElevatedButton(
               onPressed: () {
                 widget.onAddTap?.call();
+                showGeneralDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    pageBuilder: (context, animation, secondAnimation) {
+                      return const CreateTaskDialog();
+                    },
+                    transitionDuration: Const.duration300ms,
+                    transitionBuilder:
+                        (context, animation, secondAnimation, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        ),
+                      );
+                    });
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
@@ -323,16 +339,16 @@ class _MyActionBarExpand extends State<MyActionBarExpand> {
       [ServerModel? serverModel]) {
     if (index == _models.length) {
       return AnimatedTap(
-        onTap: (){
+        onTap: () {
           Scaffold.of(this.context).openEndDrawer();
         },
         child: Card(
           elevation: 5,
           margin: EdgeInsets.zero,
           color: Theme.of(context).cardColor,
-          child:  const Center(
-                child: Icon(Icons.add),
-              ),
+          child: const Center(
+            child: Icon(Icons.add),
+          ),
         ),
       );
     }
@@ -353,57 +369,56 @@ class _MyActionBarExpand extends State<MyActionBarExpand> {
             closedBuilder: (ctx, action) {
               openAction = action;
               final child = InkWell(
-                  onDoubleTap: () {
-                    if (!_models[index].isCurrent) {
-                      Application.instance.changeCandidateServer(model);
-                    }
-                  },
-                  onLongPress: () {
-                    if (_models[index] ==
-                        Application.instance.selectedServer.value) {
-                      openAction.call();
-                    }
-                  },
-                  child:  Stack(children: [
-                      ValueListenableBuilder(
-                          valueListenable: Application.instance.selectedServer,
-                          builder: (BuildContext context, ServerModel? value,
-                              Widget? child) {
-                            bool isSelected = (value != null && value == model);
-                            return AnimatedContainer(
-                              duration: Const.duration500ms,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: isSelected
-                                      ? Theme.of(context).highlightColor
-                                      : null),
-                            );
-                          }),
-                      Positioned(
-                        top: 10.h,
-                        left: 10.w,
-                        child: Text(
-                          model.aria2.config.name,
-                        ),
-                      ),
-                      Positioned(
-                          bottom: 10.h,
-                          left: 10.w,
-                          child: Text(model.aria2.config.uri().toString())),
-                      Positioned(
-                          top: 10.h,
-                          right: 10.w,
-                          child: MyAnimatedIcon(
-                            duration: Const.duration500ms,
-                            onTap: (controller) {
-                              Application.instance
-                                  .removeAria2(model.aria2.config);
-                            },
-                            size: 18.r,
-                            icon: Icons.close,
-                          ))
-                    ]),
-                  );
+                onDoubleTap: () {
+                  if (!_models[index].isCurrent) {
+                    Application.instance.changeCandidateServer(model);
+                  }
+                },
+                onLongPress: () {
+                  if (_models[index] ==
+                      Application.instance.selectedServer.value) {
+                    openAction.call();
+                  }
+                },
+                child: Stack(children: [
+                  ValueListenableBuilder(
+                      valueListenable: Application.instance.selectedServer,
+                      builder: (BuildContext context, ServerModel? value,
+                          Widget? child) {
+                        bool isSelected = (value != null && value == model);
+                        return AnimatedContainer(
+                          duration: Const.duration500ms,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: isSelected
+                                  ? Theme.of(context).highlightColor
+                                  : null),
+                        );
+                      }),
+                  Positioned(
+                    top: 10.h,
+                    left: 10.w,
+                    child: Text(
+                      model.aria2.config.name,
+                    ),
+                  ),
+                  Positioned(
+                      bottom: 10.h,
+                      left: 10.w,
+                      child: Text(model.aria2.config.uri().toString())),
+                  Positioned(
+                      top: 10.h,
+                      right: 10.w,
+                      child: MyAnimatedIcon(
+                        duration: Const.duration500ms,
+                        onTap: (controller) {
+                          Application.instance.removeAria2(model.aria2.config);
+                        },
+                        size: 18.r,
+                        icon: Icons.close,
+                      ))
+                ]),
+              );
 
               return child;
             },
