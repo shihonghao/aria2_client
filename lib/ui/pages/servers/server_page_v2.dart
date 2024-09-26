@@ -3,7 +3,6 @@ import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/event/base_event.dart';
 import 'package:aria2_client/event/event_bus_manager.dart';
 import 'package:aria2_client/ui/pages/servers/server_add_page.dart';
-import 'package:aria2_client/ui/pages/servers/server_content_v2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -47,28 +46,6 @@ class _ServerPageState extends State<ServerPage> {
             Expanded(
               child: Column(
                 children: [
-                  // AnimatedContainer(
-                  //   height: cardHeight,
-                  //   width: 401.w,
-                  //   decoration: BoxDecoration(
-                  //       borderRadius: BorderRadius.circular(20),
-                  //       boxShadow: const [
-                  //         BoxShadow(
-                  //           offset: Offset(0, 0),
-                  //           blurRadius: 4,
-                  //           color: Color.fromRGBO(0, 0, 0, 0.25),
-                  //           blurStyle: BlurStyle.outer,
-                  //         )
-                  //       ],
-                  //       gradient: const LinearGradient(
-                  //           colors: [
-                  //             Color.fromRGBO(34, 102, 125, 1.00),
-                  //             Color.fromRGBO(177, 179, 95, 0)
-                  //           ],
-                  //           begin: Alignment.centerLeft,
-                  //           end: Alignment.centerRight)),
-                  //   duration: Const.duration500ms,
-                  // ),
                   SizedBox(
                     height: 40.h,
                   ),
@@ -76,19 +53,6 @@ class _ServerPageState extends State<ServerPage> {
                 ],
               ),
             ),
-            // Row(
-            //     mainAxisAlignment: MainAxisAlignment.end,
-            //     crossAxisAlignment: CrossAxisAlignment.end,
-            //     children: buildActions()),
-            // Expanded(
-            //     child: ValueListenableBuilder<ViewType>(
-            //   valueListenable: Application.instance.serverViewType,
-            //   builder: (BuildContext context, ViewType type, Widget? child) {
-            //     return AnimatedSwitcher(
-            //         duration: const Duration(milliseconds: 500),
-            //         child: ServerContent(key: UniqueKey(), type: type));
-            //   },
-            // )),
           ],
         ),
       ),
@@ -112,26 +76,6 @@ class _ServerPageState extends State<ServerPage> {
                 size: 20.h,
               ),
             ),
-            // IconButton(
-            //     onPressed: () {
-            //       Application.instance.switchServerViewType();
-            //     },
-            //     icon: ValueListenableBuilder<ViewType>(
-            //       valueListenable: Application.instance.serverViewType,
-            //       builder:
-            //           (BuildContext context, ViewType viewType, Widget? child) {
-            //         IconData icon = viewType == ViewType.list
-            //             ? Icons.format_list_numbered_sharp
-            //             : Icons.credit_card;
-            //         return Center(
-            //             child: AnimatedSwitcher(
-            //                 duration: Const.duration200ms,
-            //                 child: Icon(
-            //                   icon,
-            //                   key: UniqueKey(),
-            //                 )));
-            //       },
-            //     )),
             OpenContainer(
               tappable: false,
               closedShape: RoundedRectangleBorder(

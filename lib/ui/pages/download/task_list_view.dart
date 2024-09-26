@@ -1,10 +1,8 @@
-import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/net/aria2_rpc_client.dart';
 import 'package:aria2_client/providers/task_model.dart';
 import 'package:aria2_client/store/IHive.dart';
 import 'package:aria2_client/timer/my_timer.dart';
 import 'package:aria2_client/timer/my_timer_state.dart';
-import 'package:aria2_client/ui/component/animation/code_rain_effect.dart';
 import 'package:aria2_client/ui/pages/download/task_overview_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -51,6 +49,8 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
           Util.showErrorToast("Can not connect to server !!");
         }
       });
+    } else {
+      startTimer();
     }
   }
 
@@ -61,6 +61,10 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
             seconds: IHive.settings
                 .get(SettingsHiveKey.taskRefreshInterval, defaultValue: 1)),
         onTime: (timer, _) async {
+          if (Application.instance.selectedServer.value == null) {
+            updateModels([]);
+            return true;
+          }
           return Aria2RpcClient.instance.tell(widget.status).then((result) {
             if (result.success) {
               List<TaskModel> newModels = [];
@@ -110,11 +114,11 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
           return Container(
             padding: EdgeInsets.only(top: 45.h),
             child: AnimatedList(
-                padding: EdgeInsets.symmetric(horizontal: 0.w),
-                key: _listKey,
-                itemBuilder: buildItem,
-                initialItemCount: _models.length,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 0.w),
+              key: _listKey,
+              itemBuilder: buildItem,
+              initialItemCount: _models.length,
+            ),
           );
         });
   }
@@ -127,7 +131,7 @@ class _TaskListViewState extends MyTimerState<TaskListView> {
         child: ChangeNotifierProvider.value(
           value: _models[index],
           child: Padding(
-            padding:  EdgeInsets.symmetric(vertical: 3.h),
+            padding: EdgeInsets.symmetric(vertical: 3.h),
             child: TaskOverviewCard(
               status: widget.status,
               height: 140,

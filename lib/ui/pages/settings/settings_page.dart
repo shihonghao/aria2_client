@@ -24,7 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: Card(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Container(
-          margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+          margin: EdgeInsets.fromLTRB(0, 50.h, 0, 0),
           child: Column(
             children: [
               Row(
@@ -32,11 +32,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   SizedBox(
                     height: 110,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                      padding: EdgeInsets.fromLTRB(20.w, 0, 0, 0),
                       child: Text(
                         S.of(context).settings,
-                        style: const TextStyle(
-                            fontSize: 70, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 60.w, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.start,
                       ),
                     ),
@@ -44,6 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
               Expanded(
+                flex: 3,
                 child: Card(
                   elevation: 10,
                   margin: const EdgeInsets.all(10),
@@ -59,7 +60,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           type: FormItemType.select,
                           onChange: (value) {
                             if (value.contains("_")) {
-                              S.load(Locale(
+                              S
+                                  .load(Locale(
                                       value.split("_")[0], value.split("_")[1]))
                                   .then((_) {
                                 setState(() {});
@@ -89,8 +91,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 label: S.of(context).lightTheme,
                                 value: 'light'),
                             FormItemOption(
-                                label: S.of(context).darkTheme,
-                                value: 'dark')
+                                label: S.of(context).darkTheme, value: 'dark')
                           ],
                         ),
                       ),
@@ -139,44 +140,46 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               Expanded(
+                  flex: 2,
                   child: SizedBox.expand(
-                child: Card(
-                  elevation: 10,
-                  margin: const EdgeInsets.all(10),
-                  color: Theme.of(context).cardColor,
-                  child: Center(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedTextKit(
-                        pause: const Duration(milliseconds: 1),
-                        repeatForever: true,
-                        animatedTexts: [
-                          MyColorizeAnimatedText("Aria2-Flutter-UI",
-                              speed: Const.duration100ms,
-                              textStyle:  TextStyle(
-                                  fontSize: 30.w, fontWeight: FontWeight.bold),
-                              colors: [
-                                Colors.white38,
-                                Colors.red,
-                                Colors.yellow,
-                                Colors.blue,
-                              ])
+                    child: Card(
+                      elevation: 10,
+                      margin: const EdgeInsets.all(10),
+                      color: Theme.of(context).cardColor,
+                      child: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AnimatedTextKit(
+                            pause: const Duration(milliseconds: 1),
+                            repeatForever: true,
+                            animatedTexts: [
+                              MyColorizeAnimatedText("Aria2-Flutter-UI",
+                                  speed: Const.duration100ms,
+                                  textStyle: TextStyle(
+                                      fontSize: 30.w,
+                                      fontWeight: FontWeight.bold),
+                                  colors: [
+                                    Colors.white38,
+                                    Colors.red,
+                                    Colors.yellow,
+                                    Colors.blue,
+                                  ])
+                            ],
+                          ),
+                          SizedBox(height: 20.h),
+                          Text(
+                            "Version: 0.0.1",
+                            style: TextStyle(
+                                fontSize: 15.w, fontWeight: FontWeight.bold),
+                          ),
+                          Text("Author: hhsmtx",
+                              style: TextStyle(
+                                  fontSize: 15.w, fontWeight: FontWeight.bold)),
                         ],
-                      ),
-                       SizedBox(height: 20.h),
-                       Text(
-                        "Version: 0.0.1",
-                        style: TextStyle(
-                            fontSize: 15.w, fontWeight: FontWeight.bold),
-                      ),
-                       Text("Author: hhsmtx",
-                          style: TextStyle(
-                              fontSize: 15.w, fontWeight: FontWeight.bold)),
-                    ],
-                  )),
-                ),
-              ))
+                      )),
+                    ),
+                  ))
             ],
           ),
         ),
