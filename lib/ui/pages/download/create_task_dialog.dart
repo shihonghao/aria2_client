@@ -172,9 +172,9 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
                   Expanded(
                       child: TextField(
                     controller: _downloadPathController,
-                    style: const TextStyle(fontSize: 10),
-                    decoration: const InputDecoration(
-                        isCollapsed: true, contentPadding: EdgeInsets.all(7)),
+                    style: TextStyle(fontSize: 15.w),
+                    decoration:  InputDecoration(
+                        isCollapsed: true, contentPadding: EdgeInsets.all(7.w)),
                   )),
                 ],
               ),

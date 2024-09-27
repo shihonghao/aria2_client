@@ -91,7 +91,7 @@ class _ServersBar extends State<MyActionBar> {
                         borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(20),
                             topRight: Radius.circular(20)),
-                        boxShadow:  [
+                        boxShadow: [
                           BoxShadow(
                               blurRadius: 10,
                               offset: const Offset(0, -1),
@@ -121,10 +121,14 @@ Future<bool> checkServerAvailable(ServerModel? model) async {
   model.setTesting(true);
   await Future.delayed(const Duration(milliseconds: 500));
   var available = false;
+  var version = "";
+  List<dynamic> enabledFeatures = [];
   return await Aria2RpcClient.instance
       .connect(model.aria2.config)
       .then((result) {
     if (result.success) {
+      version = result.data["version"];
+      enabledFeatures = result.data["enabledFeatures"];
       return true;
     }
     throw Exception();
@@ -134,7 +138,7 @@ Future<bool> checkServerAvailable(ServerModel? model) async {
   }).then((isAvailable) {
     available = isAvailable;
     if (isAvailable) {
-      Application.instance.changeServer(model);
+      Application.instance.changeServer(model, enabledFeatures, version);
     } else {
       Application.instance.candidateServer.value = null;
     }

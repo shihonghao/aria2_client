@@ -75,49 +75,31 @@ class Application extends ChangeNotifier {
     candidateServer.value = model;
   }
 
-  void changeServer(ServerModel? model) {
+  void changeServer(
+      ServerModel? model, List<dynamic> enabledFeatures, String version) {
     if (model == null) {
       selectedServer.value = model;
       return;
     }
-
     Aria2RpcClient.instance.switchServer(model.aria2.config);
-
     selectedServer.value = model;
 
-    // List<dynamic>? enabledFeatures;
-    // String? version;
-    // model.setTesting(true);
-    // bool available = false;
-    // return await Aria2RpcClient.instance.connect().then((result) {
-    //   if (result.success) {
-    //     enabledFeatures = result.data["enabledFeatures"] as List<dynamic>?;
-    //     version = result.data["version"];
-    //     return Aria2RpcClient.instance.getGlobalOption();
-    //   }
-    //   throw Exception();
-    // }).then((result) {
-    //   if (result.success) {
-    //     result.data
-    //         .addAll({"version": version, "enabledFeatures": enabledFeatures});
-    //     Aria2ServerConfig serverConfig =
-    //         Aria2ServerConfig.fromJson(result.data);
-    //     model.aria2.serverConfig = serverConfig;
-    //     selectedServer.value = model;
-    //     available = true;
-    //     return true;
-    //   }
-    //   throw Exception();
-    // }).catchError((error) {
-    //   Util.showErrorToast(
-    //       "Can not connect to server ${model.aria2.config.name}");
-    //   return false;
-    // }).whenComplete(() {
-    //   Future.delayed(Const.duration2s, () {
-    //     model.setAvailable(available);
-    //     model.setTesting(false);
-    //   });
-    // });
+    String? version;
+    Aria2RpcClient.instance.getGlobalOption().then((result) {
+      if (result.success) {
+        result.data
+            .addAll({"version": version, "enabledFeatures": enabledFeatures});
+        Aria2ServerConfig serverConfig =
+            Aria2ServerConfig.fromJson(result.data);
+        model.aria2.serverConfig = serverConfig;
+        return true;
+      }
+      throw Exception();
+    }).catchError((error) {
+      Util.showErrorToast(
+          "Can not get global options of ${model.aria2.config.name}");
+      return false;
+    });
   }
 
   Future<void> switchServerViewType() async {
