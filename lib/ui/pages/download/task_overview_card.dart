@@ -57,7 +57,9 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
     return AnimatedContainer(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          boxShadow: [BoxShadow(blurRadius: isSelected ? 10 : 0)]),
+          boxShadow: [
+            BoxShadow(blurRadius: 10, color: Theme.of(context).shadowColor)
+          ]),
       height: widget.height,
       padding: EdgeInsets.all(padding),
       duration: Const.duration300ms,
@@ -156,9 +158,9 @@ class _TaskOverviewCardState extends State<TaskOverviewCard> {
         filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
         child: InkWell(
             onTap: () {
-              isSelected = !isSelected;
-              widget.onSelected?.call(isSelected);
-              setState(() {});
+              // isSelected = !isSelected;
+              // widget.onSelected?.call(isSelected);
+              // setState(() {});
             },
             onDoubleTap: () {
               action.call();

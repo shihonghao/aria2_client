@@ -69,6 +69,7 @@ class MyApp extends StatelessWidget {
                 scaffoldBackgroundColor: const Color(0xFFCBCDCB),
                 cardColor: const Color(0xFFFFDAD4),
                 indicatorColor: const Color(0xFF9714A1),
+                shadowColor: Colors.black.withOpacity(0.25)
          ),
             navigatorObservers: [Lifecycle.lifecycleRouteObserver],
             darkTheme: ThemeData(
@@ -79,6 +80,7 @@ class MyApp extends StatelessWidget {
               primaryColor: const Color(0xFF2E3133),
               cardColor: const Color(0xFF1A1E21),
               indicatorColor: Colors.cyan,
+                shadowColor: Colors.white.withOpacity(0.25)
               // highlightColor: const Color(0xFF377E07),
             ),
             routes: routes,

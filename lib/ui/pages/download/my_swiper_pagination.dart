@@ -99,7 +99,7 @@ class _MySwiperPaginationState extends State<MySwiperPagination> {
         elevation: 3,
         child: CustomPaint(
           size: canvasSize,
-          painter: _MySwiperPaginationPainter(centerOffset, widget.itemSize),
+          painter: _MySwiperPaginationPainter(centerOffset, widget.itemSize,widget.activeColor),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -112,12 +112,13 @@ class _MySwiperPaginationState extends State<MySwiperPagination> {
 class _MySwiperPaginationPainter extends CustomPainter {
   late final Offset offset;
   late final Size itemSize;
+  late final Color activeColor;
 
-  _MySwiperPaginationPainter(this.offset, this.itemSize);
+  _MySwiperPaginationPainter(this.offset, this.itemSize,this.activeColor);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()..color = Colors.amber;
+    final Paint paint = Paint()..color = activeColor;
     canvas.drawRRect(
         RRect.fromRectAndRadius(
             Rect.fromCenter(

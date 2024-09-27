@@ -1,4 +1,3 @@
-import 'package:aria2_client/const/Const.dart';
 import 'package:aria2_client/model/task.dart';
 import 'package:aria2_client/ui/pages/download/my_swiper_pagination.dart';
 import 'package:card_swiper/card_swiper.dart';
@@ -40,17 +39,25 @@ class _DownloadPageState extends State<DownloadPage> {
           return Align(
             alignment: Alignment.topCenter,
             child: MySwiperPagination(
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return Center(child: Text(strs[index],style: TextStyle(color: config.activeIndex == index ? Colors.black : null),));
-                  },
-                  activeColor: Colors.amber,
-                  color: Colors.white,
-                  itemSize: Size(60.w, 30.h),
-                  space: 5.w,
-                  controller: config.pageController!,
-                  initialIndex: 0),
-
+                itemCount: 5,
+                itemBuilder: (context, index) {
+                  return Center(
+                      child: Text(
+                    strs[index],
+                    style: TextStyle(
+                        color: config.activeIndex == index
+                            ? Theme.of(context).brightness == Brightness.light
+                                ? Colors.white
+                                : Colors.black
+                            : null),
+                  ));
+                },
+                activeColor: Theme.of(context).indicatorColor,
+                color: Colors.white,
+                itemSize: Size(60.w, 30.h),
+                space: 5.w,
+                controller: config.pageController!,
+                initialIndex: 0),
           );
         }),
         children: [

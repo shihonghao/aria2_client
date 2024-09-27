@@ -12,6 +12,7 @@ import 'package:aria2_client/ui/pages/download/create_task_dialog.dart';
 import 'package:aria2_client/ui/pages/servers/detail/detail_page.dart';
 import 'package:aria2_client/util/Util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_reorderable_grid_view/widgets/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -90,12 +91,12 @@ class _ServersBar extends State<MyActionBar> {
                         borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(20),
                             topRight: Radius.circular(20)),
-                        boxShadow: const [
+                        boxShadow:  [
                           BoxShadow(
                               blurRadius: 10,
-                              offset: Offset(0, -1),
+                              offset: const Offset(0, -1),
                               spreadRadius: 1,
-                              color: Colors.grey)
+                              color: Theme.of(context).shadowColor)
                         ]),
                     child: ClipRRect(
                         borderRadius: const BorderRadius.only(
@@ -274,17 +275,23 @@ class MyActionBarExpand extends StatefulWidget {
 
 class _MyActionBarExpand extends State<MyActionBarExpand> {
   late List<ServerModel> _models;
-  final GlobalKey<AnimatedGridState> _gridKey = GlobalKey<AnimatedGridState>();
+  late final GlobalKey _gridViewKey;
+
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
-    Application.instance.addListener(() {
-      if (mounted && Application.instance.aria2s.length != _models.length) {
-        updateServerModels(Application.instance.aria2s.values.toList());
-      }
-    });
+    _gridViewKey = GlobalKey();
+    _scrollController = ScrollController();
+    Application.instance.addListener(updateServerModels);
     _models = Application.instance.aria2s.values.toList();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    Application.instance.removeListener(updateServerModels);
+    super.dispose();
   }
 
   @override
@@ -297,48 +304,54 @@ class _MyActionBarExpand extends State<MyActionBarExpand> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Expanded(
-              flex: 5,
-              child: AnimatedGrid(
-                key: _gridKey,
-                initialItemCount: _models.length + 1,
-                itemBuilder: buildGridItem,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisExtent: 75.h,
-                    crossAxisSpacing: 5.w,
-                    mainAxisSpacing: 5.h),
-              ),
-            ),
+                flex: 5,
+                child: ReorderableBuilder.builder(
+                  key: Key(_gridViewKey.toString()),
+                  positionDuration: Const.duration500ms,
+                  enableDraggable: false,
+                  enableLongPress: false,
+                  scrollController: _scrollController,
+                  childBuilder: (itemBuilder) {
+                    return GridView.builder(
+                      key: _gridViewKey,
+                      scrollDirection: Axis.vertical,
+                      controller: _scrollController,
+                      itemCount: _models.length + 1,
+                      itemBuilder: (context, index) {
+                        return itemBuilder(
+                          buildItem(context, index),
+                          index,
+                        );
+                      },
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisExtent: 75.h,
+                          crossAxisSpacing: 5.w,
+                          mainAxisSpacing: 5.h),
+                    );
+                  },
+                )),
           ],
         ),
       ),
     );
   }
 
-  void updateServerModels(List<ServerModel> newModels) {
-    Util.compareListAndFetch(_models, newModels,
+  void updateServerModels() {
+    if (mounted && Application.instance.aria2s.length != _models.length) {
+      Util.compareListAndFetch(
+        _models,
+        Application.instance.aria2s.values.toList(),
         compare: (o1, o2) => o1.key == o2.key,
-        onRemove: (list, removedItem) {
-          final removedIndex = _models.indexOf(removedItem);
-          _gridKey.currentState!.removeItem(removedIndex, (context, animation) {
-            final item =
-                buildGridItem(context, removedIndex, animation, removedItem);
-            list.remove(removedItem);
-            return item;
-          }, duration: Const.duration2s);
-        },
-        onInsert: (list, item) {
-          list.add(item);
-          _gridKey.currentState!
-              .insertItem(_models.length - 2, duration: Const.duration500ms);
-        });
+      );
+      setState(() {});
+    }
   }
 
-  Widget buildGridItem(
-      BuildContext context, int index, Animation<double> animation,
-      [ServerModel? serverModel]) {
-    if (index == _models.length) {
+  buildItem(BuildContext context, int index) {
+    if (index == 0) {
       return AnimatedTap(
+        key: const ValueKey("first"),
         onTap: () {
           Scaffold.of(this.context).openEndDrawer();
         },
@@ -352,78 +365,76 @@ class _MyActionBarExpand extends State<MyActionBarExpand> {
         ),
       );
     }
+    index--;
     VoidCallback openAction = () {};
-    final model = serverModel ?? _models[index];
-    return SlideTransition(
-        position: animation.drive(CurveTween(curve: Curves.easeOutBack)).drive(
-            Tween<Offset>(begin: const Offset(0, 5), end: const Offset(0, 0))),
-        child: OpenContainer(
-            transitionDuration: Const.duration2s,
-            closedColor: Theme.of(context).cardColor,
-            closedElevation: 5,
-            closedShape: Const.roundedRectangleBorder10,
-            openShape: Const.roundedRectangleBorder10,
-            openElevation: 0,
-            openColor: Colors.transparent,
-            middleColor: Colors.transparent,
-            closedBuilder: (ctx, action) {
-              openAction = action;
-              final child = InkWell(
-                onDoubleTap: () {
-                  if (!_models[index].isCurrent) {
-                    Application.instance.changeCandidateServer(model);
-                  }
-                },
-                onLongPress: () {
-                  if (_models[index] ==
-                      Application.instance.selectedServer.value) {
-                    openAction.call();
-                  }
-                },
-                child: Stack(children: [
-                  ValueListenableBuilder(
-                      valueListenable: Application.instance.selectedServer,
-                      builder: (BuildContext context, ServerModel? value,
-                          Widget? child) {
-                        bool isSelected = (value != null && value == model);
-                        return AnimatedContainer(
-                          duration: Const.duration500ms,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: isSelected
-                                  ? Theme.of(context).highlightColor
-                                  : null),
-                        );
-                      }),
-                  Positioned(
-                    top: 10.h,
-                    left: 10.w,
-                    child: Text(
-                      model.aria2.config.name,
-                    ),
-                  ),
-                  Positioned(
-                      bottom: 10.h,
-                      left: 10.w,
-                      child: Text(model.aria2.config.uri().toString())),
-                  Positioned(
-                      top: 10.h,
-                      right: 10.w,
-                      child: MyAnimatedIcon(
-                        duration: Const.duration500ms,
-                        onTap: (controller) {
-                          Application.instance.removeAria2(model.aria2.config);
-                        },
-                        size: 18.r,
-                        icon: Icons.close,
-                      ))
-                ]),
-              );
-
-              return child;
+    final model = _models[index];
+    return OpenContainer(
+        key: ValueKey(model.key),
+        transitionDuration: Const.duration2s,
+        closedColor: Theme.of(context).cardColor,
+        closedElevation: 5,
+        closedShape: Const.roundedRectangleBorder10,
+        openShape: Const.roundedRectangleBorder10,
+        openElevation: 0,
+        openColor: Theme.of(context).highlightColor,
+        middleColor: Theme.of(context).highlightColor,
+        closedBuilder: (ctx, action) {
+          openAction = action;
+          final child = InkWell(
+            onDoubleTap: () {
+              if (!_models[index].isCurrent) {
+                Application.instance.changeCandidateServer(model);
+              }
             },
-            openBuilder: (ctx, action) {
-              return const DetailPage();
-            }));
+            onLongPress: () {
+              if (_models[index] == Application.instance.selectedServer.value) {
+                openAction.call();
+              }
+            },
+            child: Stack(children: [
+              ValueListenableBuilder(
+                  valueListenable: Application.instance.selectedServer,
+                  builder: (BuildContext context, ServerModel? value,
+                      Widget? child) {
+                    bool isSelected = (value != null && value == model);
+                    return AnimatedContainer(
+                      duration: Const.duration500ms,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: isSelected
+                              ? Theme.of(context).highlightColor
+                              : null),
+                    );
+                  }),
+              Positioned(
+                top: 10.h,
+                left: 10.w,
+                child: Text(
+                  model.aria2.config.name,
+                ),
+              ),
+              Positioned(
+                  bottom: 10.h,
+                  left: 10.w,
+                  child: Text(model.aria2.config.uri().toString())),
+              Positioned(
+                  top: 10.h,
+                  right: 10.w,
+                  child: MyAnimatedIcon(
+                    duration: Const.duration500ms,
+                    onTap: (controller) {
+                      Application.instance.removeAria2(model.aria2.config);
+                    },
+                    size: 18.r,
+                    icon: Icons.close,
+                  ))
+            ]),
+          );
+
+          return child;
+        },
+        openBuilder: (ctx, action) {
+          return const DetailPage();
+        });
   }
 }

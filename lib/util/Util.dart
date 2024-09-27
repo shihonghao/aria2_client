@@ -283,10 +283,10 @@ class Util {
         Function(List<T> list, T item)? onRemove,
         Function(List<T> list, T item)? onInsert}) {
     onRemove ??= (list,item){
-      list1.remove(item);
+      list.remove(item);
     };
     onInsert ??= (list,item){
-      list1.add(item);
+      list.add(item);
     };
     final result = compareList(list1, list2, compare: compare);
     final addList = result.first;
