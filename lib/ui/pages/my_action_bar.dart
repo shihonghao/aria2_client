@@ -237,6 +237,10 @@ class _MyActionBarContent extends State<MyActionBarContent> {
                       }))),
           ElevatedButton(
               onPressed: () {
+                if (Application.instance.selectedServer.value == null ||
+                    !Application.instance.selectedServer.value!.isAvailable) {
+                  return;
+                }
                 widget.onAddTap?.call();
                 showGeneralDialog(
                     barrierDismissible: false,

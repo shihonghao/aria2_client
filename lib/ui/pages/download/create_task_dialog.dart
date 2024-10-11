@@ -73,6 +73,7 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
               onPressed: () {
                 String text = _controller.document.toPlainText();
                 final lines = text.split("\n");
+                lines.removeWhere((val) => val.trim() == "");
                 List<String> downloadUrls = [];
                 for (var value in lines) {
                   if (value.trim().isEmpty) {
@@ -85,7 +86,7 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
                   }
                   downloadUrls.add(value.trim());
                 }
-                if (downloadUrls.isNotEmpty) {
+                if (downloadUrls.length == lines.length) {
                   Aria2RpcClient.instance.createTask(downloadUrls, {
                     "dir": _downloadPathController.text,
                   }).then((_) {
@@ -140,12 +141,18 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
                       child: editor,
                     );
                   },
-                  customStyleBuilder: (Attribute<dynamic> attribute) {
-                    debugPrint(attribute.key);
-                    if (attribute.key.toLowerCase() == 'magnet') {
-                      return TextStyle(color: Theme.of(context).indicatorColor);
+                  customStyles: DefaultStyles(
+                      inlineCode: InlineCodeStyle(
+                          style: const TextStyle(
+                              color: Colors.lightBlue,
+                              backgroundColor: Colors.white))),
+                  onPerformAction: (action) {
+                    if (action == TextInputAction.newline) {
+                      _formatDocument();
                     }
-                    return const TextStyle();
+                  },
+                  onTapOutside: (event, node) {
+                    _formatDocument();
                   },
                   placeholder: "支持多个链接，每个链接占一行",
                   padding: EdgeInsets.fromLTRB(5.w, 10.h, 10.w, 5.h),
@@ -154,14 +161,6 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
                   minHeight: 200),
             ),
           ),
-          // const Padding(
-          //   padding: EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-          //   child: Row(
-          //     children: [
-          //       Text("下载链接数 : 3"),
-          //     ],
-          //   ),
-          // ),
           Expanded(
             flex: 1,
             child: Padding(
@@ -173,7 +172,7 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
                       child: TextField(
                     controller: _downloadPathController,
                     style: TextStyle(fontSize: 15.w),
-                    decoration:  InputDecoration(
+                    decoration: InputDecoration(
                         isCollapsed: true, contentPadding: EdgeInsets.all(7.w)),
                   )),
                 ],
@@ -198,6 +197,44 @@ class _CreateTaskDialogState extends State<CreateTaskDialog> {
         ],
       );
     }
+  }
+
+  void _formatDocument() async {
+    List<String> prefixes = [
+      "http://",
+      "https://",
+      "magnet:?xt=urn:btih:",
+      "ftp://",
+      "sftp://"
+    ];
+    var plainText = _controller.document.toPlainText();
+    _controller
+      ..skipRequestKeyboard = true
+      ..formatText(0, plainText.length, Attribute.ol)
+      ..formatText(0, plainText.length, Attribute.clone(Attribute.bold, null))
+      ..formatText(
+          0, plainText.length, Attribute.clone(Attribute.inlineCode, null));
+    for (var prefix in prefixes) {
+      var search = _controller.document.search(prefix);
+
+      if (search.isNotEmpty) {
+        var startIndexDelta = 0;
+        for (var startIndex in search) {
+          startIndex = startIndex + startIndexDelta;
+          _controller
+            ..skipRequestKeyboard = true
+            ..formatText(startIndex, prefix.length, Attribute.bold)
+            ..formatText(startIndex, prefix.length, Attribute.inlineCode);
+
+          if (startIndex > 1 &&
+              _controller.document.getPlainText(startIndex - 1, 1) != "\n") {
+            _controller.document.insert(startIndex, "\n");
+            startIndexDelta += 1;
+          }
+        }
+      }
+    }
+    _controller.moveCursorToEnd();
   }
 
   toggle() {
